@@ -1,0 +1,60 @@
+# 如何使用ClientToken保证API调用的幂等性
+> https://help.aliyun.com/zh/ecs/developer-reference/how-to-ensure-idempotence
+
+您在调用ECS API时，如果发生请求超时或服务器内部错误，客户端可能会尝试重发请求。您可以在请求中设置ClientToken参数来确保请求完成的次数不超过一次，以此避免多次重试带来重复操作的问题。
+什么是幂等性
+在数学计算或者计算机科学中，幂等性（idempotence）是指相同操作或资源在一次或多次请求中具有同样效果的作用。幂等性是在分布式系统设计中具有十分重要的地位。
+保证幂等性
+通常情况下，客户端只需要在500（InternalError）或503（ServiceUnavailable）错误，或者无法获取响应结果时重试。使用阿里云ECS API，您可以从客户端生成一个参数值不超过64的ASCII字符，并将值赋予ClientToken，保证重试请求的幂等性。
+ClientToken详解
+ClientToken参数的详细信息如下所示。
+ClientToken是一个由客户端生成的唯一的、大小写敏感、不超过64个ASCII字符的字符串。例如，ClientToken=123e4567-e89b-12d3-a456-426655440000。
+当您使用了一个已经使用过的ClientToken，同时请求中的其他参数有变化，ECS会返回IdempotentParameterMismatch的错误代码，导致请求失败。此时，建议您更换ClientToken的值然后重试。
+当您使用了一个已经使用过的ClientToken，其他请求参数无变化，那么重复提交该请求后，客户端将收到与首次提交相同的结果，对您的服务端状态没有影响。
+说明
+参数SignatureNonce、Timestamp和Signature在重试时是需要变化的。具体原因是ECS使用签名随机数SignatureNonce，确保每次请求都是唯一的，防止重放攻击。使用时间戳Timestamp，标记每次请求发起的时间。因此，再次请求必须提供不同的SignatureNonce和Timestamp参数值，同时也会导致Signature值的变化。
+添加了ClientToken参数后：
+返回结果是200 HTTPCode时，重试后客户端可以得到与上次相同的结果，但对您的服务端状态没有影响。
+返回结果是4xx HTTPCode时，如果错误信息没有try it later类似的信息，重试不会成功。您需要根据错误信息排查问题后再重试请求。
+幂等请求示例
+以RunInstance创建一台ECS实例为例，如果您使用同一个ClientToken值，其他请求参数相同时，则服务端会返回相同的请求结果，只会产生一个InstanceId。在遇到因实例规格库存不足等问题导致实例创建失败时，待库存充足后建议您更换ClientToken值后创建实例。
+https://ecs.aliyuncs.com/?Action=RunInstances
+&RegionId=cn-hangzhou
+&InstanceType=ecs.cm4.6xlarge
+&ImageId=win2008r2_64_ent_sp1_en-us_40G_alibase_20170915.vhd
+&SecurityGroupId=sg-securitygroupid
+&Amount=1
+.......
+&ClientToken=123e4567-e89b-12d3-a456-426655440000
+&<公共请求参数>
+如果您不使用ClientToken，在报错重试时，可能会创建多台ECS实例。
+API列表
+以下为部分包含了ClientToken参数的API，供您参考。具体哪些API支持ClientToken参数请以各API文档为准，此处不一一列举。
+RunInstances
+RenewInstance
+ModifyInstanceNetworkSpec
+ModifyInstanceChargeType
+ModifyInstanceSpec
+ModifyPrepayInstanceSpec
+CreateInstance
+CreateDisk
+ResizeDisk
+ModifyDiskChargeType
+ReplaceSystemDisk
+CreateSnapshot
+CreateImage
+CreateNetworkInterface
+CreateSecurityGroup
+ModifySecurityGroupEgressRule
+ModifySecurityGroupPolicy
+AuthorizeSecurityGroup
+RevokeSecurityGroup
+RevokeSecurityGroupEgress
+AuthorizeSecurityGroupEgress
+ModifySecurityGroupRule
+CreateDeploymentSet
+AssignPrivateIpAddresses
+CreateHpcCluster
+DeleteHpcCluster
+DescribeHpcClusters
+ModifyHpcClusterAttribute

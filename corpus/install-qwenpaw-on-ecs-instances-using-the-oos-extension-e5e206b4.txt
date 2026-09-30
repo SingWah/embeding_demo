@@ -1,0 +1,40 @@
+# 在 ECS 实例上通过 OOS 扩展程序一键安装 QwenPaw,无需手动配置环境与依赖;安装后通过公网访问 URL 登录 Web 控制台,配置模型即可开始对话。
+> https://help.aliyun.com/zh/ecs/user-guide/install-qwenpaw-on-ecs-instances-using-the-oos-extension
+
+在 ECS 实例上通过系统运维管理(OOS)的扩展程序功能,可一键安装 QwenPaw,无需手动配置环境与依赖;安装后通过公网访问 URL 登录 Web 控制台,配置模型即可开始对话。
+工具概览
+QwenPaw 是阿里云开源的支持多模型与多智能体的 AI 助手平台,提供 Web 控制台与丰富的扩展能力。核心能力包括:
+多智能体管理:支持创建与切换多个智能体,每个智能体可独立配置模型、技能与工具。
+多模型接入:内置 Aliyun Coding Plan、DashScope、ModelScope、Ollama、LM Studio、OpenRouter 等多种 Provider,支持灵活切换。
+扩展生态:内置技能(Skills)、工具(Tools)、MCP、ACP 等扩展能力,以及定时任务(Cron Jobs)、消息渠道(Channels)、会话管理等运维功能。
+扩展程序详情:QwenPaw 扩展程序。
+前提条件
+云助手 Agent:目标 ECS 实例已安装并运行云助手服务,OOS 通过云助手下发安装任务。阿里云官方镜像默认预装云助手,无需额外操作。
+公网访问:目标 ECS 实例已绑定公网 IP(EIP 或固定公网 IP),并保证公网带宽大于 0 Mbps,以便从本地浏览器访问 QwenPaw Web 控制台。
+安全组规则:实例所属安全组在入方向已放通 QwenPaw 默认服务端口(TCP 8088),授权对象建议为您的本地公网 IP 或可控的 IP 段,避免暴露至全网。
+操作步骤
+步骤一、安装 QwenPaw
+登录系统运维管理(OOS)控制台。
+在左侧导航栏,选择服务器管理 > 扩展程序。
+在公共扩展程序页签中,找到 QwenPaw 扩展程序卡片,单击安装扩展程序。
+在安装面板中,选择需要安装的实例,单击创建,等待安装完成。
+步骤二、获取访问信息
+登录云服务器 ECS 控制台。
+在左侧导航栏,选择实例与镜像 > 实例,然后单击目标实例 ID。
+在实例详情页签右侧的扩展程序区域,找到 QwenPaw,单击配置信息。
+在配置信息对话框中,复制并保存以下信息:
+公网访问 URL:形如 http://<实例公网IP>:8088,用于后续登录 Web 控制台。
+用户名:默认为 admin。
+密码:系统自动生成的初始密码,请妥善保存。
+步骤三、注册管理员账号
+在本地浏览器中,打开步骤二获取的公网访问 URL(如 http://<实例公网IP>:8088)。
+在 Create Account 页面,输入用户名(默认 admin)与配置信息中获取的密码,单击Register,完成管理员账号注册。
+首次访问 QwenPaw 时,需要将配置信息中的初始凭证通过 Create Account 页面注册为管理员账号。注册完成后,该账号即为后续登录与管理 QwenPaw 的唯一管理员账号,请妥善保管。
+步骤四、配置模型提供商
+登录 QwenPaw Web 控制台后,在左侧导航栏的设置区域,单击模型。
+在提供商列表中,选择需要启用的内置 Provider(如 Aliyun Coding Plan (China)、DashScope、ModelScope、OpenRouter、Ollama、LM Studio 等),单击对应卡片的设置。
+在设置面板中,填写 API Key 等鉴权信息并保存,然后单击模型拉取可用模型列表。
+步骤五、开始对话
+在左侧导航栏,单击聊天。
+在聊天页面右上角,单击Select model,选择步骤四配置好的模型。
+在底部输入框中输入消息,按回车发送,即可与 QwenPaw 智能体开始对话。

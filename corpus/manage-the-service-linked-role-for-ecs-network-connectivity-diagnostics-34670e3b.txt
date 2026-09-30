@@ -1,0 +1,64 @@
+# 网络连通性诊断服务关联角色
+> https://help.aliyun.com/zh/ecs/user-guide/manage-the-service-linked-role-for-ecs-network-connectivity-diagnostics
+
+本文介绍如何通过网络连通性诊断服务关联角色AliyunServiceRoleForECSNetworkInsights授予云服务器ECS权限。
+背景信息
+服务关联角色是与某个云服务关联的角色，拥有完成对应操作所必须的权限，例如网络连通性诊断服务关联角色AliyunServiceRoleForECSNetworkInsights拥有完成创建诊断线路、发起诊断任务操作所需的访问VPC资源的权限。更多服务关联角色的信息，请参见服务关联角色。
+AliyunServiceRoleForECSNetworkInsights权限策略
+角色名称：AliyunServiceRoleForECSNetworkInsights
+角色权限策略：AliyunServiceRolePolicyForECSNetworkInsights
+策略内容如下所示：
+"Version": "1",
+"Statement": [
+"Action": [
+"vpc:DescribeNetworkAcls",
+"vpc:DescribeNetworkAclAttributes",
+"vpc:DescribeNatGateways",
+"vpc:DescribeRouteEntryList",
+"vpc:DescribeRouteTableList",
+"vpc:DescribeRouteTables",
+"vpc:DescribeRouterInterfaceAttribute",
+"vpc:DescribeRouterInterfaces",
+"vpc:DescribeVRouters",
+"antiddos-public:DescribeInstance"
+"Effect": "Allow",
+"Resource": "*"
+"Action": [
+"nis:IsOpenService",
+"nis:CreateNetworkPath",
+"nis:CreateNetworkReachableAnalysis",
+"nis:GetNetworkReachableAnalysis",
+"nis:DeleteNetworkPath",
+"nis:DeleteNetworkReachableAnalysis"
+"Effect": "Allow",
+"Resource": "*"
+"Action": [
+"BssOpenApi:CreateInstance"
+"Effect": "Allow",
+"Resource": "*"
+"Action": [
+"bss:ModifyInstance"
+"Effect": "Allow",
+"Resource": "*"
+"Action": "ram:DeleteServiceLinkedRole",
+"Effect": "Allow",
+"Resource": "*",
+"Condition": {
+"StringEquals": {
+"ram:ServiceName": "network-insights.ecs.aliyuncs.com"
+创建AliyunServiceRoleForECSNetworkInsights
+在您创建诊断线路和发起诊断任务时，系统会检查当前账号是否存在AliyunServiceRoleForECSNetworkInsights，如果不存在则自动创建。
+AliyunServiceRoleForECSNetworkInsights包含权限策略AliyunServiceRolePolicyForECSNetworkInsights，服务关联角色包含的权限策略由对应的云服务定义和使用，您不能为服务关联角色添加、修改或删除权限。
+删除AliyunServiceRoleForECSNetworkInsights
+如果您不再需要使用AliyunServiceRoleForECSNetworkInsights时，可以手动删除。具体操作，请参见删除RAM角色。
+常见问题
+为什么我的RAM用户无法自动创建网络连通性诊断服务关联角色（AliyunServiceRoleForECSNetworkInsights）？
+您需要拥有指定的权限，才能自动创建或删除网络连通性诊断服务关联角色（AliyunServiceRoleForECSNetworkInsights）。因此，在RAM用户无法自动创建网络连通性诊断服务关联角色（AliyunServiceRoleForECSNetworkInsights）时，您需为其添加以下权限策略。
+"Statement": [
+"Action": "ram:CreateServiceLinkedRole",
+"Resource": "*",
+"Effect": "Allow",
+"Condition": {
+"StringEquals": {
+"ram:ServiceName": "network-insights.ecs.aliyuncs.com"
+"Version": "1"

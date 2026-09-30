@@ -1,0 +1,121 @@
+# 无公网IP的ECS实例通过内网调用API
+> https://help.aliyun.com/zh/ecs/developer-reference/call-api-operations-over-the-internal-network
+
+如果专有网络VPC类型的ECS实例没有设置公网IP，则无法调用API。本文介绍该类实例如何通过阿里云内网调用API。
+背景信息
+由于云服务器ECS提供的接入地址（Endpoint）为公网服务地址，当您的ECS实例没有分配公网带宽或者不存在公网IP地址时，无法使用阿里云CLI或者SDK等工具发起API请求。此时，您可以通过以下两种方式实现阿里云内网调用API。
+SDK：Java SDK核心库在4.5.3版本起，支持通过VPC内网调用API。
+CLI：使用CLI时，只需将Endpoint修改为对应地域的接入地址，即可实现内网调用API。
+使用说明如下：
+两种方式仅适用于专有网络VPC类型ECS实例所在的地域，且仅能使用对应地域的接入地址（Endpoint）操作同地域资源，不支持跨地域操作。
+建议您使用已部署了阿里云CLI或者SDK的自定义镜像创建ECS实例，避免实例在无公网访问的条件下无法加载相关依赖。
+支持的内网调用API的ECS接入地址（Endpoint）如下表所示，请确保您使用的Endpoint在列举范围内。
+阿里云地域
+地域ID
+接入地址（Endpoint）
+华东 1（杭州）
+cn-hangzhou
+ecs-vpc.cn-hangzhou.aliyuncs.com
+华东 2（上海）
+cn-shanghai
+ecs-vpc.cn-shanghai.aliyuncs.com
+华东5（南京-本地地域）
+cn-nanjing
+ecs-vpc.cn-nanjing.aliyuncs.com
+华东6（福州-本地地域）
+cn-fuzhou
+ecs-vpc.cn-fuzhou.aliyuncs.com
+华北 1（青岛）
+cn-qingdao
+ecs-vpc.cn-qingdao.aliyuncs.com
+华北 2（北京）
+cn-beijing
+ecs-vpc.cn-beijing.aliyuncs.com
+华北 3（张家口）
+cn-zhangjiakou
+ecs-vpc.cn-zhangjiakou.aliyuncs.com
+华北 5（呼和浩特）
+cn-huhehaote
+ecs-vpc.cn-huhehaote.aliyuncs.com
+华北 6（乌兰察布）
+cn-wulanchabu
+ecs-vpc.cn-wulanchabu.aliyuncs.com
+华南 1（深圳）
+cn-shenzhen
+ecs-vpc.cn-shenzhen.aliyuncs.com
+华南 2（河源）
+cn-heyuan
+ecs-vpc.cn-heyuan.aliyuncs.com
+华南 3（广州）
+cn-guangzhou
+ecs-vpc.cn-guangzhou.aliyuncs.com
+西南 1（成都）
+cn-chengdu
+ecs-vpc.cn-chengdu.aliyuncs.com
+中国（香港）
+cn-hongkong
+ecs-vpc.cn-hongkong.aliyuncs.com
+新加坡
+ap-southeast-1
+ecs-vpc.ap-southeast-1.aliyuncs.com
+马来西亚（吉隆坡）
+ap-southeast-3
+ecs-vpc.ap-southeast-3.aliyuncs.com
+印度尼西亚（雅加达）
+ap-southeast-5
+ecs-vpc.ap-southeast-5.aliyuncs.com
+菲律宾（马尼拉）
+ap-southeast-6
+ecs-vpc.ap-southeast-6.aliyuncs.com
+泰国（曼谷）
+ap-southeast-7
+ecs-vpc.ap-southeast-7.aliyuncs.com
+日本（东京）
+ap-northeast-1
+ecs-vpc.ap-northeast-1.aliyuncs.com
+韩国（首尔）
+ap-northeast-2
+ecs-vpc.ap-northeast-2.aliyuncs.com
+德国（法兰克福）
+eu-central-1
+ecs-vpc.eu-central-1.aliyuncs.com
+英国（伦敦）
+eu-west-1
+ecs-vpc.eu-west-1.aliyuncs.com
+美国（硅谷）
+us-west-1
+ecs-vpc.us-west-1.aliyuncs.com
+美国（弗吉尼亚）
+us-east-1
+ecs-vpc.us-east-1.aliyuncs.com
+阿联酋（迪拜）
+me-east-1
+ecs-vpc.me-east-1.aliyuncs.com
+方式一（推荐）：SDK内网调用API
+使用SDK过程中，只需要简单配置，即可实现内网调用API。Java代码示例如下所示：
+import com.aliyun.ecs20140526.Client;
+import com.aliyun.ecs20140526.models.DescribeRegionsRequest;
+import com.aliyun.ecs20140526.models.DescribeRegionsResponse;
+import com.aliyun.teaopenapi.models.Config;
+import com.aliyun.teautil.models.RuntimeOptions;
+public class Test {
+public static void main(String[] args) throws Exception {
+Config config = new Config();
+// 必填，请确保代码运行环境设置了环境变量 ALIBABA_CLOUD_ACCESS_KEY_ID。
+config.setAccessKeyId(System.getenv("ALIBABA_CLOUD_ACCESS_KEY_ID"));
+// 必填，请确保代码运行环境设置了环境变量 ALIBABA_CLOUD_ACCESS_KEY_SECRET。
+config.setAccessKeySecret(System.getenv("ALIBABA_CLOUD_ACCESS_KEY_SECRET"));
+// Endpoint 请参考 https://api.aliyun.com/product/Ecs
+config.setEndpoint("<ENDPOINT>");
+// 初始化ECS客户端
+Client ecsClient = new Client(config);
+// 创建查询地域信息的请求对象
+DescribeRegionsRequest describeRegionsRequest = new DescribeRegionsRequest();
+// 创建运行时选项对象
+RuntimeOptions runtime = new RuntimeOptions();
+// 发送请求并获取地域信息响应
+DescribeRegionsResponse response = ecsClient.describeRegionsWithOptions(describeRegionsRequest, runtime);
+System.out.println(response.body.toMap());
+方式二：CLI内网调用API
+以接口DescribeRegions为例，调用命令示例如下：
+aliyun ecs DescribeRegions --endpoint ecs-vpc.cn-hangzhou.aliyuncs.com

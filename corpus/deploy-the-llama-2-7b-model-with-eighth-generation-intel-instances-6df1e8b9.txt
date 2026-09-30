@@ -1,0 +1,175 @@
+# 使用第八代Intel实例部署Llama
+> https://help.aliyun.com/zh/ecs/user-guide/deploy-the-llama-2-7b-model-with-eighth-generation-intel-instances
+
+本文以搭建大语言模型服务，介绍使用阿里云第八代Intel实例，基于xFasterTransformer单机部署Llama-2-7B语言模型。
+背景信息
+Llama-2-7B
+Llama-2-7B是由Meta研发的70亿参数规模的开源大模型。最新版本的Llama 2现在对个人、创作者、研究人员和企业开放，以便他们可以负责任地进行实验、创新并扩展他们的想法。
+阿里云第八代Intel CPU实例
+阿里云八代实例（g8i/c8i/r8i/hfc8i/hfg8i/hfr8i）采用Intel® Xeon® Emerald Rapids或者Intel® Xeon® Sapphire Rapids，该实例支持使用新的AMX（Advanced Matrix Extensions）指令来加速AI任务。相比于上一代实例，八代实例在Intel® AMX的加持下，推理和训练性能大幅提升。
+xFasterTransformer
+xFasterTransformer是由Intel官方开源的推理框架，为大语言模型（LLM）在CPU X86平台上的部署提供了一种深度优化的解决方案，支持多CPU节点之间的分布式部署方案，使得超大模型在CPU上的部署成为可能。此外，xFasterTransformer提供了C++和Python两种API接口，涵盖了从上层到底层的接口调用，易于用户使用并将xFasterTransformer集成到自有业务框架中。xFasterTransformer目前支持的模型如下：
+Models
+Framework
+Distribution
+Pytorch
+C++
+ChatGLM
+ChatGLM2
+ChatGLM3
+Llama
+Llama2
+Baichuan
+QWen
+SecLLM(YaRN-Llama)
+Opt
+xFasterTransformer支持多种低精度数据类型来加速模型部署。除单一精度以外，还支持混合精度，以更充分地利用CPU的计算资源和带宽资源，从而提高大语言模型的推理速度。以下是xFasterTransformer支持的单一精度和混合精度类型：
+FP16
+BF16
+INT8
+W8A8
+INT4
+NF4
+BF16_FP16
+BF16_INT8
+BF16_W8A8
+BF16_INT4
+BF16_NF4
+W8A8_INT8
+W8A8_int4
+W8A8_NF4
+重要
+阿里云不对第三方模型“Llama-2-7B”的合法性、安全性、准确性进行任何保证，阿里云不对由此引发的任何损害承担责任。
+Llama-2-7B的代码受Meta许可证的约束，为了下载模型权重和分词器，请访问Meta官网申请许可证。您应自觉遵守第三方模型的用户协议、使用规范和相关法律法规，并就使用第三方模型的合法性、合规性自行承担相关责任。
+步骤一：创建ECS实例
+前往实例创建页。
+按照界面提示完成参数配置，创建一台ECS实例。
+需要注意的参数如下，其他参数的配置，请参见自定义购买实例。
+实例：Llama-2-7B运行大概需要16 GiB内存以上，为了保证模型运行的稳定，实例规格至少需要选择ecs.c8i.4xlarge（32 GiB内存）。
+镜像：Alibaba Cloud Linux 3.2104 LTS 64位。
+公网IP：选中分配公网IPv4地址，带宽计费模式选择按使用流量，带宽峰值设置为100 Mbps。以加快模型下载速度。
+系统盘：Llama-2-7B模型数据下载、转换和运行过程中需要占用60 GiB的存储空间，为了保证模型顺利运行，建议系统盘设置为100 GiB。
+添加安全组规则。
+在ECS实例安全组的入方向添加安全组规则并放行22端口和8080端口（22端口用于访问SSH服务，8080端口用于请求Llama2服务）。具体操作，请参见添加安全组规则。
+步骤二：安装模型所需容器环境
+远程连接该ECS实例。
+具体操作，请参见使用Workbench登录Linux实例。
+安装并启动Docker。
+具体操作，请参见安装并使用Docker和Docker Compose。
+获取并运行Intel xFasterTransformer容器。
+sudo docker pull registry.openanolis.cn/openanolis/xfastertransformer:1.7.3-23
+sudo docker run -it --name xFT -h xFT --privileged --shm-size=16g --network host -v /mnt:/mnt -w /mnt/xFasterTransformer registry.openanolis.cn/openanolis/xfastertransformer:1.7.3-23
+当出现类似如下信息时，表示已获取并成功运行xFasterTransformer容器。
+[ecs-user@iZuf6epjbtjc ~]$ sudo docker pull registry.openanolis.cn/openanolis/xfastertransformer:1.7.3-23
+1.7.3-23: Pulling from openanolis/xfastertransformer
+a8ede12a3939: Pull complete
+9999739bce1f: Pull complete
+cb62f821a6d8: Pull complete
+ac8ed0e35b17: Pull complete
+5183b0b1eb1d: Pull complete
+375bd19cec22: Pull complete
+b0fec068aed0: Pull complete
+ebf0c1febfdb: Pull complete
+317c71eed5ce: Pull complete
+36095701a3ad: Pull complete
+f1b77b925530: Pull complete
+4f4fb700ef54: Pull complete
+4d755c4a190d: Pull complete
+Digest: sha256:e88c4b325a824046ff5d57402aaeb896bec2d129925e960ac93
+Status: Downloaded newer image for registry.openanolis.cn/openanolis/xfastertransformer:1.7.3-23
+registry.openanolis.cn/openanolis/xfastertransformer:1.7.3-23
+[ecs-user@iZuf6epjbtj ~]$ sudo docker run -it --name xFT -h xFT --privileged --shm-size=16g --network host -v /mnt:/mnt -w /mnt/xFasterTransformer registry.openanolis.cn/openanolis/xfastertransformer:1.7.3-23
+:: initializing oneAPI environment ...
+bash: BASH_VERSION = 5.2.15(1)-release
+args: Using "$@" for setvars.sh arguments:
+:: ccl -- latest
+:: compiler -- latest
+:: mpi -- latest
+:: tbb -- latest
+:: oneAPI environment initialized ::
+[root@xFT xFasterTransformer]#
+重要
+后续操作都需要在容器中运行，如果退出了容器，可以通过以下命令启动并再次进入容器的Shell环境。
+sudo docker start xFT
+sudo docker exec -it xFT bash
+（可选）更新xFasterTransformer脚本代码。
+xFasterTransformer镜像中已包含对应版本的脚本代码，可以更新升级到最新的测试脚本。
+yum update -y
+yum install -y git
+cd /root/xFasterTransformer
+git pull
+步骤三：准备模型数据
+在容器中安装依赖软件。
+yum update
+yum install -y wget git git-lfs vim tmux
+启用Git LFS。
+下载预训练模型需要Git LFS的支持。
+git lfs install
+创建并进入模型数据目录。
+mkdir /mnt/data
+cd /mnt/data
+创建一个tmux session。
+tmux
+重要
+下载预训练模型耗时较长，且成功率受网络情况影响较大，建议在tmux session中下载，以避免ECS断开连接导致下载模型中断。
+下载Llama-2-7B预训练模型。
+pip install einops transformers_stream_generator tiktoken
+git clone https://www.modelscope.cn/modelscope/Llama2-Chinese-7b-Chat-ms.git llama-2-7b
+转换模型数据。
+由于下载的模型数据是HuggingFace格式，需要转换成xFasterTransformer格式。生成的模型文件夹为/mnt/data/llama-2-7b-xft。
+python -c 'import xfastertransformer as xft; xft.LlamaConvert().convert("/mnt/data/llama-2-7b")'
+说明
+不同的模型数据使用的Convert类不同，xFasterTransformer支持以下模型转换类：
+LlamaConvert
+ChatGLMConvert
+ChatGLM2Convert
+ChatGLM3Convert
+OPTConvert
+BaichuanConvert
+QwenConvert
+步骤四：运行Llama 2服务
+安装相关依赖。
+pip3 install -i https://mirrors.aliyun.com/pypi/simple/ mlserver
+将/root/xFasterTransformer/serving/mlserver/single-rank/modelsettings.json中模型文件路径修改为正确路径。
+sed -i 's/"model_path": "[^"]*"/"model_path": "\/mnt\/data\/llama-2-7b-xft"/' /root/xFasterTransformer/serving/mlserver/single-rank/model-settings.json
+sed -i 's/"token_path": "[^"]*"/"token_path": "\/mnt\/data\/llama-2-7b"/' /root/xFasterTransformer/serving/mlserver/single-rank/model-settings.json
+说明
+模型其他配置可以在model-settings.json中的parameters:extra中进行配置，包括数据格式，生成长度output_length等。
+MLServer框架支持批处理，将多个请求合并为一个请求进行推理，开启批处理请调整max_batch_size和max_batch_time参数。
+max_batch_size：最多多少个请求可以被合并为一个，当设置N大于1时，最多创建batch size为N的请求。当设置为0或1时禁用该功能。
+max_batch_time：在达到最大批处理大小前，等待新请求的最长时间，单位为秒。当设置为0时，禁用该功能。
+配置服务IP地址，以启用公网访问。
+默认IP地址为127.0.0.1，需要修改为0.0.0.0才能通过公网IP访问服务。配置文件为/root/xFasterTransformer/serving/mlserver/singlerank/settings.json。
+sed -i 's/"host": "127\.0\.0\.1"/"host": "0.0.0.0"/g' /root/xFasterTransformer/serving/mlserver/single-rank/settings.json
+说明
+默认服务端口为8080，您也可以修改settings.json中的http_port属性为自定义端口号。
+运行Llama 2服务。
+cd /root/xFasterTransformer/serving/mlserver/single-rank/
+OMP_NUM_THREADS=$(($(lscpu | grep "^CPU(s):" | awk '{print $NF}') / 2)) LD_PRELOAD=libiomp5.so numactl -C $(seq -s, 0 2 $(($(lscpu | grep "^CPU(s):" | awk '{print $NF}') - 2))) -m 0 mlserver start .
+[root@xFT data]# cd /root/xFasterTransformer/serving/mlserver/single-rank/
+[root@xFT single-rank]# OMP_NUM_THREADS=$(($(lscpu | grep "^CPU(s):" | awk '{print $NF}') / 2)) LD_PRELOAD=libiomp5.so numactl -C $(seq -s, 0 2 $(($(lscpu | grep "^CPU(s):" | awk '{print $NF}') - 2))) -m 0 mlserver start .
+2024-07-10 09:31:22,153 [mlserver] WARNING - Model name 'xft-model' is different than model's folder name 'single-rank'.
+2024-07-10 09:31:22,189 [mlserver.parallel] DEBUG - Starting response processing loop...
+2024-07-10 09:31:22,190 [mlserver.rest] INFO - HTTP server running on http://0.0.0.0:8080
+INFO: Started server process [661]
+INFO: Waiting for application startup.
+2024-07-10 09:31:22,202 [mlserver.metrics] INFO - Metrics server running on http://0.0.0.0:8082
+2024-07-10 09:31:22,202 [mlserver.metrics] INFO - Prometheus scraping endpoint can be accessed on http://0.0.0.0:8082/metrics
+INFO: Started server process [661]
+INFO: Waiting for application startup.
+INFO: Application startup complete.
+2024-07-10 09:31:23,504 [mlserver.grpc] INFO - gRPC server running on http://0.0.0.0:8081
+INFO: Application startup complete.
+INFO: Uvicorn running on http://0.0.0.0:8080 (Press CTRL+C to quit)
+INFO: Uvicorn running on http://0.0.0.0:8082 (Press CTRL+C to quit)
+[INFO] SINGLE_INSTANCE MODE.
+2024-07-10 09:31:41,916 [mlserver][xft-model] INFO - Loaded model 'xft-model' successfully.
+2024-07-10 09:31:41,917 [mlserver][xft-model] INFO - Loaded model 'xft-model' successfully.
+使用curl命令发送服务请求。
+Llama-2-7B模型非AI聊天机器人版本，输出结果为续写模式。AI聊天模式请下载Llama-2-chat-7B版本模型，并将输入调整为chat格式："[INST] {输入Prompt} [/INST]"。
+在一台新实例或新的终端上，通过以下命令发送POST请求。请修改其中的ECS公网IP地址。prompt可以修改post_data中的data属性。
+post_data='{"inputs": [{"name": "questions", "shape": [1, 1], "datatype": "BYTES", "parameters": {"content_type": "str"}, "data": ["你好，今天过得怎么样？"]}]}'
+url="http://<ECS公网IP地址>:8080/v2/models/xft-model/infer"
+curl -X POST -H "Content-Type: application/json" -d "$post_data" "$url"
+返回结果：
+{"model_name":"xft-model","id":"03960dfc-006a-4b94-af06-dc4c339f748","parameters":{},"outputs":[{"name":"output-0","shape":[1,1],"datatype":"BYTES","parameters":{"content_type":"str"},"data":["张三：你好，我是张三。今天过得怎么样？\n张彤：你好，谢谢你。你今天有什么新的计划吗？\n张三：我在准备一个新的项目，但是我需要一些帮助。你能帮我吗？\n张彤：当然可以，我会尽力帮助你。但是，你需要告诉我你的计划，以便我能更好地了解你的需求。\n张三：我的计划是开一家新的餐厅，想在这里提供一些新的产品和服务。我需要一些资金来支持这个项目。\n张彤：这听起来很有想法。你有什么资金计划吗？\n张三：我计划向一些投资者寻求资金，并且我想在社交媒体上宣传我的项目。\n张彤：这听起来很有可能，你需要更多的注意？\n张三：我可以提供一些有价值的服务，例如免费的餐厅体验和一些特别的活动。\n张彤：这听起来很有可能，我会尽力帮助你，并且我会告诉你的朋友们来支持你的项目。请告诉我讨论的主题内容。\n"]}]}

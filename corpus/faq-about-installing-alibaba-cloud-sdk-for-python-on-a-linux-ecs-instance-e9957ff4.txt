@@ -1,0 +1,54 @@
+# 在Linux系统的ECS实例中安装阿里云 Python SDK失败有哪些解决方案
+> https://help.aliyun.com/zh/ecs/developer-reference/faq-about-installing-alibaba-cloud-sdk-for-python-on-a-linux-ecs-instance
+
+本文介绍在Linux系统的ECS实例中安装阿里云Python SDK时所遇到的问题及其解决方案。
+问题列表
+问题1： 使用Python SDK所需的最低Python版本怎么查？
+问题2： 安装SDK时提示“Command "python setup.py egg_info" failed with error code 1 in XX”。
+问题3：ModuleNotFoundError: No module named 'XX'。
+问题4：如何安装Python3？
+问题5：如何将Python2升级到Python3？
+常见问题及解决方案
+问题1： 使用Python SDK所需的最低Python版本怎么查？
+阿里云Python SDK所需的Python版本是依据Python语言管理机构发布的各个版本终止时间表来确定的，您可以登录OpenAPI 门户
+查看Python的最低版本要求。在阿里云 SDK 中心的云服务器 ECS 页面，选择 SDK 代系为 V2.0（推荐），语言选择 Python，进入快速入门标签页，在环境要求部分可查看最低版本要求为 Python >= 3.7。
+问题2： 安装SDK时提示“Command "python setup.py egg_info" failed with error code 1 in XX”。
+该问题通常是由Python版本或pip版本过低，或缺少必要的依赖项引起的。以下是一些排查和解决该问题的方法：
+检查Python版本。
+请确保所使用的Python版本符合阿里云Python SDK的要求。您可以通过执行命令python -V或python3 -V来检查ECS中已安装的Python版本。如发现Python版本不符合要求，请安装最新版本Python，请参见问题4：如何安装Python3。
+若Python版本符合要求，请更新pip版本。
+使用最新版的pip安装软件包可以有效避免一些已知的问题。可通过运行pip install --upgrade pip来更新pip，更新之后再尝试安装SDK。
+问题3：安装SDK时提示“ModuleNotFoundError: No module named 'XX'”。
+此类问题是由于缺少某些必要的依赖库导致的，您可以通过pip install XX解决该问题。
+问题4：如何安装Python3？
+您可以按照以下步骤在CentOS中安装Python3。如需了解更多Python3的安装方式，请参见在Linux系统中安装Python。
+访问Python官网以获取最新源码包的下载链接，并使用以下命令进行下载与解压。例如下载Python 3.11.10。
+wget https://www.python.org/ftp/python/3.11.10/Python-3.11.10.tgz
+tar -xzvf Python-3.11.10.tgz
+在编译Python之前，您需要安装一些必要的依赖库和工具。
+sudo yum -y install gcc
+sudo yum -y install zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel readline-devel tk-devel gdbm-devel libpcap-devel xz-devel libffi-devel
+进入源码目录进行配置和编译。
+cd Python-3.11.10
+./configure --prefix=/usr/python
+make && sudo make altinstall
+执行which python3 pip3查找当前系统是否存在python3和pip3软链接，如果存在，需要删除这些软链接。
+[root@xxx]# which python3 pip3
+/usr/bin/python3
+/usr/bin/pip3
+[root@xxx]# rm -rf /usr/bin/python3 /usr/bin/pip3
+sudo rm -rf /usr/bin/python3 /usr/bin/pip3
+创建新的软链接，将python3和pip3指向新的可执行文件。
+说明
+软链接用于创建指向文件或目录的快捷方式，方便用户快速访问。比如使用python3实际上指向的是python3.11解释器。
+sudo ln -s /usr/python/bin/python3.11 /usr/bin/python3
+sudo ln -s /usr/python/bin/pip3.11 /usr/bin/pip3
+查看已安装的Python版本信息。
+python3 -V
+pip3 -V
+[root@iZxxx ~]# python3 -V
+Python 3.11.10
+[root@iZxxx ~]# pip3 -V
+pip 24.0 from /usr/python/lib/python3.11/site-packages/pip (python 3.11)
+问题5：如何将Python2升级到Python3？
+您可以直接在ECS上安装Python 3.XX.XX版本。在成功安装后，您将能够使用与Python3相关的命令。有关如何安装Python3的详细信息，请参见问题4：如何安装Python3。

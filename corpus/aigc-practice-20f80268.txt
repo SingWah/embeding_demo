@@ -1,0 +1,28 @@
+# AIGC实践
+> https://help.aliyun.com/zh/ecs/user-guide/aigc-practice/
+
+在GPU实例上部署Qwen3.5-397B-A17B-FP8
+在GPU实例上部署Qwen3-235B-A22B
+在GPU实例上部署DeepSeek-R1蒸馏模型
+基于GPU实例单机部署满血版DeepSeek模型
+基于GPU实例双机分布式部署满血版Deepseek模型
+在ECS上部署Open WebUI体验阿里云百炼满血版 Deepseek-R1
+在GPU实例上部署千问QwQ-32B推理模型
+在GPU实例上基于Alpaca大模型搭建个人版“对话大模型”
+在GPU实例上基于ChatGLM-6B语言模型搭建AI对话机器人
+基于Deepytorch加速器快速实现AIGC绘画
+使用Megatron-Deepspeed训练GPT-2并生成文本
+基于Deepytorch加速器快速实现Stable Diffusion生成特定物体图片
+基于Deepytorch加速器快速实现LLaMA-7B指令微调
+基于DeepGPU加速器快速实现Qwen1.5-7B指令微调
+使用AMD CPU实例部署ChatGLM-6B
+使用AMD CPU实例部署千问Qwen-7B-Chat
+使用AMD CPU实例部署千问Qwen-VL-Chat
+使用AMD CPU实例部署千问Qwen-Audio-Chat
+使用AMD CPU实例部署Stable Diffusion
+使用基于英特尔CPU的c8i实例部署ChatGLM2-6B
+使用基于Intel CPU的g8i实例加速Stable Diffusion推理
+使用第八代Intel实例单机部署Qwen-72B-Chat
+使用第八代Intel实例部署Qwen-7B-Chat模型
+使用Intel CPU实例部署Qwen-1.8B-Chat推荐系统并进行Query改写演示
+使用第八代Intel实例部署Llama-2-7B模型

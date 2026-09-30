@@ -1,0 +1,53 @@
+# 使用Hermes Agent与Claude Code构建AI开发团队
+> https://help.aliyun.com/zh/ecs/user-guide/use-hermes-agent-and-claude-code-to-build-an-ai-development-team
+
+通过阿里云云开发机DevBox，一键部署Hermes Agent与Claude Code的协同开发环境，构建AI驱动的开发团队。
+技术方案解析
+Hermes Agent：智能主控协调者
+Hermes Agent是具备自我进化能力的AI智能体，内置完整的学习闭环。核心能力包括：
+跨会话持久化记忆：记住代码风格、项目偏好和沟通习惯。
+经验自动沉淀：任务完成后自动提炼经验，打包为可复用的技能卡。遇到类似问题时直接调用，降低资源消耗。
+主控协调：负责任务拆解、流程调度和交互确认。
+Claude Code：资深编码专家
+Claude Code是Anthropic开发的代码领域专家模型，具备代码生成、理解和调试能力。本方案中，Claude Code作为编码专家，专注处理Hermes Agent下发的编程任务，输出高质量代码。
+协同工作模式
+两者协同时，形成类似"技术主管+资深工程师"的团队模式。
+任务接收与方案设计
+向Hermes Agent下达开发任务。Hermes进行需求分析，协同Claude Code构思技术方案。两者结合历史经验和当前需求，设计最优开发路径。
+方案确认与迭代
+Hermes将方案呈现给用户。根据反馈调整方向，确保开发目标符合预期。
+编码执行与成果交付
+方案确认后，Hermes将编码任务分配给Claude Code。Claude Code生成代码、编写测试用例并调试。Hermes整合成果后反馈。
+经验沉淀与自我进化
+任务完成后，Hermes记录关键节点和解决方案，形成新的技能卡。每次任务后，AI团队的能力都会增强。
+这种协同模式将AI从一次性工具转变为可持续积累的数字资产。随着使用增长，AI团队持续学习项目风格和开发习惯，效率不断提升。
+使用云开发机DevBox快速启动
+阿里云提供一键部署方案。通过云开发机DevBox，快速启动一台预置好所有依赖的ECS服务器，并通过IDE连接开发。
+重要
+云开发机DevBox仅支持新建ECS实例，不支持在已有ECS实例上部署。
+步骤一：创建云开发机
+登录ECS控制台-实例。
+在左侧导航栏，进入应用管理页签。
+单击通过模板创建，在应用模板市场中找到云开发机DevBox并单击部署。
+在开发环境选项中，选择AI编码助手下的Hermes + Claude Code。
+步骤二：配置API Key
+配置完成后，系统自动启动一台预置好Hermes Agent与Claude Code的ECS服务器，并在控制台返回IDE连接URL。目前支持VSCode和Qoder两种IDE，请提前下载并安装。单击该URL，通过IDE远程连接ECS服务器。
+连接成功后，单击顶部菜单栏的查看（View），在下拉菜单中选择终端（Terminal）。在终端中输入以下命令，完成Claude Code和Hermes的配置。
+创建Claude Code配置文件。
+sudo mkdir /etc/claude-code
+sudo vim /etc/claude-code/managed-settings.json
+按i键进入编辑模式，输入以下内容。将【YOUR_API_KEY】替换为实际的API Key。
+# 如果使用Coding Plan类型的API Key，需将ANTHROPIC_BASE_URL替换为https://coding.dashscope.aliyuncs.com/apps/anthropic。
+# 如果使用Token Plan类型的API Key，需将ANTHROPIC_BASE_URL替换为https://token-plan.cn-beijing.maas.aliyuncs.com/apps/anthropic。
+"env": {
+"ANTHROPIC_AUTH_TOKEN": "【YOUR_API_KEY】",
+"ANTHROPIC_BASE_URL": "https://dashscope.aliyuncs.com/apps/anthropic",
+"ANTHROPIC_MODEL": "qwen3.6-plus"
+按Esc键退出编辑模式，输入:wq保存并退出。
+配置Hermes的API Key。
+echo 'DASHSCOPE_API_KEY=【YOUR_API_KEY】' >> ~/.hermes/.env
+步骤三：启动AI开发团队
+在终端输入hermes命令启动Hermes Agent，并输入以下提示词：
+请你协同Claude Code来帮助我完成代码开发任务，你作为主协调者，Claude Code负责编码。
+我会给你下发开发任务，你或者Claude Code给出设计方案后必须由我确定后再开始实际开发。
+（Claude Code已经安装并配置，使用的是API代理的阿里云灵积认证）

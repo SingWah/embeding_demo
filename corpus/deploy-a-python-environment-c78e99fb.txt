@@ -1,0 +1,158 @@
+# ECS中安装python
+> https://help.aliyun.com/zh/ecs/user-guide/deploy-a-python-environment
+
+Python 是一种解释型、交互式、面向对象的编程语言，因其简洁易用性，在人工智能、网站开发及科学计算等领域得到广泛应用，成为现代技术开发不可或缺的工具。本文将为您介绍如何在云服务器ECS中部署Python环境。
+使用包管理器安装Python
+使用包管理器可以高效且便捷地安装Python，但所提供的版本可能较为陈旧，从而无法安装最新版本的Python。
+Alibaba Cloud linux/CentOS
+更新系统软件包。
+sudo yum update -y
+列出所有可用但尚未安装的Python软件包。
+sudo yum list available | grep '^python3[0-9]\+\.\(x86_64\|aarch64\)'
+以下示例中，包管理器中可安装的版本包括 Python 3.8 和 Python 3.11：
+[root@i-xxx ~]# dnf list available | grep '^python3\([0-9]\)\?\(\.[0-9]\+\)\?\.x86_64*'
+python3.11.x86_64 3.11.10-1.0.1.al8 alinux3-updates
+python38.x86_64 3.8.17-2.0.1.module+al8.6.0+10712+26c4c595 alinux3-module
+从可用的Python软件包中，选择符合您需求的版本进行安装，例如安装Python 3.8。若无符合要求的版本，请手动安装Python。
+X86架构
+sudo yum install python38.x86_64 -y
+ARM架构
+sudo yum install python38.aarch64 -y
+安装成功后，您可以输入命令python3.8 -V验证安装是否成功。
+[root@iZ2xxxqkZ ~]# python3.8 -V
+Python 3.8.17
+Ubuntu
+更新系统软件包。
+sudo apt update
+列出所有可用的Python软件包。
+apt-cache search python | grep '^python3\.[0-9]\+ '
+以下示例中，包管理器中可安装的版本包括 Python 3.8 和 Python 3.9：
+root@ixxxZ:~# apt-cache search python | grep '^python3\.[0-9]\+ '
+python3.8 - Interactive high-level object-oriented language (version 3.8)
+python3.9 - Interactive high-level object-oriented language (version 3.9)
+从可用列表中选择一个版本安装，例如安装Python 3.8。若无符合要求的版本，请手动安装Python。
+sudo apt install -y python3.8
+安装成功后，您可以输入命令python3.8 -V验证安装是否成功。
+root@ixxx:~# python3.8 -V
+Python 3.8.10
+手动安装Python
+适用于需要安装特定版本或进行自定义配置的场景。
+Alibaba Cloud linux/CentOS
+访问Python官网，鼠标悬浮在Downloads上，单击选择Source code。
+选择所需安装的Python版本，复制相应的下载链接，并使用以下命令进行下载及解压。本示例以安装Python 3.8.10为例。
+# https://www.python.org/ftp/python/3.8.10/Python-3.8.10.tgz 可根据实际情况替换
+wget https://www.python.org/ftp/python/3.8.10/Python-3.8.10.tgz
+tar xzf Python-3.8.10.tgz
+cd Python-3.8.10
+安装构建所需依赖。
+sudo yum groupinstall -y "Development Tools"
+sudo yum install -y python3-devel
+编译并安装。
+./configure --enable-optimizations
+make -j $(nproc)
+sudo make altinstall
+查看安装结果。
+python3.8 --version
+[root@izxxx Z Python-3.8.10]# python3.8 --version
+Python 3.8.10
+Ubuntu
+访问Python官网，鼠标悬浮在Downloads上，单击选择Source code。
+选择所需安装的Python版本，复制相应的下载链接，并使用以下命令进行下载及解压。本示例以安装Python 3.8.10为例。
+wget https://www.python.org/ftp/python/3.8.10/Python-3.8.10.tgz
+tar -xzf Python-3.8.10.tgz
+安装构建所需的依赖。
+sudo apt update
+sudo apt install -y build-essential checkinstall libreadline-dev libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libbz2-dev libffi-dev zlib1g-dev
+编译并安装。
+cd Python-3.8.10
+./configure --enable-optimizations
+make -j $(nproc)
+sudo make altinstall
+查看安装结果。
+root@ixxxZ:~/Python-3.8.10# python3.8 -V
+Python 3.8.10
+Windows
+访问Python官网，鼠标悬浮在Downloads上，单击选择Windows。
+选择所需安装的Python版本，本示例选择Python 3.8.10，单击Download Windows installer (64-bit)下载安装文件。
+选择下载好的安装文件（python-3.8.10-amd64.exe），双击开始安装。
+勾选 Install launcher for all users (recommended) 和 Add Python 3.8 to PATH，然后单击 Customize installation。
+在 Optional Features 页面，保持所有可选功能（Documentation、pip、tcl/tk and IDLE、Python test suite、py launcher）的勾选状态，单击 Next。
+在 Advanced Options 页面，勾选 Add Python to environment variables，将安装路径设置为 C:\Python38，然后单击 Install。
+安装完成后，打开 CMD 终端，执行以下命令验证 Python 是否安装成功：
+C:\Users\Administrator>python
+Python 3.8.10 (tags/v3.8.10:3d8993a, May 3 2021, 11:48:03) [MSC v.1928 64 bit (AMD64)] on win32
+Type "help", "copyright", "credits" or "license" for more information.
+多版本管理工具安装Python
+适用于在同一台机器上管理多个Python版本的场景，或满足便捷切换不同版本以进行测试和开发的需求。本文以使用pyenv工具安装Python为例。
+安装pyenv
+Alibaba Cloud linux/CentOS
+安装pyenv所需的编译工具。
+sudo yum groupinstall -y "Development Tools"
+sudo yum install -y openssl-devel bzip2 bzip2-devel readline-devel sqlite sqlite-devel libffi-devel xz-devel
+安装pyenv。
+git clone https://gitee.com/mirrors/pyenv.git ~/.pyenv
+配置环境变量。
+说明
+以下命令仅对当前会话有效，当会话退出之后所设置的环境变量将会丢失。如需长期保留环境变量，可将export命令配置到操作系统的启动配置文件中。
+export PATH="$HOME/.pyenv/bin:$PATH"
+eval "$(pyenv init --path)"
+eval "$(pyenv init -)"
+使环境变量更改生效。
+source ~/.bashrc
+验证安装成功。
+pyenv --version
+Ubuntu
+安装pyenv所需的编译工具。
+sudo apt update
+sudo apt install -y make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev libncurses5-dev libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev
+安装pyenv。
+git clone https://gitee.com/mirrors/pyenv.git ~/.pyenv
+配置环境变量。
+说明
+以下命令仅对当前会话有效，当会话退出之后所设置的环境变量将会丢失。如需长期保留环境变量，可将export命令配置到操作系统的启动配置文件中。
+echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
+echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
+echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n eval "$(pyenv init -)"\nfi' >> ~/.bashrc
+使环境变量更改生效。
+exec $SHELL
+验证安装成功。
+pyenv --version
+Windows
+在任务栏搜索框，搜索Windows PowerShell，单击打开。
+在Windows PowerShell中安装Chocolatey。
+Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+使用Chocolatey安装pyenv-win。
+choco install pyenv-win
+配置环境变量。
+安装完成后，需要手动添加pyenv到系统的环境变量中。右键单击此电脑，选择属性 > 高级系统设置 > 环境变量，在系统变量中选中Path，点击编辑 > 新建，然后添加%USERPROFILE%\.pyenv\pyenv-win\bin到路径列表中。单击确定，保存环境变量配置。
+关闭Windows PowerShell窗口并重新打开。
+验证安装成功。
+pyenv --version
+安装Python
+当pyenv安装完成之后，可以通过pyenv工具安装多个版本的Python，以满足不同环境的需求。
+查询可以安装的Python版本。
+pyenv install -l | grep -E '^[^a-zA-Z]+$'
+安装Python。本文将以安装Python 3.8.10和Python 3.12.1为示例，具体可安装的版本以实际情况为准。
+说明
+默认情况下，pyenv 采用单线程方式进行编译，因此在安装Python时所需时间较长。您可以通过设置export MAKE_OPTS="-j$(nproc)"增加并发编译线程数，从而加快编译速度。
+pyenv install 3.8.10
+pyenv install 3.12.1
+查看所有可用版本。
+pyenv versions
+root@iZ****:~# pyenv versions
+* system (set by /root/.pyenv/version)
+3.8.10
+3.12.1
+设置全局默认版本。
+pyenv global 3.8.10
+查看当前版本。
+pyenv version
+root@iZxxxZ:~# pyenv global 3.8.10
+root@iZxxxZ:~# pyenv version
+3.8.10 (set by /root/.pyenv/version)
+为特定项目设置局部版本。
+pyenv local 3.12.1
+相关文档
+若您希望通过Python调用ECS SDK，具体操作，请参见Python SDK调用示例。
+若您在使用ECS SDK过程中遇到了问题，请参见在Linux系统ECS实例中安装阿里云Python SDK常见问题。
+云助手支持在无需登录ECS的情况下批量执行命令（包括Shell、PowerShell、Bat等），因此您可以通过云助手执行Python安装脚本。关于云助手的详细介绍，请参见云助手概述。

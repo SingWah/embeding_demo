@@ -1,0 +1,61 @@
+# 升级Linux ECS实例的操作系统内核
+> https://help.aliyun.com/zh/ecs/user-guide/upgrade-the-linux-instance-kernel
+
+当Linux ECS实例的操作系统内核版本遇到了稳定性或性能问题（如系统崩溃、卡顿、内存泄漏等），或需要使用新的内核功能时，可通过升级实例的操作系统内核解决。
+升级须知
+升级操作系统内核是一个比较复杂和风险较高的操作，可能会导致系统不稳定或出现兼容性问题。在进行升级前，建议备份重要数据，了解升级过程和可能出现的问题，并谨慎操作。
+操作步骤
+以Alibaba Cloud Linux、CentOS、Ubuntu、Debian系列操作系统为例，指导您如何升级操作系统内核。
+Alibaba Cloud Linux&CentOS
+（可选）基于云盘创建快照来备份数据。具体操作，请参见手动创建单个快照。
+远程连接ECS实例。连接方式，请参见通过Workbench登录Linux实例。
+查看当前操作系统内核版本。
+uname -r
+检查是否有可用的内核版本。
+sudo yum list kernel
+CentOS 6操作系统版本结束了生命周期（EOL），按照社区规则，CentOS 6的源地址http://mirror.centos.org/centos-6/内容已移除，您在阿里云上继续使用默认配置的CentOS 6的源会发生报错。如果您需要使用CentOS 6系统中的一些安装包，则需要手动切换源地址。具体操作，请参见CentOS 6 EOL如何切换源？。
+若没有可升级的版本：建议更换操作系统至Alibaba Cloud Linux 3。具体操作，请参见通过SMC将CentOS 7/8迁移至Alibaba Cloud Linux或更换操作系统（更换系统盘）。
+若有符合需求的版本：请执行以下操作升级内核。
+执行以下命令，确认当前系统initrd或initramfs文件中已经包含了virtio-blk和xen-blkfront驱动。
+sudo lsinitrd /boot/initramfs-`uname -r`.img | grep -E 'virtio|xen'
+若回显信息返回类似如下信息，表示包含virtio-blk和xen-blkfront驱动，否则不包含。
+-rw-r--r-- 1 root root 83312 Jul 22 10:38 usr/lib/modules/4.19.91-27.5.al7.x86_64/kernel/drivers/block/xen-blkfront.ko
+-rw-r--r-- 1 root root 68016 Jul 22 10:38 usr/lib/modules/4.19.91-27.5.al7.x86_64/kernel/drivers/net/xen-netfront.ko
+若不包含virtio-blk和xen-blkfront驱动，参考如下步骤在系统中添加。否则请跳过该步骤。
+sudo sh -c "echo 'add_drivers+=\"xen-blkfront virtio_blk\"' >> /etc/dracut.conf.d/virt-drivers.conf"
+升级操作系统内核。
+sudo yum install kernel -y
+更新GRUB配置文件，以便实例在启动时选择新的内核版本。
+sudo grub2-mkconfig -o /boot/grub2/grub.cfg
+重启实例。
+sudo reboot
+验证新的内核版本是否已成功安装。
+uname -r
+返回新安装的内核版本，表示已成功升级内核。
+Ubuntu&Debian
+（可选）创建一个云盘快照来备份数据。具体操作，请参见手动创建单个快照。
+远程连接ECS实例。
+具体操作，请参见通过Workbenc登录Linux实例。
+查看当前操作系统内核版本，确认是否需要升级。
+uname -r
+更新系统软件包列表，并检查是否有可用的内核版本。
+sudo apt update
+apt-cache search linux-image
+若没有可升级的版本：建议更换操作系统至更高版本。具体操作，请参见：更换操作系统（更换系统盘）。
+若有符合需求的版本：
+升级操作系统内核。
+sudo apt-get install linux-image-<目标内核包名>
+（条件可选）当操作系统为Ubuntu时，还需升级操作系统内核额外模块。
+sudo apt-get install linux-modules-extra-<目标内核包名>
+例如Ubuntu 20.04需要升级内核至5.15.0版本时，升级命令如下：
+sudo apt update
+apt-cache search linux-image | grep '5.15' | grep generic
+sudo apt-get install linux-image-5.15.0-122-generic
+sudo apt-get install linux-modules-extra-5.15.0-122-generic
+更新GRUB配置文件，以便实例在启动时选择新的内核版本。
+sudo update-grub
+重启实例，并刷新Workbench页面。
+sudo reboot
+验证新的内核版本是否已成功安装。
+uname -r
+返回新安装的内核版本，表示已成功升级内核。

@@ -1,0 +1,177 @@
+# 如何处理IIS Web网站访问故障问题？
+> https://help.aliyun.com/zh/ecs/user-guide/how-do-i-resolve-the-issues-that-occur-when-i-access-iis-websites
+
+问题索引
+访问基于IIS搭建的Web网站时提示“500 - 内部服务器错误”，如何处理？
+如何在IIS中设置禁止通过IP地址直接访问网站？
+如何解决基于IIS配置的网站因服务端口被占用导致无法访问的问题？
+访问基于IIS搭建的网站提示“403.14-Forbidden”错误，如何处理？
+访问基于IIS搭建的网站，出现“0x80070002系统找不到指定的文件”错误？
+通过FTP over TLS方式连接IIS服务创建的FTP站点时，提示“534 Policy requires SSL”信息，如何处理？
+访问使用IIS创建的网站提示“Bad Request - Invalid Hostname”错误如何处理？
+访问使用IIS部署的网站时，出现“500.19-xxx中不允许绝对物理路径xxx”报错，如何处理？
+访问基于IIS搭建的Web网站时提示“500 - 内部服务器错误”，如何处理？
+问题原因
+隐藏详细错误：IIS 默认向远程客户端显示通用的 "500 错误" 页面，以避免泄露服务器的敏感信息（如代码路径、数据库连接字符串等）。
+配置或代码缺陷：问题的根本原因通常是 web.config 文件语法错误、应用程序代码异常。
+解决方案
+通过在 IIS 中为站点启用详细错误，服务器将直接在浏览器中显示具体的错误原因和代码行号，从而准确定位问题。
+登录ECS实例。
+访问ECS控制台-实例。在页面左侧顶部，选择目标资源所在的资源组和地域。
+进入目标实例详情页，单击远程连接，选择通过Workbench远程连接。选择连接方式为终端连接，输入账号和密码，登录图形化终端页面。
+打开IIS管理器。
+单击开始，选择服务器管理器。
+在服务器管理器页面右上角，选择工具 > Internet Information Services (IIS) 管理器。
+启用详细错误。
+在Internet Information Services (IIS) 管理器页面的左侧导航栏，单击目标网站。
+在IIS区域，双击错误页。
+在页面右侧操作区域中，单击编辑功能设置，选择详细错误，然后单击确定。
+访问网站，查看详细错误信息。
+按Ctrl + F5强制刷新，浏览器将显示详细的错误信息，并明确指出是哪个配置文件（如 web.config）的哪一行出错。可根据详细的错误提示，修复对应的配置文件或应用程序代码。
+如何在IIS中设置禁止通过IP地址直接访问网站？
+登录ECS实例。
+访问ECS控制台-实例。在页面左侧顶部，选择目标资源所在的资源组和地域。
+进入目标实例详情页，单击远程连接，选择通过Workbench远程连接。选择连接方式为终端连接，输入账号和密码，登录图形化终端页面。
+打开IIS管理器。
+单击开始，选择服务器管理器。
+在服务器管理器页面右上角，选择工具 > Internet Information Services (IIS) 管理器。
+绑定域名。
+在Internet Information Services (IIS) 管理器页面的左侧导航栏，单击目标网站，然后单击操作列的绑定，在网站绑定窗口中，双击主机名参数为空的记录，打开编辑网站绑定窗口，填写域名。
+若通过域名访问该网站正常，通过服务器的公网IP无法访问该网站，表示设置成功。
+如何解决基于IIS配置的网站因服务端口被占用导致无法访问的问题？
+登录ECS实例。
+访问ECS控制台-实例。在页面左侧顶部，选择目标资源所在的资源组和地域。
+进入目标实例详情页，单击远程连接，选择通过Workbench远程连接。选择连接方式为终端连接，输入账号和密码，登录图形化终端页面。
+以管理员身份打开Windows PowerShell。
+单击开始，输入PowerShell，右键单击Windows PowerShell并选择以管理员身份运行。
+检查服务端口是否被占用。
+Get-NetTCPConnection -LocalPort <端口>
+回执中包含端口状态State和所属进程OwningProcess。
+LocalAddress LocalPort RemoteAddress RemotePort State AppliedSetting OwningProcess
+------------ --------- ------------- ---------- ----- -------------- -------------
+:: 80 :: 0 Listen 4
+以上示例表示80
+端口被ID
+为4
+的进程占用。
+根据PID找到具体的应用程序。
+将 <PID> 替换为上一步中 OwningProcess 列显示的进程ID。
+Get-Process -Id <PID>
+解决端口冲突。
+关闭占用端口的进程。
+若确认占用端口的程序可以被关闭，可使用taskkill命令强制结束该进程。
+taskkill /F /PID <PID>
+修改应用端口。
+为减少应用程序端口冲突，建议使用注册端口范围（8000-49151）内的端口。
+单击开始，选择服务器管理器，在服务器管理器页面右上角，选择工具 > Internet Information Services （IIS） 管理器。
+在Internet Information Services （IIS） 管理器页面的左侧导航栏，单击目标网站，然后单击操作窗口的绑定。
+在网站绑定窗口中，选择已有绑定记录，点击编辑，修改端口，点击确定。
+重启IIS。
+iisreset /noforce
+访问网站，验证访问是否正常。
+访问基于IIS搭建的网站提示“403.14-Forbidden”错误，如何处理？
+问题原因
+缺少默认文档：网站根目录或访问的子目录中没有配置默认的入口文件（如 index.html, default.aspx）。
+禁用目录浏览：IIS 的安全设置默认禁止列出目录内容。当找不到默认文档时，此设置会触发 403.14 错误。
+解决方案
+方案一：配置默认文档（推荐）
+登录ECS实例。
+访问ECS控制台-实例。在页面左侧顶部，选择目标资源所在的资源组和地域。
+进入目标实例详情页，单击远程连接，选择通过Workbench远程连接。选择连接方式为终端连接，输入账号和密码，登录图形化终端页面。
+打开IIS管理器。
+单击开始，选择服务器管理器。
+在服务器管理器页面右上角，选择工具 > Internet Information Services (IIS) 管理器。
+配置默认文档。
+在 Internet Information Services (IIS) 管理器 中，单击目标网站，在IIS区域，双击默认文档，单击启用。
+在默认文档列表中，添加网站的入口文件名，如 index.html、default.htm 等。需确保指定的默认文档文件确实存在于网站的物理根目录中。
+重新访问网站，验证访问是否正常。
+方案二：启用目录浏览
+重要
+启用目录浏览会暴露站点的文件和目录结构，存在安全风险。
+登录ECS实例。
+访问ECS控制台-实例。在页面左侧顶部，选择目标资源所在的资源组和地域。
+进入目标实例详情页，单击远程连接，选择通过Workbench远程连接。选择连接方式为终端连接，输入账号和密码，登录图形化终端页面。
+打开IIS管理器。
+单击开始，选择服务器管理器。
+在服务器管理器页面右上角，选择工具 > Internet Information Services (IIS) 管理器。
+启用目录浏览。
+在Internet Information Services (IIS) 管理器页面的左侧导航栏，单击目标网站。
+在IIS区域，双击目录浏览，在页面右侧操作区域中，单击启用。
+重新访问网站，验证访问是否正常。
+访问基于IIS搭建的网站，出现“0x80070002系统找不到指定的文件”错误？
+问题原因
+IIS 依靠处理程序映射（Handler Mappings）来决定如何处理特定文件类型的请求（如 .aspx 文件）。当.NET Framework的安装顺序不当，或其在 IIS 中的注册信息损坏或丢失时，IIS 无法找到处理ASP.NET请求的正确组件，从而导致“找不到指定文件”的错误。
+解决方案
+核心方案是使用aspnet_regiis.exe工具，在 IIS 中重新注册正确的.NET Framework版本，以修复损坏的处理程序映射。
+单击开始，输入cmd，右键单击命令提示符并选择以管理员身份运行。
+导航到Framework目录。
+aspnet_regiis.exe 工具位于 .NET Framework 的安装目录下。
+通常位于C:\Windows\Microsoft.NET\Framework64目录下。以.NET Framework 4.x为例：
+cd /d C:\Windows\Microsoft.NET\Framework64\v4.0.30319
+卸载ASP.NET。
+aspnet_regiis.exe -u
+将ASP.NET安装并注册到 IIS 中。
+aspnet_regiis.exe -i
+重启IIS。
+iisreset /noforce
+访问网站，验证是否可以正常访问。
+通过FTP over TLS方式连接IIS服务创建的FTP站点时，提示“534 Policy requires SSL”信息，如何处理？
+问题原因
+FTP客户端默认或显式配置使用FTPS（FTP over SSL/TLS）协议进行安全连接，服务器端的IIS FTP站点未设置允许SSL连接，导致服务器拒绝了客户端发起的SSL/TLS握手请求。
+解决方案
+检查并启用IIS中目标FTP站点的SSL连接策略，确保其与客户端的安全连接要求一致。
+登录ECS实例。
+访问ECS控制台-实例。在页面左侧顶部，选择目标资源所在的资源组和地域。
+进入目标实例详情页，单击远程连接，选择通过Workbench远程连接。选择连接方式为终端连接，输入账号和密码，登录图形化终端页面。
+打开IIS管理器。
+单击开始，选择服务器管理器。
+在服务器管理器页面右上角，选择工具 > Internet Information Services (IIS) 管理器。
+配置FTP站点SSL策略。
+单击目标FTP站点，在主页的FTP区域，双击FTP SSL设置。
+在FTP SSL设置区域，将SSL 策略设置为允许 SSL 连接，然后在操作窗口中单击应用。
+连接FTP站点，验证是否正常。
+访问使用IIS创建的网站提示“Bad Request - Invalid Hostname”错误如何处理？
+问题原因
+IIS服务器收到了一个HTTP请求，但无法根据请求头中的主机名（Hostname）找到与之匹配的已配置站点：
+主机名未绑定：目标网站未在IIS中添加针对该访问域名的绑定。
+绑定信息错误：网站已绑定主机名，但存在拼写错误，或绑定到了错误的IP地址或端口。
+绑定冲突：域名已被绑定到IIS中的另一个站点，导致请求分发冲突。
+解决方案
+检查并正确配置目标站点的网站绑定，确保访问域名与站点配置匹配。
+登录ECS实例。
+访问ECS控制台-实例。在页面左侧顶部，选择目标资源所在的资源组和地域。
+进入目标实例详情页，单击远程连接，选择通过Workbench远程连接。选择连接方式为终端连接，输入账号和密码，登录图形化终端页面。
+打开IIS管理器。
+单击开始，选择服务器管理器。
+在服务器管理器页面右上角，选择工具 > Internet Information Services (IIS) 管理器。
+检查并配置网站绑定。
+在Internet Information Services （IIS） 管理器页面的左侧导航栏，单击目标网站，然后单击操作栏中的绑定。
+在网站绑定页面，绑定域名或者检查已绑定的域名信息是否正确。
+添加新域名。
+在网站绑定页面，单击添加。
+在添加网站绑定页面，在主机名上设置网站域名信息，然后单击确定。
+查看或修改已绑定域名。
+在网站绑定页面，双击已绑定的信息记录。
+在编辑网站绑定页面，查看绑定信息。
+若需修改域名，可编辑主机名，然后单击确定。
+访问网站，验证访问是否正常。
+访问使用IIS部署的网站时，出现“500.19-xxx中不允许绝对物理路径xxx”报错，如何处理？
+问题原因
+ApplicationHost.config或Web.config文件中存在格式不正确或无法识别的XML元素。
+ApplicationHost.config 作为服务器的根配置文件，定义了全局默认值和服务器级别的设置。
+Web.config 文件则提供了应用程序级别的配置，用于覆盖或扩展从上层继承的设置。
+解决方案
+登录ECS实例。
+访问ECS控制台-实例。在页面左侧顶部，选择目标资源所在的资源组和地域。
+进入目标实例详情页，单击远程连接，选择通过Workbench远程连接。选择连接方式为终端连接，输入账号和密码，登录图形化终端页面。
+打开IIS管理器。
+单击开始，选择服务器管理器。
+在服务器管理器页面右上角，选择工具 > Internet Information Services (IIS) 管理器。
+检查web.config文件。
+在Internet Information Services （IIS） 管理器页面的左侧导航栏，单击目标网站，然后在操作区域单击浏览，进入该网站的站点目录。
+打开站点目录下的web.config配置文件，参考IIS 配置参考进行检查和修复。
+检查ApplicationHost.config文件。
+进入C:\Windows\System32\inetsrv\config\文件夹下，打开ApplicationHost.config配置文件，参考ApplicationHost.config配置进行检查和修复。
+打开命令提示符，重启IIS。
+iisreset /noforce
+访问网站，验证访问是否正常。

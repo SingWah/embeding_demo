@@ -1,0 +1,510 @@
+# 在Linux上安装Docker和Docker Compose
+> https://help.aliyun.com/zh/ecs/user-guide/install-and-use-docker
+
+为不同Linux发行版安装Docker与Docker Compose。可将应用及依赖打包成可移植容器，实现标准化部署并简化多服务管理。
+安装Docker
+快速安装
+可使用Terraform一键运行。这支持在现有实例上安装Docker，或新建一个预装Docker的实例。
+新建实例：设置参数create_instance = true，依次单击发起调试 > 预览并执行。
+选择一个已有实例：设置参数create_instance = false和instance_id，依次单击发起调试 > 预览并执行。
+命令行安装
+Alibaba Cloud Linux 3
+安装新版Docker前，卸载所有已安装的Docker组件。可以避免潜在的冲突和兼容性问题。
+卸载旧版本的Docker
+卸载旧版Docker、相关软件包和软件源。
+忽略提示软件包未安装的消息。这说明该软件包未安装。
+#删除Docker相关源
+sudo rm -f /etc/yum.repos.d/docker*.repo
+#卸载Docker和相关的软件包
+sudo dnf -y remove \
+docker-ce \
+containerd.io \
+docker-ce-rootless-extras \
+docker-buildx-plugin \
+docker-ce-cli \
+docker-compose-plugin
+卸载Docker不会自动移除镜像、容器、存储卷和网络。这些数据默认存储在/var/lib/docker/目录。需手动删除此目录。
+安装Docker社区版本。
+非阿里云服务器，需将http://mirrors.cloud.aliyuncs.com替换为https://mirrors.aliyun.com
+#添加Docker软件包源
+sudo wget -O /etc/yum.repos.d/docker-ce.repo http://mirrors.cloud.aliyuncs.com/docker-ce/linux/centos/docker-ce.repo
+sudo sed -i 's|https://mirrors.aliyun.com|http://mirrors.cloud.aliyuncs.com|g' /etc/yum.repos.d/docker-ce.repo
+#Alibaba Cloud Linux3专用的dnf源兼容插件
+sudo dnf -y install dnf-plugin-releasever-adapter --repo alinux3-plus
+#安装Docker社区版本，容器运行时containerd.io，以及Docker构建和Compose插件
+sudo dnf -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+启动Docker并设置开机自启。
+#启动Docker
+sudo systemctl start docker
+#设置Docker守护进程在系统启动时自动启动
+sudo systemctl enable docker
+Alibaba Cloud Linux 4
+安装新版Docker前，卸载所有已安装的Docker组件。可以避免潜在的冲突和兼容性问题。
+卸载旧版的Docker
+卸载旧版Docker、相关软件包和软件源。
+#删除Docker相关源
+sudo rm -f /etc/yum.repos.d/docker*.repo
+#卸载Docker和相关的软件包
+sudo dnf -y remove \
+docker \
+moby \
+docker-ce \
+containerd.io \
+docker-ce-rootless-extras \
+docker-buildx-plugin \
+docker-ce-cli \
+docker-compose-plugin
+卸载Docker不会自动移除镜像、容器、存储卷和网络。这些数据默认存储在/var/lib/docker/目录。需手动删除此目录。
+安装 Docker
+通过 Alinux 软件源安装 Moby
+Moby 包含了 Docker 的完整核心功能。在 Alibaba Cloud Linux 4中，系统默认通过 Moby 包提供容器引擎能力，安装后，系统提供的命令、服务名（dockerd）、API 以及容器镜像均与标准 Docker 完全一致。
+sudo yum install -y moby
+通过 Docker CE 软件源安装
+非阿里云服务器，需将http://mirrors.cloud.aliyuncs.com替换为https://mirrors.aliyun.com，同时自行从 docker-ce 的仓库中选择支持 centos 的相关版本，并在安装前请确认旧版 Docker 已经被移除。
+#添加 Docker-ce 软件包源
+sudo wget -O /etc/yum.repos.d/docker-ce.repo http://mirrors.cloud.aliyuncs.com/docker-ce/linux/centos/docker-ce.repo
+sudo sed -i 's|https://mirrors.aliyun.com|http://mirrors.cloud.aliyuncs.com|g' /etc/yum.repos.d/docker-ce.repo
+#用户需要自行选择安装 centos 的哪个版本，比如：centos9 还是 centos10，再决定将 releasesever 替换成哪个版本
+# 如果更换 centos 9，则执行：
+sudo sed -i 's|$releasever|9|' /etc/yum.repos.d/docker-ce.repo
+# 如果更换 centos10, 则执行：
+sudo sed -i 's|$releasever|10|' /etc/yum.repos.d/docker-ce.repo
+#安装Docker社区版本，容器运行时containerd.io，以及Docker构建和Compose插件
+sudo dnf -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+说明
+安装 Docker CE 后，如需切换回 Alibaba Cloud Linux 4 原生提供的 Moby，请先移除 Docker CE 相关组件并关闭对应软件源：
+sudo yum remove -y docker-ce docker-ce-cli
+sudo rm -rf /etc/yum.repos.d/docker-ce.repo
+启动 Docker 并设置开机自启。
+# 启动服务并设置开机自启
+sudo systemctl start docker
+sudo systemctl enable docker
+# 验证安装
+docker --version # 将显示已经安装的版本
+说明
+当前系统已启用Moby作为默认容器运行时，在后续版本中也将持续更新 Moby。
+为了保持前向兼容，旧版本Docker 组件仍然可使用，但是将不再更新。
+Ubuntu
+安装新版Docker前，卸载所有已安装的Docker组件。可以避免潜在的冲突和兼容性问题。
+卸载旧版本的Docker
+卸载旧版Docker、相关软件包和软件源。
+忽略提示软件包未安装的消息。这说明该软件包未安装。
+#删除Docker相关源
+sudo rm -f /etc/apt/sources.list.d/*docker*.list
+#卸载Docker和相关的软件包
+for pkg in docker.io docker-buildx-plugin docker-ce-cli docker-ce-rootless-extras docker-compose-plugin docker-doc docker-compose podman-docker containerd runc; do sudo apt-get remove -y $pkg; done
+卸载Docker不会自动移除镜像、容器、存储卷和网络。这些数据默认存储在/var/lib/docker/目录。需手动删除此目录。
+安装Docker社区版本。
+非阿里云服务器，需将http://mirrors.cloud.aliyuncs.com替换为https://mirrors.aliyun.com
+#更新包管理工具
+sudo apt-get update
+sudo apt-get -y install apt-transport-https ca-certificates curl software-properties-common
+#添加Docker软件包源（使用keyrings方式管理GPG密钥）
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL http://mirrors.cloud.aliyuncs.com/docker-ce/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
+ARCH=$(dpkg --print-architecture)
+DISTRO=$(. /etc/os-release && echo "$VERSION_CODENAME")
+sudo tee /etc/apt/sources.list.d/docker.list > /dev/null <<EOF
+deb [arch=${ARCH} signed-by=/etc/apt/keyrings/docker.gpg] http://mirrors.cloud.aliyuncs.com/docker-ce/linux/ubuntu ${DISTRO} stable
+EOF
+sudo apt-get update
+#安装Docker社区版本，容器运行时containerd.io，以及Docker构建和Compose插件
+sudo apt-get -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+启动Docker并设置开机自启。
+#启动Docker
+sudo systemctl start docker
+#设置Docker守护进程在系统启动时自动启动
+sudo systemctl enable docker
+Debian
+安装新版Docker前，卸载所有已安装的Docker组件。可以避免潜在的冲突和兼容性问题。
+卸载旧版本的Docker
+卸载旧版Docker、相关软件包和软件源。
+忽略提示软件包未安装的消息。这说明该软件包未安装。
+#删除Docker相关源
+sudo rm -f /etc/apt/sources.list.d/*docker*.list
+#卸载Docker和相关的软件包
+for pkg in docker.io docker-buildx-plugin docker-ce-cli docker-ce-rootless-extras docker-compose-plugin docker-doc docker-compose podman-docker containerd runc; do sudo apt-get remove -y $pkg; done
+卸载Docker不会自动移除镜像、容器、存储卷和网络。这些数据默认存储在/var/lib/docker/目录。需手动删除此目录。
+安装Docker社区版本。
+非阿里云服务器，需将http://mirrors.cloud.aliyuncs.com替换为https://mirrors.aliyun.com
+重要
+Debian 10 及更早版本，需先更换源。
+#添加 GPG 密钥
+sudo apt update
+sudo apt install ca-certificates curl
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL http://mirrors.cloud.aliyuncs.com/docker-ce/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+#将该软件源添加到 Apt 源列表中。
+sudo tee /etc/apt/sources.list.d/docker.sources <<EOF
+Types: deb
+URIs: http://mirrors.cloud.aliyuncs.com/docker-ce/linux/debian
+Suites: $(. /etc/os-release && echo "$VERSION_CODENAME")
+Components: stable
+Signed-By: /etc/apt/keyrings/docker.asc
+EOF
+sudo apt update
+#安装Docker社区版本，容器运行时containerd.io，以及Docker构建和Compose插件
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+启动Docker并设置开机自启。
+#启动Docker
+sudo systemctl start docker
+#设置Docker守护进程在系统启动时自动启动
+sudo systemctl enable docker
+Red Hat
+安装新版Docker前，卸载所有已安装的Docker组件。可以避免潜在的冲突和兼容性问题。
+卸载旧版本的Docker
+卸载旧版Docker、相关软件包和软件源。
+忽略提示软件包未安装的消息。这说明该软件包未安装。
+#删除Docker相关源
+sudo rm -f /etc/yum.repos.d/docker*.repo
+#卸载旧版本的Docker和相关的软件包
+sudo yum -y remove \
+docker-ce \
+containerd.io \
+docker-ce-rootless-extras \
+docker-buildx-plugin \
+docker-ce-cli \
+docker-compose-plugin
+卸载Docker不会自动移除镜像、容器、存储卷和网络。这些数据默认存储在/var/lib/docker/目录。需手动删除此目录。
+安装Docker社区版本。
+非阿里云服务器，需将http://mirrors.cloud.aliyuncs.com替换为https://mirrors.aliyun.com
+#添加Docker软件包源
+sudo wget -O /etc/yum.repos.d/docker-ce.repo http://mirrors.cloud.aliyuncs.com/docker-ce/linux/rhel/docker-ce.repo
+sudo sed -i 's|https://mirrors.aliyun.com|http://mirrors.cloud.aliyuncs.com|g' /etc/yum.repos.d/docker-ce.repo
+#安装Docker社区版本，容器运行时containerd.io，以及Docker构建和Compose插件
+sudo yum -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+启动Docker并设置开机自启。
+#启动Docker
+sudo systemctl start docker
+#设置Docker守护进程在系统启动时自动启动
+sudo systemctl enable docker
+Fedora
+安装新版Docker前，卸载所有已安装的Docker组件。可以避免潜在的冲突和兼容性问题。
+卸载旧版本的Docker
+卸载旧版Docker、相关软件包和软件源。
+忽略提示软件包未安装的消息。这说明该软件包未安装。
+#删除Docker相关源
+sudo rm -f /etc/yum.repos.d/docker*.repo
+#卸载Docker和相关的软件包
+sudo dnf -y remove \
+docker-ce \
+containerd.io \
+docker-ce-rootless-extras \
+docker-buildx-plugin \
+docker-ce-cli \
+docker-compose-plugin
+卸载Docker不会自动移除镜像、容器、存储卷和网络。这些数据默认存储在/var/lib/docker/目录。需手动删除此目录。
+安装Docker社区版本。
+非阿里云服务器，需将http://mirrors.cloud.aliyuncs.com替换为https://mirrors.aliyun.com
+#添加Docker软件包源
+sudo wget -O /etc/yum.repos.d/docker-ce.repo http://mirrors.cloud.aliyuncs.com/docker-ce/linux/fedora/docker-ce.repo
+sudo sed -i 's|https://mirrors.aliyun.com|http://mirrors.cloud.aliyuncs.com|g' /etc/yum.repos.d/docker-ce.repo
+#安装Docker社区版本，容器运行时containerd.io，以及Docker构建和Compose插件
+sudo dnf -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+启动Docker并设置开机自启。
+#启动Docker
+sudo systemctl start docker
+#设置Docker守护进程在系统启动时自动启动
+sudo systemctl enable docker
+Anolis OS
+安装新版Docker前，卸载所有已安装的Docker组件。可以避免潜在的冲突和兼容性问题。
+卸载旧版本的Docker
+卸载旧版Docker、相关软件包和软件源。
+忽略提示软件包未安装的消息。这说明该软件包未安装。
+#删除Docker相关源
+sudo rm -f /etc/yum.repos.d/docker*.repo
+#卸载旧版本的Docker和相关的软件包
+sudo yum -y remove \
+docker-ce \
+containerd.io \
+docker-ce-rootless-extras \
+docker-buildx-plugin \
+docker-ce-cli \
+docker-compose-plugin
+卸载Docker不会自动移除镜像、容器、存储卷和网络。这些数据默认存储在/var/lib/docker/目录。需手动删除此目录。
+安装Docker社区版本。
+非阿里云服务器，需将http://mirrors.cloud.aliyuncs.com替换为https://mirrors.aliyun.com
+#添加Docker软件包源
+sudo wget -O /etc/yum.repos.d/docker-ce.repo http://mirrors.cloud.aliyuncs.com/docker-ce/linux/centos/docker-ce.repo
+sudo sed -i 's|https://mirrors.aliyun.com|http://mirrors.cloud.aliyuncs.com|g' /etc/yum.repos.d/docker-ce.repo
+#安装Docker社区版本，容器运行时containerd.io，以及Docker构建和Compose插件
+sudo yum -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+启动Docker并设置开机自启。
+#启动Docker
+sudo systemctl start docker
+#设置Docker守护进程在系统启动时自动启动
+sudo systemctl enable docker
+Alibaba Cloud Linux 2
+安装新版Docker前，卸载所有已安装的Docker组件。可以避免潜在的冲突和兼容性问题。
+卸载旧版本的Docker
+卸载旧版Docker、相关软件包和软件源。
+忽略提示软件包未安装的消息。这说明该软件包未安装。
+#删除Docker相关源
+sudo rm -f /etc/yum.repos.d/docker*.repo
+#卸载旧版本的Docker和相关的软件包
+sudo yum -y remove \
+docker-ce \
+containerd.io \
+docker-ce-rootless-extras \
+docker-buildx-plugin \
+docker-ce-cli \
+docker-compose-plugin
+卸载Docker不会自动移除镜像、容器、存储卷和网络。这些数据默认存储在/var/lib/docker/目录。需手动删除此目录。
+安装Docker社区版本。
+非阿里云服务器，需将http://mirrors.cloud.aliyuncs.com替换为https://mirrors.aliyun.com
+#添加Docker软件包源
+sudo wget -O /etc/yum.repos.d/docker-ce.repo http://mirrors.cloud.aliyuncs.com/docker-ce/linux/centos/docker-ce.repo
+sudo sed -i 's|https://mirrors.aliyun.com|http://mirrors.cloud.aliyuncs.com|g' /etc/yum.repos.d/docker-ce.repo
+#Alibaba Cloud Linux2专用的yum源兼容插件
+sudo yum install yum-plugin-releasever-adapter --disablerepo=* --enablerepo=plus
+#安装Docker社区版本，容器运行时containerd.io，以及Docker构建和Compose插件
+sudo yum -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+启动Docker并设置开机自启。
+#启动Docker
+sudo systemctl start docker
+#设置Docker守护进程在系统启动时自动启动
+sudo systemctl enable docker
+CentOS 7.x
+安装新版Docker前，卸载所有已安装的Docker组件。可以避免潜在的冲突和兼容性问题。
+卸载旧版本的Docker
+卸载旧版Docker、相关软件包和软件源。
+忽略提示软件包未安装的消息。这说明该软件包未安装。
+#删除Docker相关源
+sudo rm -f /etc/yum.repos.d/docker*.repo
+#卸载旧版本的Docker和相关的软件包
+sudo yum -y remove \
+docker-ce \
+containerd.io \
+docker-ce-rootless-extras \
+docker-buildx-plugin \
+docker-ce-cli \
+docker-compose-plugin
+卸载Docker不会自动移除镜像、容器、存储卷和网络。这些数据默认存储在/var/lib/docker/目录。需手动删除此目录。
+安装Docker社区版本。
+非阿里云服务器，需将http://mirrors.cloud.aliyuncs.com替换为https://mirrors.aliyun.com
+#添加Docker软件包源
+sudo wget -O /etc/yum.repos.d/docker-ce.repo http://mirrors.cloud.aliyuncs.com/docker-ce/linux/centos/docker-ce.repo
+sudo sed -i 's|https://mirrors.aliyun.com|http://mirrors.cloud.aliyuncs.com|g' /etc/yum.repos.d/docker-ce.repo
+#安装Docker社区版本，容器运行时containerd.io，以及Docker构建和Compose插件
+sudo yum -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+启动Docker并设置开机自启。
+#启动Docker
+sudo systemctl start docker
+#设置Docker守护进程在系统启动时自动启动
+sudo systemctl enable docker
+CentOS 8.x
+安装新版Docker前，卸载所有已安装的Docker组件。可以避免潜在的冲突和兼容性问题。
+卸载旧版本的Docker
+卸载旧版Docker、相关软件包和软件源。
+忽略提示软件包未安装的消息。这说明该软件包未安装。
+#删除Docker相关源
+sudo rm -f /etc/yum.repos.d/docker*.repo
+#卸载Docker和相关的软件包
+sudo dnf -y remove \
+docker-ce \
+containerd.io \
+docker-ce-rootless-extras \
+docker-buildx-plugin \
+docker-ce-cli \
+docker-compose-plugin
+卸载Docker不会自动移除镜像、容器、存储卷和网络。这些数据默认存储在/var/lib/docker/目录。需手动删除此目录。
+安装Docker社区版本。
+非阿里云服务器，需将http://mirrors.cloud.aliyuncs.com替换为https://mirrors.aliyun.com
+#添加Docker软件包源
+sudo wget -O /etc/yum.repos.d/docker-ce.repo http://mirrors.cloud.aliyuncs.com/docker-ce/linux/centos/docker-ce.repo
+sudo sed -i 's|https://mirrors.aliyun.com|http://mirrors.cloud.aliyuncs.com|g' /etc/yum.repos.d/docker-ce.repo
+#安装Docker社区版本，容器运行时containerd.io，以及Docker构建和Compose插件
+sudo dnf -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+启动Docker并设置开机自启。
+#启动Docker
+sudo systemctl start docker
+#设置Docker守护进程在系统启动时自动启动
+sudo systemctl enable docker
+配置镜像源
+由于运营商网络原因，从Docker Hub拉取镜像会失败。配置镜像加速器可解决该问题。
+重要
+docker search命令会直接查询Docker Hub，因此会执行失败。
+登录容器镜像服务控制台，在左侧导航栏选择镜像工具 > 镜像加速器，在镜像加速器页面获取加速器地址。
+编辑Docker配置文件/etc/docker/daemon.json。若文件不存在，先创建。
+"registry-mirrors": ["<加速器地址>"]
+重启Docker服务应用新配置。
+sudo systemctl restart docker
+使用Docker快速部署Web应用
+构建Web程序镜像。
+#拉取Nginx镜像
+sudo docker pull nginx:latest
+#创建Dockerfile设置Nginx作为基础镜像，并在Web服务器的根目录创建一个显示Hello World!的index.html文件。
+sudo tee Dockerfile <<-'EOF'
+FROM nginx:latest
+RUN echo 'Hello World!' > /usr/share/nginx/html/index.html
+EOF
+#构建镜像，镜像名称为hello-world
+sudo docker build . -t hello-world:latest
+使用Web应用镜像启动名为hello-world的容器。
+sudo docker run -d -p 80:80 --name hello-world hello-world:latest
+执行curl http://localhost命令，验证Web程序是否正确显示Hello World!。
+安装Docker Compose
+当应用包含多个服务，或服务间存在启动顺序依赖时，可以使用Docker Compose，通过一个YAML文件来定义、运行和统一管理。
+Alibaba Cloud Linux、CentOS、Red Hat、Anolis、Fedora
+sudo yum -y install docker-compose-plugin
+Ubuntu、Debian
+sudo apt-get -y install docker-compose-plugin
+如果执行安装命令时发生报错，请参照 安装Docker Compose失败 配置软件源后重新执行安装命令。
+使用Docker Compose部署应用
+创建编排文件docker-compose.yaml。
+#创建编排文件，添加Mysql与WordPress
+sudo tee docker-compose.yaml <<-'EOF'
+version: '3.1'
+services:
+wordpress:
+image: wordpress
+restart: always
+ports:
+- "80:80"
+environment:
+#数据库地址
+WORDPRESS_DB_HOST: wordpress_db
+#数据库用户名
+WORDPRESS_DB_USER: wordpress
+#数据库密码
+WORDPRESS_DB_PASSWORD: ${WORDPRESS_DB_PASSWORD}
+#数据库名称
+WORDPRESS_DB_NAME: wordpress
+volumes:
+- wordpress:/var/www/html
+db:
+image: mysql:5.7
+restart: always
+container_name: wordpress_db
+environment:
+#数据库名称
+MYSQL_DATABASE: wordpress
+#数据库用户名
+MYSQL_USER: wordpress
+#数据库密码
+MYSQL_PASSWORD: ${WORDPRESS_DB_PASSWORD}
+#数据库ROOT用户密码
+MYSQL_RANDOM_ROOT_PASSWORD: ${WORDPRESS_DB_PASSWORD}
+volumes:
+- db:/var/lib/mysql
+volumes:
+wordpress:
+db:
+EOF
+启动WordPress服务。将命令中的<数据库密码>调整为MySQL数据库密码。
+使用Docker Compose时，命令不用连字符，比如docker compose version。
+#启动服务容器。
+sudo env "PATH=$PATH" "WORDPRESS_DB_PASSWORD=<数据库密码>" docker compose -f docker-compose.yaml up -d
+在浏览器中输入http://云服务器ECS实例的公网IP，访问WordPress。
+需要在安全组放行80端口。
+常见问题
+配置了镜像加速镜像还是拉取不到
+由于运营商网络等不稳定因素影响，镜像加速器无法保证成功拉取到指定版本的容器镜像。建议在生产环境中减少对DockerHub容器镜像的依赖，如果拉取失败请参见官方镜像加速。
+Docker配置非root用户权限
+默认情况下，Docker命令需要root权限（即使用sudo）。为了避免每次都输入sudo并遵循最小权限原则，应将当前用户添加到docker用户组。
+将当前用户添加到docker组。
+sudo usermod -aG docker $USER
+执行newgrp docker命令生效后。直接使用docker命令，无需添加sudo。
+http://mirrors.cloud.aliyuncs.com无法访问
+问题现象：地址http://mirrors.cloud.aliyuncs.com无法访问。
+可能原因：网络不稳定。
+解决方案：请将http://mirrors.cloud.aliyuncs.com替换为https://mirrors.aliyun.com。
+使用https://mirrors.aliyun.com需要您的实例已开通公网。如您不清楚如何开通公网，请参见开通公网。
+执行dnf config-manager命令报错
+问题现象：在Linux系统实例中执行dnf config-manager命令出现如下报错：
+/usr/lib/python3/dist-packages/dnf/const.py:22: DeprecationWarning: The distutils package is deprecated and slated for removal in Python 3.12. Use setuptools or check PEP 632 for potential alternatives.
+可能原因：dnf版本太旧导致安装失败。
+解决方案：您可以尝试使用sudo dnf update dnf来更新dnf软件包到最新状态，然后再尝试安装Docker。
+执行dnf install docker-ce命令报错
+问题现象：在Linux系统实例中执行dnf -y install docker-ce命令出现如下报错：
+(8-9/12): docker-ce-24.0.7-1.el8.x86_64.rpm 38% [================- ] 8.2 MB/s | 38 MB 00:07 ETA
+The downloaded packages were saved in cache until the next successful transaction.
+You can remove cached packages by executing 'dnf clean packages'.
+Error: Error downloading packages:
+containerd.io-1.6.26-3.1.el8.x86_64: Cannot download, all mirrors were already tried without success.
+可能原因：软件包缓存太旧导致安装失败。
+解决方案：您可以尝试使用sudo dnf clean packages清理软件包缓存之后，再尝试安装docker。
+问题现象：在Linux系统实例中执行dnf -y install docker-ce命令出现如下报错：
+CentOS- Base 0.0 B/s | 0 B 00:30
+Errors during downloading metadata for repository 'base':
+- Curl error (6): Couldn't resolve host name for http://mirror.centos.org/os/BaseOS/x86_64/os/repodata/repomd.xml [Could not resolve host: mirror.aliyuncs.com]
+- Curl error (28): Timeout was reached for http://mirror.centos.org/os/BaseOS/x86_64/os/repodata/repomd.xml [Connection timed out after 30000 milliseconds]
+- Curl error (6): Couldn't resolve host name for http://mirror.centos.org/os/BaseOS/x86_64/os/repodata/repomd.xml [Could not resolve host: mirror.cloud.aliyuncs.com]
+Error: Failed to download metadata for repo 'base': Cannot download repomd.xml: Cannot download repodata/repomd.xml: All mirrors were tried
+可能原因：使用了已下线的CentOS 8软件源。
+解决方案：可参考如下步骤，使用阿里提供的可用源替换已下线的CentOS 8软件源。
+# 备份过期软件源。
+sudo mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup
+# 下载阿里提供的CentOS-Base.repo 到 /etc/yum.repos.d/。
+wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.cloud.aliyuncs.com/repo/Centos-vault-8.5.2111.repo
+# 将阿里源中的软件源地址替换为ECS可访问的源地址。
+sudo sed -i 's/mirrors.cloud.aliyuncs.com/url_tmp/g' /etc/yum.repos.d/CentOS-Base.repo && sudo sed -i 's/mirrors.aliyun.com/mirrors.cloud.aliyuncs.com/g' /etc/yum.repos.d/CentOS-Base.repo && sudo sed -i 's/url_tmp/mirrors.aliyun.com/g' /etc/yum.repos.d/CentOS-Base.repo
+# 清理旧缓存并生成缓存。
+sudo yum clean all && sudo yum makecache
+执行完上述步骤后再尝试安装docker即可。
+安装Docker Compose失败
+若执行 Docker Compose 安装命令失败，可能是因为实例尚未配置软件包源。您可以根据实例的操作系统配置软件包源，配置完成后重新执行安装Docker Compose 命令。
+Alibaba Cloud Linux 3
+#添加Docker软件包源
+sudo wget -O /etc/yum.repos.d/docker-ce.repo http://mirrors.cloud.aliyuncs.com/docker-ce/linux/centos/docker-ce.repo
+sudo sed -i 's|https://mirrors.aliyun.com|http://mirrors.cloud.aliyuncs.com|g' /etc/yum.repos.d/docker-ce.repo
+#Alibaba Cloud Linux3专用的dnf源兼容插件
+sudo dnf -y install dnf-plugin-releasever-adapter --repo alinux3-plus
+Ubuntu
+#更新包管理工具
+sudo apt-get update
+sudo apt-get -y install apt-transport-https ca-certificates curl software-properties-common
+#添加Docker软件包源（使用keyrings方式管理GPG密钥）
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL http://mirrors.cloud.aliyuncs.com/docker-ce/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
+ARCH=$(dpkg --print-architecture)
+DISTRO=$(. /etc/os-release && echo "$VERSION_CODENAME")
+sudo tee /etc/apt/sources.list.d/docker.list > /dev/null <<EOF
+deb [arch=${ARCH} signed-by=/etc/apt/keyrings/docker.gpg] http://mirrors.cloud.aliyuncs.com/docker-ce/linux/ubuntu ${DISTRO} stable
+EOF
+sudo apt-get update
+Debian
+重要
+Debian 10 及更早版本，需先更换源。
+#添加 GPG 密钥
+sudo apt update
+sudo apt install ca-certificates curl
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL http://mirrors.cloud.aliyuncs.com/docker-ce/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+#将该软件源添加到 Apt 源列表中。
+sudo tee /etc/apt/sources.list.d/docker.sources <<EOF
+Types: deb
+URIs: http://mirrors.cloud.aliyuncs.com/docker-ce/linux/debian
+Suites: $(. /etc/os-release && echo "$VERSION_CODENAME")
+Components: stable
+Signed-By: /etc/apt/keyrings/docker.asc
+EOF
+sudo apt update
+Red Hat
+#添加Docker软件包源
+sudo wget -O /etc/yum.repos.d/docker-ce.repo http://mirrors.cloud.aliyuncs.com/docker-ce/linux/rhel/docker-ce.repo
+sudo sed -i 's|https://mirrors.aliyun.com|http://mirrors.cloud.aliyuncs.com|g' /etc/yum.repos.d/docker-ce.repo
+Fedora
+#添加Docker软件包源
+sudo wget -O /etc/yum.repos.d/docker-ce.repo http://mirrors.cloud.aliyuncs.com/docker-ce/linux/fedora/docker-ce.repo
+sudo sed -i 's|https://mirrors.aliyun.com|http://mirrors.cloud.aliyuncs.com|g' /etc/yum.repos.d/docker-ce.repo
+Anolis OS / CentOS
+#添加Docker软件包源
+sudo wget -O /etc/yum.repos.d/docker-ce.repo http://mirrors.cloud.aliyuncs.com/docker-ce/linux/centos/docker-ce.repo
+sudo sed -i 's|https://mirrors.aliyun.com|http://mirrors.cloud.aliyuncs.com|g' /etc/yum.repos.d/docker-ce.repo
+Alibaba Cloud Linux 2
+#添加Docker软件包源
+sudo wget -O /etc/yum.repos.d/docker-ce.repo http://mirrors.cloud.aliyuncs.com/docker-ce/linux/centos/docker-ce.repo
+sudo sed -i 's|https://mirrors.aliyun.com|http://mirrors.cloud.aliyuncs.com|g' /etc/yum.repos.d/docker-ce.repo
+#Alibaba Cloud Linux2专用的yum源兼容插件
+sudo yum install yum-plugin-releasever-adapter --disablerepo=* --enablerepo=plus
+相关文档
+Docker的更多使用方法，请参见Docker官方文档。
+阿里云推出了制品中心，为开发者免费提供了来源于阿里云官方、龙蜥社区的安全可信容器基础镜像。
+使用企业P2P加速功能提升镜像拉取速度。具体操作，请参见在其他容器环境中使用P2P加速。
+在Docker中配置CLI来管理阿里云资源。具体操作，请参见在Docker容器中运行阿里云CLI。
+在轻量应用服务器上部署Docker，可参考基于轻量应用服务器上部署并使用Docker。

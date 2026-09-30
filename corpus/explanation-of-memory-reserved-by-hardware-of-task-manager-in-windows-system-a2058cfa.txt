@@ -1,0 +1,17 @@
+# Windows系统中任务管理器的硬件保留的内存解释
+> https://help.aliyun.com/zh/ecs/user-guide/explanation-of-memory-reserved-by-hardware-of-task-manager-in-windows-system
+
+本文介绍 Windows 实例的任务管理器中“硬件保留的内存”的含义、计算方式及主要构成。
+任务管理器中显示的“硬件保留的内存”，是操作系统无法使用的物理内存部分。该数值由“已安装内存”与“总内存”两个值的差值计算得出。以一台 8 GB 内存的实例为例，相关取值如下：
+plaintext[+0x268] m_InstalledMemoryMB : 8192.000000 [Type: double] // 已安装内存
+[+0x240] m_TotalMemoryMB : 8187.964844 [Type: double] // 总内存（可供操作系统使用）
+因此，该实例的硬件保留内存约为 8192 - 8187.96 ≈ 4.04 MB。
+已安装内存的来源
+已安装内存是从固件表 “RSMB” 中获取的，该表记录了所有物理内存信息。相关 API 为 GetSystemFirmwareTable 函数。
+总内存的来源
+总内存是通过固件报告的内存描述符（memory descriptors）计算得出的。操作系统会将所有可供其使用的页面（pages）加总，作为总内存。
+硬件保留内存主要包括以下部分：
+固件保留内存（Firmware Reserved、Firmware Permanent）
+固件代码和数据（Firmware Code/Data）
+特殊用途内存（如 IO space、bad、special、hypervisor reserved 等）
+其他操作系统无法使用的内存区域

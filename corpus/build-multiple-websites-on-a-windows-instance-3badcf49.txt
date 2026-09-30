@@ -1,0 +1,60 @@
+# IIS服务配置多站点
+> https://help.aliyun.com/zh/ecs/user-guide/build-multiple-websites-on-a-windows-instance
+
+在一台ECS实例中配置多个Web站点，可以有效节约运营成本，便捷管理多个网站（包括更新软件、配置安全设置、备份数据等），根据各个网站的需求变化，可以灵活调整资源分配等。本文介绍如何在Windows Server 2012 R2 64位系统的ECS实例上使用IIS服务器搭建多个Web站点。
+前提条件
+已创建ECS实例，并部署了Web环境。具体操作请参见快速部署宝塔面板。
+本教程中，将通过Windows操作系统的IIS服务器，搭建两个测试站点windows-testpage-1和windows-testpage-2，并配置相同端口下不同域名来实现站点访问。
+创建测试站点
+远程连接已部署Web环境的ECS实例。
+具体操作，请参见使用Workbench登录Windows实例。
+在桌面上单击这台电脑，并进入默认网站根目录下C:\wwwroot。
+分别创建windows-testpage-1和windows-testpage-2两个文件夹。
+文件夹位于 C:\wwwroot 目录下。
+进入windows-testpage-1文件夹，创建测试文件test1.php，并在文件中输入以下测试内容。
+<?php
+echo "<title>Test-1</title>";
+echo "windows-test-1";
+进入windows-testpage-2文件夹，创建测试文件test2.php，并在文件中输入以下测试内容。
+<?php
+echo "<title>Test-2</title>";
+echo "windows-test-2";
+配置IIS服务器
+在桌面底部任务栏，单击服务器管理器图标。
+在顶部菜单栏，单击工具 > Internet Information Services (IIS)管理器。
+在IIS管理器的左侧导航栏，单击服务器名称，并单击网站。
+在右侧操作区域，单击添加网站...。添加windows-testpage-1测试站点，然后单击确定。
+添加网站配置信息如下所示：
+配置说明：
+网站名称：测试名称windows-testpage-1
+应用程序池：DefaultAppPool
+物理路径：测试站点windows-testpage-1的物理路径
+主机名：测试域名test1.com
+在右侧操作区域，单击添加网站...。添加windows-testpage-2测试站点，然后单击确定。
+添加网站配置信息如下所示。绑定区域中，类型选择 http，IP 地址保持全部未分配，端口设置为 80，并勾选立即启动网站。
+配置说明：
+网站名称：测试名称windows-testpage-2
+应用程序池：DefaultAppPool
+物理路径：测试站点windows-testpage-2的物理路径
+主机名：测试域名test2.com
+添加完成后，IIS 网站列表中显示三个网站（default.com、windows-test-1、windows-test-2）均为已启动状态，分别绑定域名 default.com、test1.com、test2.com，端口均为 80。
+（可选）本地配置hosts
+由于本教程中全部使用的测试信息，因此需要在本地的hosts文件中配置IP映射。如果您在配置多个站点信息时使用的是真实的域名，请忽略该步骤。教程中本地物理机使用Windows操作系统。
+访问C:\Windows\System32\drivers\etc目录。
+复制hosts文件进行备份。
+保留hosts - 副本文件，在测试完成后使用该文件恢复hosts文件的初始状态。
+修改hosts文件。
+在文件末尾追加以下内容，然后保存文件并退出。
+<ECS实例公网IP> test1.com
+<ECS实例公网IP> test2.com
+返回Windows桌面，并按下Win + R组合键。
+在运行对话框中输入cmd，并单击确定。
+在命令行中运行以下命令，使hosts配置立即生效。
+ipconfig /flushdns
+执行结果
+在本地主机打开浏览器，成功访问到两个测试站点。
+访问 test1.com/test1.php，页面成功返回 windows-test-1 文本，表明第一个测试站点运行正常。
+访问 test2.com/test2.php，页面显示 windows-test-2，表明第二个虚拟主机站点配置正常。
+至此多个Web站点已搭建成功。在实际搭建站点场景中，您只需要将主机名与项目的物理路径配置正确，即可实现多站点的访问。如果您需要安装SSL证书，请参见在IIS服务器安装SSL证书（Windows）。
+相关文档
+如果您想要在Linux实例中部署多个Web站点，请参见Nginx服务配置多站点。

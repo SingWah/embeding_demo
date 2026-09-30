@@ -1,0 +1,161 @@
+# 版本说明
+> https://help.aliyun.com/zh/ecs/developer-reference/api-ecs-2014-05-26-changeset
+
+变更时间：2026-03-30
+变更集发布说明：
+OpenAPI 名称
+变更内容概要
+操作
+CloneDisks
+新增 OpenAPI。
+查看变更详情
+查看API文档
+变更时间：2026-03-27
+变更集发布说明：
+OpenAPI 名称
+变更内容概要
+操作
+DescribeLockedSnapshots
+OpenAPI 错误码发生变更、OpenAPI 返回结构发生变更。
+查看变更详情
+查看API文档
+LockSnapshot
+OpenAPI 错误码发生变更、OpenAPI 返回结构发生变更。
+查看变更详情
+查看API文档
+变更时间：2026-03-26
+变更集发布说明：
+OpenAPI 名称
+变更内容概要
+操作
+CreateImagePipeline
+OpenAPI 错误码发生变更。
+查看变更详情
+查看API文档
+DescribeImagePipelines
+OpenAPI 描述信息更新、OpenAPI 错误码发生变更。
+查看变更详情
+查看API文档
+StartImagePipelineExecution
+OpenAPI 描述信息更新、OpenAPI 错误码发生变更。
+查看变更详情
+查看API文档
+变更时间：2026-03-26
+变更集发布说明：
+OpenAPI 名称
+变更内容概要
+操作
+CreateDeploymentSet
+OpenAPI 错误码发生变更、OpenAPI 入参发生变更。
+查看变更详情
+查看API文档
+DescribeDeploymentSets
+OpenAPI 错误码发生变更、OpenAPI 入参发生变更、OpenAPI 返回结构发生变更。
+查看变更详情
+查看API文档
+变更时间：2026-03-25
+变更集发布说明：
+OpenAPI 名称
+变更内容概要
+操作
+CreateAutoSnapshotPolicy
+OpenAPI 错误码发生变更。
+查看变更详情
+查看API文档
+CreateSnapshot
+OpenAPI 错误码发生变更。
+查看变更详情
+查看API文档
+CreateSnapshotGroup
+OpenAPI 错误码发生变更。
+查看变更详情
+查看API文档
+变更时间：2026-03-23
+变更集发布说明：
+OpenAPI 名称
+变更内容概要
+操作
+ModifyInstanceDeployment
+OpenAPI 错误码发生变更。
+查看变更详情
+查看API文档
+变更时间：2026-03-19
+变更集发布说明：
+OpenAPI 名称
+变更内容概要
+操作
+CancelTask
+OpenAPI 描述信息更新、OpenAPI 错误码发生变更。
+查看变更详情
+查看API文档
+变更时间：2026-03-17
+变更集发布说明：
+OpenAPI 名称
+变更内容概要
+操作
+DeleteActivation
+OpenAPI 错误码发生变更。
+查看变更详情
+查看API文档
+DeleteCommand
+OpenAPI 错误码发生变更。
+查看变更详情
+查看API文档
+DescribeActivations
+OpenAPI 错误码发生变更。
+查看变更详情
+查看API文档
+DescribeCloudAssistantStatus
+OpenAPI 错误码发生变更。
+查看变更详情
+查看API文档
+DescribeSendFileResults
+OpenAPI 错误码发生变更。
+查看变更详情
+查看API文档
+DescribeTerminalSessions
+OpenAPI 错误码发生变更。
+查看变更详情
+查看API文档
+DisableActivation
+OpenAPI 错误码发生变更。
+查看变更详情
+查看API文档
+EndTerminalSession
+OpenAPI 错误码发生变更。
+查看变更详情
+查看API文档
+InstallCloudAssistant
+OpenAPI 错误码发生变更。
+查看变更详情
+查看API文档
+ListPluginStatus
+OpenAPI 错误码发生变更。
+查看变更详情
+查看API文档
+ModifyInvocationAttribute
+OpenAPI 错误码发生变更。
+查看变更详情
+查看API文档
+变更时间：2026-03-17
+变更集发布说明：
+OpenAPI 名称
+变更内容概要
+操作
+DescribeCloudAssistantSettings
+OpenAPI 错误码发生变更、OpenAPI 返回结构发生变更。
+查看变更详情
+查看API文档
+ModifyCloudAssistantSettings
+OpenAPI 错误码发生变更、OpenAPI 入参发生变更。
+查看变更详情
+查看API文档
+变更时间：2026-03-12
+变更集发布说明：
+OpenAPI 名称
+变更内容概要
+操作
+ModifyInstanceDeployment
+OpenAPI 描述信息更新、OpenAPI 错误码发生变更。
+查看变更详情
+查看API文档

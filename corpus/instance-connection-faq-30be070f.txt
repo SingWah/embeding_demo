@@ -1,0 +1,276 @@
+# 连接实例
+> https://help.aliyun.com/zh/ecs/instance-connection-faq/
+
+SSH远程连接问题
+Workbench登录问题
+提示“连接超时”怎么办？
+提示“登录失败，无法使用密码登录方式”怎么办？
+提示“登录实例失败，原因：用户名或密码不正确”怎么办？
+提示“登录实例失败：DefaultConnectFuture[root@/xxx.xxx.xx.xxx:22]: Failed (AnnotatedConnectException) to execute: Connection refused: /xxx.xxx.xx.xxx:22”怎么办？
+Workbench 远程连接报错 URL 404 怎么办？
+使用SSH客户端登录问题
+提示“Access denied”错误怎么办？
+提示“Permission denied, please try again”错误怎么办？
+提示“ssh_exchange_identification: read: Connection reset by peer”错误怎么办？
+提示“No supported authentication methods available (server sent: publickey,gssapi-keyex,gssapi-with-mic)”错误怎么办？
+提示“Too many authentication failures”错误怎么办？
+提示“Host key verification failed”错误怎么办？
+提示“error: Unable to load host key: /etc/ssh/ssh_host_rsa_key”怎么办？
+提示“Maximum amount of failed attempts was reached”错误怎么办？
+提示“could not set limit for ‘nofile’: Operation not permitted”错误怎么办？
+提示“This account is currently not available.”错误怎么办？
+提示“fatal: mm_request_send: write: Broken pipe”错误怎么办？
+使用SFTP客户端登录问题
+提示“Received unexpected end-of-file from SFTP server”错误怎么办？
+其他
+SSH服务端口配置错误导致无法连接ECS实例怎么办？
+SSH服务未启动导致无法远程连接Linux实例怎么办？
+启用PAM认证模块后，无法登录Linux实例怎么办？
+重置Linux实例root用户密码后，无法使用修改后的密码登录实例怎么办？
+ECS 实例因资源耗尽导致系统夯住、无法远程连接（SSH/VNC/Workbench 失败）怎么办？
+SSH服务启动问题&解决方案
+sshd配置错误导致SSH服务启动失败，从而无法远程连接ECS实例该如何解决？
+sshd服务启动失败，系统日志报错：/usr/share/empty.sshd must be owned by root and not group or world-writable
+启动SSH服务时提示“error while loading shared libraries”错误怎么办？
+启动SSH服务时提示“fatal: Cannot bind any address”错误怎么办？
+启动SSH服务时提示“Bad configuration options”错误怎么办？
+启动SSH服务提示“Failed to start OpenSSh server daemon”错误怎么办？
+启动SSH服务时提示“must be owned by root and not group or world-writable”错误怎么办？
+启动SSH服务时未遇到任何错误信息，但是ssh服务未启动该怎么办？
+其他常见问题&解决方案
+如何保持进程在SSH客户端断开后仍继续运行？
+远程连接Linux实例时卡顿怎么办？
+SSH登录或数据传输速度都很慢怎么办？
+修改Linux实例密码失败，提示“passwd: Module is unknown”怎么办？
+远程桌面（RDP）连接问题
+无法远程连接Windows实例的排查方法
+通过远程桌面连接Windows实例，提示“为安全考虑，已锁定该用户账户，原因是登录尝试或密码更改尝试过多”错误怎么办？
+Windows远程桌面连接出现“内部错误”
+远程登录Windows实例提示“您的凭据不工作”如何处理？
+通过远程桌面连接Windows实例时出现“出现身份验证错误，要求的函数不受支持”如何解决?
+通过远程桌面连接Windows实例提示“远程桌面用户组没有该权限”错误怎么办？
+通过远程桌面连接Windows实例提示"连接被拒绝，因为没有授权此用户账户进行远程登录"错误怎么办？
+通过远程桌面连接Windows实例提示“由于协议错误，会话将被中断，请重新连接到远程计算机”错误怎么办？
+通过远程桌面连接Windows Server 2008 R2系统的ECS实例时，提示“未指定远程桌面授权服务器”错误怎么办？
+通过远程桌面连接Windows实例提示“发生身份验证错误，无法连接到本地安全机构”错误怎么办？
+通过远程桌面连接Windows实例出现报错代码“0x112f”错误怎么办？
+Windows Server 2012系统的ECS实例无法允许单个用户连接多个远程桌面会话怎么办？
+在Windows系统的ECS实例上安装软件后，通过命令行工具执行命令时提示“command not found”错误怎么办？
+Windows Server 2008与2012系统的ECS实例无法启用远程协助中的“允许远程协助连接这台计算机”选项怎么办？
+通过远程桌面连接Windows实例提示“要远程登录，你需要具有通过远程桌面服务进行登录的权限。”信息如何解决?
+通过远程桌面连接Windows实例无法长时间保持连接如何解决？
+通过远程桌面连接Winodws系统的ECS实例时，无法进行文本复制粘贴如何解决？
+通过远程桌面连接Windows系统的ECS实例时，提示“远程桌面连接已断开”错误怎么办？
+使用相同的账号和密码，通过VNC登录Windows实例成功，通过远程桌面连接Windows实例却失败怎么办？
+通过远程桌面连接Windows系统的ECS实例提示“发生身份验证错误。要求的安全包不存在”错误怎么办?
+Windows实例的RPC组件异常如何解决？
+通过远程桌面连接Windows实例提示“远程连接计算机需要网络级别身份验证”怎么办?
+通过Mac系统的远程桌面连接Windows实例，提示“远程桌面连接无法验证您希望连接的计算机的身份”错误怎么办？
+通过远程桌面连接Windows系统的ECS实例时，提示“终端服务器超出了最大允许连接数”错误怎么办？
+通过远程桌面连接Windows实例失败但没有错误提示怎么办？
+通过远程桌面连接Windows实例提示“系统找不到指定的文件”错误怎么办？
+为什么使用默认的端口（3389）无法登录Windows实例？
+通过远程桌面连接Windows实例，输入密码后连接自动断开，查看系统日志显示存在登录和注销记录怎么办？
+Windows实例如何启动远程桌面连接RDP服务
+通过远程桌面连接Windows实例，提示“由于从远程计算机接收到非预期的服务器身份验证证书，连接已经被终止”错误怎么办？
+通过远程桌面连接Windows实例，提示“远程桌面由于以下原因之一无法连接到远程计算机”错误怎么办？
+通过Workbench工具RDP远程连接Windows实例的问题
+由于远程桌面配置“不允许远程连接到此计算机”导致无法远程连接Windows实例
+通过远程桌面连接Windows Server 2022系统的ECS实例，提示“你的远程桌面服务会话已结束，可能是下列原因之一”错误怎么办？
+通过VNC远程连接实例的问题
+通过VNC远程连接实例的问题
+无法连接ECS实例中的FTP服务问题
+Windows实例
+在Windows系统的ECS实例中，无法通过外网环境连接和访问FTP服务怎么办？
+连接Windows系统的ECS实例中的FTP服务器时，提示“530 Login incorrect”错误怎么办？
+连接Windows系统的ECS实例中的FTP服务器时，提示“530 valid hostname is expected”错误怎么办？
+Windows系统的ECS实例中，通过FTP上传文件到FileZilla Server失败，提示“550 Permission denied”错误怎么办？
+通过FTP over TLS方式连接Windows实例上IIS服务创建的FTP站点时，提示“534 Policy requires SSL”信息，如何处理？
+Linux实例
+上传文件到Linux系统的ECS实例中的FTP站点时，提示“425 Security:Bad IP connection”错误怎么办？
+Linux系统的ECS实例通过vsftp上传文件失败，提示“553 Could not create file”错误怎么办？
+附录
+sshd服务启动失败，系统日志报错：/usr/share/empty.sshd must be owned by root and not group or world-writable
+问题描述
+ECS实例中sshd服务启动失败，系统日志显示OpenSSH服务器因权限问题无法启动，系统日志报错信息：/usr/share/empty.sshd must be owned by root and not group or world-writable
+问题原因
+sshd服务启动失败，原因是/usr/share/empty文件权限不符合要求。
+解决方案
+chown -R root.root /usr/share/empty
+chmod 744 /usr/share/empty
+systemctl start sshd
+ll -ld /usr/share/empty*
+在Windows系统的ECS实例中，无法通过外网环境连接和访问FTP服务怎么办？
+问题现象
+在Windows系统的ECS实例中，已经搭建的FTP服务在外网环境无法连接和访问该FTP服务器。
+问题原因
+可能导致该问题的原因如下：
+未放行FTP的安全组规则：请参考方案一：添加FTP的安全组规则进行操作。
+防火墙拦截FTP进程：请参考方案二：配置FTP防火墙支持进行操作。
+解决方案
+请根据实际情况，选择以下两种方案进行操作。
+方案一：添加FTP的安全组规则
+当您在Windows系统的ECS实例中搭建好FTP站点后，需要在Windows系统的ECS实例所属的安全组中，添加入方向规则，放行FTP服务器所需的21端口以及FTP服务器被动模式可能占用的端口范围1024~65535，具体操作请参见添加安全组规则。
+说明
+关于安全组的更多配置信息，请参见安全组应用指导和案例和常用端口。
+方案二：配置FTP防火墙支持
+如果您的防火墙为开启状态，则需要通过配置IIS管理器放行TCP21端口与1024~65535端口用于FTP服务。请参考以下步骤进行操作。
+说明
+Windows系统的ECS实例内部的防火墙默认为关闭状态。
+本文以IIS管理器为例，介绍如何配置FTP。
+远程连接Windows实例。
+具体操作，请参见通过密码或密钥认证登录Windows实例。
+打开IIS 管理器，然后双击FTP防火墙支持，进入FTP防火墙支持的配置界面。
+配置相关参数，并单击应用。
+说明
+参数说明如下：
+防火墙的外部IP地址：输入该Windows系统的ECS实例的公网IP地址。
+数据通道端口范围：指定用于被动连接的端口范围。可指定的有效端口范围为1025-65535。请根据实际需求进行设置，本文以1024~65535端口为例。
+打开命令行，执行以下命令重启FTP服务，确保覆盖每个FTP站点的配置。
+net stop ftpsvc&net start ftpsvc
+（可选）若配置好FTP服务器后，可以在本机访问，但是无法通过另一台机器访问，该问题是由于防火墙配置错误，请参考以下操作进行配置：
+首先检查服务器管理器中的入站规则，确保已启用FTP服务器。
+添加Windows服务主进程。
+打开控制面板 > Windows防火墙，然后单击左侧的允许程序或功能通过Windows防火墙。
+在新窗口中单击允许运行另一程序，在浏览中找到C:\Windows\System32\svchost.exe打开以添加服务主进程。
+此时会多出一项Windows服务主进程，选中家庭/工作（专用）与公用，然后单击确定。
+连接Windows系统的ECS实例中的FTP服务器时，提示“530 Login incorrect”错误怎么办？
+问题现象
+连接Windows系统的ECS实例中的FTP服务器时，提示以下错误。
+响应：331 Please specify the password.
+命令：PASS ************
+响应：530 Login incorrect.
+错误：严重错误：无法连接到服务器
+问题原因
+可能是由于以下原因导致的：
+FTP密码不正确：请参考方案一：修改FTP密码进行操作。
+FTP用户权限配置错误：请参考方案二：添加FTP用户权限进行操作。
+解决方案
+请根据实际情况，选择以下两种方案进行操作。
+方案一：修改FTP密码
+远程连接Windows实例。
+具体操作，请参见通过密码或密钥认证登录Windows实例。
+右键单击桌面的计算机 > 管理，打开服务器管理器。
+单击左侧配置本地用户和组 > 用户，右键单击对应的FTP账号，选择设置密码。
+方案二：添加FTP用户权限
+远程连接Windows实例。
+具体操作，请参见通过密码或密钥认证登录Windows实例。
+检查FTP对应的目录文件是否正常存在。
+若不存在：请参考步骤三：设置共享文件的权限，重新创建FTP对应文件并添加相关权限。
+若存在：右键单击该文件夹，选择属性 > 安全，选择对应FTP账号添加相关权限。
+连接Windows系统的ECS实例中的FTP服务器时，提示“530 valid hostname is expected”错误怎么办？
+问题现象
+通过IIS 7.5配置的FTP绑定域名后，通过IP等方式连接Windows系统的ECS实例中的FTP服务器时，提示“530 valid hostname is expected”或者“503 Login with USER first”错误。
+问题原因
+通过IIS 7.5配置的FTP绑定域名后，在登录FTP时，输入的域名格式不正确。
+解决方案
+如果FTP绑定的域名是www.example.com，用户名为user，则登录时需要使用www.example.com|user进行登录。
+说明
+注意中间用“|”分隔。
+您也可以将域名绑定删除，然后直接通过用户名进行登录。
+Windows系统的ECS实例中，通过FTP上传文件到FileZilla Server失败，提示“550 Permission denied”错误怎么办？
+问题现象
+在Windows系统的ECS实例中，通过FTP向FileZilla Server上传文件时，提示“550 Permission denied”错误。
+问题原因
+FileZilla Server中相应的FTP账号没有write权限。
+解决方案
+远程连接Windows实例。
+具体操作，请参见通过密码或密钥认证登录Windows实例。
+运行FileZilla Server软件。在Users配置页面，选择Shared folders配置项。
+选择对应的用户与目录，勾选Write单选框，单击OK按钮，完成权限配置。
+通过FTP over TLS方式连接Windows实例上IIS服务创建的FTP站点时，提示“534 Policy requires SSL”信息，如何处理？
+问题描述
+通过FTP over TLS方式连接Windows实例上IIS服务创建的FTP站点时，提示“534 Policy requires SSL”信息，无法连接FTP站点。
+问题原因
+由该问题的“534 Local policy on server does not allow TLS secure connections.”响应信息可知，FTP站点的FTP SSL 设置参数不正确导致该问题。
+解决方案
+远程连接Windows实例。
+具体操作，请参见连接方式概述。
+在桌面左下角，选择 > Windows管理工具 > Internet Information Services（IIS）管理器。
+在FTP主页的FTP区域，双击FTP SSL设置。
+在FTP SSL设置区域，将SSL 策略设置为允许 SSL 连接，然后在操作列单击应用。
+再次访问该FTP站点。
+上传文件到Linux系统的ECS实例中的FTP站点时，提示“425 Security:Bad IP connection”错误怎么办？
+问题现象
+用户上传文件到Linux系统的ECS实例中的FTP站点时，提示“425 Security:Bad IP connection”错误。
+问题原因
+该问题通常是由于客户端处于NAT网络，而NAT网络关联的公网IP不止一个，导致两次连接时，源IP不一致，从而导致报错。
+说明
+FTP服务同时拥有两个连接，一个是控制连接，一个是数据连接。在默认情况下，数据传输时FTP服务器端会核实两个连接的源IP是否一致，如果不一致，就会报“425 Security:Bad IP connection”错误。
+解决方案
+请参考以下操作，关闭被动模式下的IP安全检查。
+远程连接Linux实例。
+具体操作，请参见通过密码或密钥认证登录Linux实例。
+执行如下命令，编辑FTP配置文件。
+vi /etc/vsftpd/vsftpd.conf
+按i键进入编辑模式，在配置文件中添加如下内容。
+pasv_promiscuous=yes
+编辑完成后，按Esc键退出编辑模式，然后输入:wq并按回车键保存退出。
+执行如下命令，重启FTP服务。
+systemctl restart vsftpd
+Linux系统的ECS实例通过vsftp上传文件失败，提示“553 Could not create file”错误怎么办？
+问题现象
+Linux系统的ECS实例通过vsftp上传文件失败，提示“553 Could not create file”错误。
+问题原因
+可能由于以下原因导致：
+Linux实例磁盘空间已满。
+FTPhome目录未拥有write权限。
+解决方案
+请参考以下操作排查Linux实例磁盘空间大小及FTPhome目录拥有权限情况。
+远程连接Linux实例。
+具体操作，请参见通过密码或密钥认证登录Linux实例。
+执行如下命令，确认是否为Linux实例磁盘空间已满，导致文件无法上传提示该错误。
+df -h
+说明
+磁盘分区空间使用率达到100%则表示该磁盘空间已满。
+系统显示类似如下信息。例如，分区/dev/xvda1的使用率为59%。
+Filesystem Size Used Avail Use% Mounted on
+/dev/xvda1 20G 11G 7.8G 59% /
+tmpfs 498M 1.6M 496M 1% /dev/shm
+执行如下命令，确认FTPhome目录是否拥有write权限。
+说明
+执行后续命令前，请根据实际情况，更换/home/user目录为您实际FTP的home目录名称。
+ls -l /home/user
+如以下示例所示，权限没有w，则代表您当前没有write权限。
+dr-xr-xr-x 4 xxx xxx 4096 May 10 21:47 zhengbo
+执行如下命令，添加write权限并保存。
+chmod +w /home/user
+执行如下命令，若命令执行结果中存在w，则表示write权限添加成功。
+ls -l /home/user
+ECS 实例因资源耗尽导致系统夯住、无法远程连接（SSH/VNC/Workbench 失败）怎么办？
+当 ECS 实例因 CPU 负载过高、内存不足或磁盘 IO/BPS/IOPS 打满导致操作系统无响应时，可能无法通过 SSH、VNC 或 Workbench 远程连接实例。请按以下步骤进行紧急恢复和根因排查。
+问题原因
+系统夯住（Hang）通常由以下原因之一或组合导致：
+内存不足触发频繁换页：物理内存耗尽后，内核 kswapd0 进程持续将内存页换出到磁盘（swap），导致磁盘 IO 打满，系统整体响应极慢。
+单一进程资源耗尽：某个进程（如 Docker 容器、Java 应用、MySQL 数据库）占用了大量 CPU 或内存资源，导致系统无法为 SSH 等关键服务分配资源。
+磁盘空间 100% 满：磁盘空间耗尽会导致关键系统进程无法正常工作。例如，SSH 登录需要写入历史记录文件，磁盘满时该操作会被阻塞，导致 SSH 连接卡住。
+紧急恢复步骤
+创建快照备份数据
+登录ECS 管理控制台，找到目标实例的系统盘和数据盘，优先创建快照备份。
+重要
+系统夯住状态下，磁盘 IO 可能持续高位，快照创建时间会明显延长，请耐心等待完成。
+尝试通过云助手发送命令（可选）
+如果希望在重启前先停止导致问题的应用程序以确保数据落盘，可以尝试在 ECS 管理控制台通过云助手向实例发送 kill 或 stop 命令。但如果操作系统内核已无响应，命令会执行超时，此时请直接进行下一步。
+警告
+执行 kill 或 stop 命令将强制中断目标进程，可能导致业务数据写入不完整、文件损坏或数据库非正常关闭，操作前评估业务影响。
+重启实例
+在 ECS 管理控制台对实例执行重启操作。
+首先尝试普通重启（等待内核响应关机指令），观察 10～15 分钟。
+如果普通重启超时无效，执行强制重启。强制重启相当于物理断电重启，有极小概率损坏正在写入的文件，因此请务必确认已完成快照备份。
+根因定位与长期优化
+安装 atop 工具：建议使用atop工具监控Linux系统指标并配置开机自启（systemctl enable atop），atop 会持续记录系统资源使用情况。
+检查 OOM 记录：执行 dmesg | grep -i oom 或查看 /var/log/messages，确认系统是否发生过 OOM（Out Of Memory）事件。
+优化内存配置：针对内存瓶颈，可以配置 Linux swap 分区作为临时缓冲。如果业务长期需要更多内存，建议升级实例规格。
+配置云监控告警：在云监控中为 CPU 使用率、内存使用率、磁盘 IO 等指标配置阈值告警，在资源接近耗尽前及时收到通知。
+Workbench 远程连接报错 URL 404 怎么办？
+可能是链接失效导致。请返回ECS 控制台，找到对应的实例，再次选择远程连接 > Workbench 远程连接，系统会生成新的有效链接。
+Alibaba Cloud Linux 3.2104如何配置登录失败锁定账户
+Alibaba Cloud Linux 3.2104 操作系统使用autoselect的方式来自动管理pam.d。手动修改pam.d参数不会生效。正确配置方法如下：
+执行命令查看当前是local还是sssd。默认是sssd。
+sudo authselect current
+配置faillock。
+sudo authselect select sssd with-faillock --force
+修改/etc/security/faillock.conf文件。例如登录失败3次，锁定60s , root用户也需要被锁定，则配置如下三个参数：
+deny = 3
+unlock_time = 60
+even_deny_root

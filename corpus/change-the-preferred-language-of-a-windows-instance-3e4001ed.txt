@@ -1,0 +1,44 @@
+# 如何为ECS实例设置Windows操作系统首选语言
+> https://help.aliyun.com/zh/ecs/user-guide/change-the-preferred-language-of-a-windows-instance
+
+本文介绍如何为阿里云公共镜像中的Windows Server更新下载语言资源包，为一台ECS实例重新设置首选语言。
+背景信息
+云服务器ECS仅提供中文版和英文版的Windows Server公共镜像。如果您需要使用其他语言版本，如阿拉伯语、德语、俄语或日语等，可以根据本文设置ECS实例的首选语言。
+本文示例中，实例默认语言为中文，以将实例默认语言设置为日本语为例，介绍Windows Server 2012及其以上版本的操作系统。 实例切换操作系统首选语言以及创建自定义镜像的操作流程。
+操作步骤
+连接Windows实例。具体操作，请参见使用Workbench登录Windows实例
+打开PowerShell模块。
+运行以下命令临时禁用WSUS（Windows Server Update Services）更新源。
+Set-ItemProperty -Path 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU' -Name UseWUServer -Value 0
+Restart-Service -Name wuauserv
+设置实例操作系统首选语言。
+Windows Server 2019及其以上版本
+打开Windows 设置，单击时间和语言。
+在左侧侧边栏单击语言，在右侧区域首选语言选项下单击添加语言。
+在弹出框的搜索框中，选择一种语言，例如日本语，单击Next。
+在安装语言功能弹出框中勾选设置为我的Windows显示语言，单击安装 。
+在语言设置页面，等待语言下载完毕后，点击向上箭头，更改语言优先级
+安装完成后，在ECS管理控制台重启实例。具体操作，请参见重启实例。
+再次连接Windows实例。显示语言更改为日语。
+打开PowerShell ISE模块，运行以下命令重新启用WSUS。
+Set-ItemProperty -Path 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU' -Name UseWUServer -Value 1
+Restart-Service -Name wuauserv
+打开Windows Update，检查安全更新，重新安装配置在设置语言之前已完成的所有安全更新。
+Windows Server 2012&2016
+打开控制面板，单击时钟、语言和区域 > 语言 > 添加语言。
+在添加语言界面中，选择一种语言，例如日本语，单击添加。
+选择语言，例如日本语，单击上移更改语言优先级。
+单击所选语言右侧的Options，在线检查语言更新。
+等待实例检查更新，大约三分钟后更新完成，会提示可供下载，单击下载并安装语言包。
+等待安装完成。
+安装完成后，在ECS管理控制台重启实例。具体操作，请参见重启实例。
+再次连接Windows实例。显示语言更改为日本语。
+打开PowerShell ISE模块，运行以下命令重新启用WSUS。
+Set-ItemProperty -Path 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU' -Name UseWUServer -Value 1
+Restart-Service -Name wuauserv
+打开Windows Update，检查安全更新，重新安装在设置语言之前已完成的所有安全更新。
+后续步骤
+您可以使用相同语言设置创建多台实例：
+登录ECS管理控制台。
+根据该Windows实例创建自定义镜像。具体操作，请参见创建自定义镜像。
+通过自定义镜像创建指定数量的实例。具体操作，请参见使用自定义镜像或共享镜像创建实例。

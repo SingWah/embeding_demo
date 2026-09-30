@@ -1,0 +1,286 @@
+# 通过CLI使用和管理ECS实例
+> https://help.aliyun.com/zh/ecs/developer-reference/api-reference-quick-start
+
+阿里云CLI（Command Line Interface）是一种命令行工具，允许用户在终端或命令行界面调用阿里云API，来创建、配置、管理阿里云云资源。本文主要介绍如何使用阿里云CLI调用ECS API来创建和管理ECS实例的方法及其常用示例。
+说明
+关于阿里云CLI的详细信息，请参见什么是阿里云CLI。
+CLI使用方式
+安装和配置CLI
+使用本地终端
+安装CLI。
+阿里云CLI提供了Windows、Linux和macOS三种操作系统下的安装服务，请根据您使用设备的操作系统选择：
+安装CLI（Windows）
+安装CLI（Linux）
+安装CLI（macOS）
+配置CLI。
+配置调用阿里云资源所需的凭证信息、地域、语言等。具体配置，请参见配置凭证。
+重要
+为保证账号安全，建议您创建专用于API访问的RAM用户并创建对应的AccessKey。更多关于凭据的安全使用建议，请参见凭据的安全使用方案。
+通过Cloud Shell（适用于调试）
+通过阿里云控制台使用CLI时，无需做任何安装配置操作即可使用。由于其销毁特性会导致数据丢失，建议您使用阿里云控制台做简单、快速的操作，例如调试。
+重要
+到期销毁：Cloud Shell创建的虚拟机只有1小时使用期限，到期后会立即销毁虚拟机。再次启动时，会创建一台全新的虚拟机。
+无操作销毁：无交互式操作30分钟或者关闭所有会话窗口将视为终止操作，在终止操作后15分钟云命令行将销毁此台虚拟机。再次启动云命令行时，会为您创建一台全新的虚拟机。更多使用限制，请参见使用限制。
+登录ECS管理控制台，单击右上角的Cloud Shell图标，进入Cloud Shell控制台。
+通过CLI调用ECS API
+重要
+不同数据类型字段需要遵循的格式要求，详细说明，请参见参数格式。
+关于命令结构说明，请参见生成并调用命令。
+调用接口前建议您仔细阅读相关API的使用说明。
+安装配置好CLI后，您可以在终端按照以下命令结构，调用ECS API。
+aliyun ecs <API Name> --<参数1 取值1> --<参数2 取值2> ...
+可以通过OpenAPI自动生成API对应的CLI代码
+登录云服务器ECS API调试列表。
+选择您需要使用的API，并填写参数。
+单击右侧的CLI示例页签即可生成携带参数的命令。
+CLI调用示例
+以下示例为您展示如何使用阿里云CLI调用云服务器ECS API。
+重要
+以下请求仅为示例，具体请求命令请根据实际需求修改。
+创建ECS实例
+以在杭州地域创建一个基于Alibaba Cloud Linux镜像的包年包月的ECS实例为例，指导您如何通过CLI创建ECS实例。
+准备工作。
+在创建ECS实例前，请确保您已经创建了专有网络VPC、交换机、安全组，并获取其ID。
+说明
+如果您已有上述资源且符合需求，可跳过该步骤。
+调用CreateVpc创建VPC。
+假设在华东1（杭州）创建专有网络VPC，VPC网段为192.168.0.0/16。
+请求示例
+aliyun vpc CreateVpc \
+--RegionId cn-hangzhou \
+--CidrBlock 192.168.0.0/16
+返回示例
+"RequestId": "EC94C73B-8103-4B86-B353-E65C7C9E****",
+"ResourceGroupId": "rg-acfmzw2jz2z****",
+"RouteTableId": "vtb-bp1jxpr9ji5wcn4yv****",
+"VRouterId": "vrt-bp1dyxemup2q4ouga****",
+"VpcId": "vpc-bp1d9v4763ym2hlzt****"
+调用CreateVSwitch在VPC中创建交换机。
+假设交换机网段为192.168.0.0/24，VPC ID为vpc-bp1d9v4763ym2hlzt****。
+请求示例
+aliyun vpc CreateVSwitch \
+--CidrBlock 192.168.0.0/24 \
+--VpcId vpc-bp1d9v4763ym2hlzt**** \
+--ZoneId=cn-hangzhou-i
+返回示例
+"RequestId": "AF1787C4-0D81-44F0-A324-D5C54EA0****",
+"VSwitchId": "vsw-bp11hf5r945gewysp****"
+调用CreateSecurityGroup创建安全组。
+请求示例
+aliyun ecs CreateSecurityGroup \
+--RegionId cn-hangzhou \
+--VpcId vpc-bp1d9v4763ym2hlzt****
+返回示例
+"RequestId": "B1C25C34-9B84-49E3-9E50-FB7D7970****",
+"SecurityGroupId": "sg-bp18z2q1jg4gq95t****"
+调用AuthorizeSecurityGroup添加安全组规则。
+假设在安全组（ID为sg-bp18z2q1jg4gq95t****）的入方向放行22端口，协议为TCP。
+请求示例
+aliyun ecs AuthorizeSecurityGroup \
+--RegionId cn-hangzhou \
+--SecurityGroupId sg-bp18z2q1jg4gq95t**** \
+--IpProtocol tcp \
+--SourceCidrIp 0.0.0.0/0 \
+--PortRange 22/22
+返回示例
+"RequestId": "FA8B1E61-C9C9-4D91-9628-64B8E2F4****"
+创建ECS实例。
+调用RunInstances创建一个包年包月的ECS实例。
+场景示例
+参数
+示例取值
+RegionId
+地域：cn-hangzhou
+ImageId
+镜像：推荐使用Alibaba Cloud Linux镜像aliyun_3_x64_20G_alibase_20240528.vhd。
+InstanceType
+实例规格：
+个人应用：推荐选择2 vCPU 2 GiB的实例规格ecs.e-c1m1.large。
+中小企业应用：推荐选择2 vCPU 4 GiB的实例规格ecs.c7.large。
+SecurityGroupId
+安全组ID：根据CreateSecurityGroup返回结果。
+示例：sg-bp18z2q1jg4gq95t****
+VSwitchId
+交换机ID：根据CreateVSwitch返回结果。
+示例：vsw-bp11hf5r945gewysp****
+InstanceName
+实例名称。
+示例：ecs_cli_demo
+InstanceChargeType
+付费方式：实例按照包年包月的付费方式PrePaid。
+说明
+您需要确保账号余额能够完成支付。
+PeriodUnit
+付费周期单位：Month
+Period
+付费时长：1
+InternetMaxBandwidthOut
+公网IP带宽：1
+Password
+实例登录密码：<yourPassword>
+说明
+您需要自定义复杂密码以保护ECS实例的安全。
+SystemDisk.Category
+系统盘类型：cloud_essd
+SystemDisk.Size
+系统盘大小：40
+请求示例
+aliyun ecs RunInstances \
+--RegionId cn-hangzhou \
+--ImageId aliyun_3_x64_20G_alibase_20240528.vhd \
+--InstanceType ecs.c7.large \
+--SecurityGroupId sg-bp18z2q1jg4gq95t**** \
+--VSwitchId vsw-bp11hf5r945gewysp**** \
+--InstanceName ecs_cli_demo \
+--InstanceChargeType PrePaid \
+--PeriodUnit Month \
+--Period 1 \
+--InternetMaxBandwidthOut 1 \
+--Password <yourPassword> \
+--SystemDisk.Category cloud_essd \
+--SystemDisk.Size 40
+返回示例
+"InstanceIdSets": {
+"InstanceIdSet": [
+"i-bp1de173dp87k5uv****"
+"OrderId": 23577729747****,
+"RequestId": "B0855F1A-279F-5153-BAA9-C245E073****",
+"TradePrice": ****
+连接实例
+获取实例的公网IP信息。
+调用DescribeInstances，通过实例ID（i-bp1ducce5hs1jm98****）获取实例的公网IP信息。
+请求示例
+aliyun ecs DescribeInstances \
+--RegionId cn-hangzhou \
+--InstanceIds '["i-bp1ducce5hs1jm98****"]'
+返回示例
+参数PublicIpAddresses为实例的公网IP信息。
+连接ECS实例。
+ssh <用户名>@<公网IP>
+启动实例
+调用StartInstance接口启动一台ECS实例。
+场景示例：实例ID为i-bp1aq39j2yul5y01****，地域为华东1（杭州）（cn-hangzhou），启动实例时不进行故障处理，并且预检查后直接启动ECS实例。
+请求示例
+aliyun ecs StartInstance \
+--RegionId cn-hangzhou \
+--InstanceId i-bp1aq39j2yul5y01**** \
+--InitLocalDisk false \
+--DryRun false
+返回示例
+"RequestId": "2DD09CBD-1F4D-4923-94C7-F3BD67137BBE"
+查询实例的详细信息
+您可以调用DescribeInstances接口查询一台或多台ECS实例的详细信息。
+示例1：根据实例ID查询ECS实例
+假设查询实例ID为i-bp14a7xie8erwsvo****的实例信息。
+请求示例
+aliyun ecs DescribeInstances \
+--RegionId cn-hangzhou \
+--InstanceIds '["i-bp14a7xie8erwsvo****"]' \
+--output cols=InstanceId,InstanceName,Description,ImageId,Status rows=Instances.Instance[]
+返回示例
+InstanceId | InstanceName | Description | ImageId | Status
+---------- | ------------ | ----------- | ------- | ------
+i-bp1de173dp87k5uv**** | ecs_cli_demo | | aliyun_3_x64_20G_alibase_20240528.vhd | Running
+示例2：根据标签查询ECS实例
+假设查询绑定owner:zhangsan标签的ECS实例信息。
+请求示例
+aliyun ecs DescribeInstances \
+--RegionId cn-hangzhou \
+--Tag.1.Key owner \
+--Tag.1.Value zhangsan \
+--output cols=InstanceId,InstanceName,Description,ImageId,Status rows=Instances.Instance[]
+返回示例
+InstanceId | InstanceName | Description | ImageId | Status
+---------- | ------------ | ----------- | ------- | ------
+i-bp1de173dp87k5uv**** | ecs_cli_demo | | aliyun_3_x64_20G_alibase_20240528.vhd | Running
+示例3：根据镜像ID查询ECS实例
+查询镜像为m-bp12qhgxbmp5eh02****标签的ECS实例信息。
+请求示例
+aliyun ecs DescribeInstances \
+--RegionId cn-hangzhou \
+--ImageId m-bp12qhgxbmp5eh02**** \
+--output cols=InstanceId,InstanceName,Description,ImageId,Status rows=Instances.Instance[]
+返回示例
+InstanceId | InstanceName | Description | ImageId | Status
+---------- | ------------ | ----------- | ------- | ------
+i-bp14a7xie8erwsvo**** | demo01 | desc01 | m-bp12qhgxbmp5eh02**** | Running
+i-bp1aq39j2yul5y01**** | demo02 | desc02 | m-bp12qhgxbmp5eh02**** | Stopped
+示例4：查询指定VPC内的ECS实例
+假设VPC ID为vpc-bp1vwnn14rqpyiczj****、交换机ID为vsw-bp1ddbrxdlrcbim46****。
+请求示例
+aliyun ecs DescribeInstances \
+--RegionId cn-hangzhou \
+--VpcId vpc-bp1vwnn14rqpyiczj**** \
+--VSwitchId vsw-bp1ddbrxdlrcbim46**** \
+--output cols=InstanceId,InstanceName,ImageId,Status rows=Instances.Instance[]
+返回示例
+InstanceId | InstanceName | ImageId | Status
+---------- | ------------ | ------- | ------
+i-bp14a7xie8erwsvo**** | namedemo01 | m-bp12qhgxbmp5eh02**** | Running
+i-bp1c271nqm264lwj**** | namedemo02 | P2VSImageLnx125 | Running
+i-bp18a6ub0vt1tvn1**** | namedemo03 | aliyun_3_x64_20G_alibase_20240528.vhd | Running
+i-bp1aq39j2yul5y01**** | namedemo04 | m-bp12qhgxbmp5eh02**** | Stopped
+示例5：分页查询ECS实例
+调用DescribeInstances分页查询杭州地域的ECS实例，每页展示5条信息。
+请求示例
+aliyun ecs DescribeInstances \
+--RegionId cn-hangzhou \
+--PageNumber 2 \
+--PageSize 5 \
+--output cols=InstanceId,InstanceName,ImageId,Status rows=Instances.Instance[]
+返回示例
+InstanceId | InstanceName | ImageId | Status
+---------- | ------------ | ------- | ------
+i-bp1akazu9o0rm7q0**** | demoname01 | centos_8_0_x64_20G_alibase_20191225.vhd | Running
+i-bp134jm1g6kqyiqu**** | demoname02 | m-bp1bc3g3b032o0ja**** | Running
+i-bp17qwke5y0v7hk2**** | demoname03 | centos_7_02_64_20G_alibase_20170818.vhd | Running
+i-bp18a6ub0vt1tvn1**** | demoname04 | centos_7_02_64_20G_alibase_20170818.vhd | Running
+i-bp1aq39j2yul5y01**** | demoname05 | m-bp12qhgxbmp5eh02**** | Stopped
+创建快照
+调用CreateSnapshot接口创建快照。
+场景示例：为ESSD云盘d-bp14bjlwo3t3owin****创建一个快照（快照名称为demoname，描述为demo，保留时间：3天）。
+请求示例
+aliyun ecs CreateSnapshot \
+--DiskId d-bp14bjlwo3t3owin**** \
+--SnapshotName demoname \
+--Description demo \
+--RetentionDays 3
+返回示例
+"RequestId": "DFB0B01F-420D-4932-911E-7328920C2012",
+"SnapshotId": "s-bp1eyr9nxxoo9icj****"
+通过实例创建自定义镜像
+调用CreateImage接口，基于ECS实例创建一个自定义镜像。
+场景示例
+参数
+示例取值
+实例ID
+i-bp1aq39j2yul5y01****
+操作系统
+Alibaba Cloud Linux（即Platform为Aliyun）
+地域
+cn-hangzhou
+请求示例
+aliyun ecs CreateImage \
+--RegionId cn-hangzhou \
+--InstanceId i-bp1aq39j2yul5y01**** \
+--ImageName demoimage \
+--Description demoimage \
+--Platform Aliyun
+返回示例
+"ImageId": "m-bp1503ydxxrppctb****",
+"RequestId": "011AE447-20CE-4043-81AC-7AF2BBC4****"
+停止实例
+调用StopInstance停止一台运行中（Running）的ECS实例，正常关机（ForceStop为 false）且停机模式为普通停机模式（StoppedMode为KeepCharging，即停止后仍旧保留实例并继续收费），预检查后正常停止ECS实例。
+场景示例：实例ID为i-bp1aq39j2yul5y01****，地域为华东1（杭州）（cn-hangzhou）。
+请求示例
+aliyun ecs StopInstance \
+--RegionId cn-hangzhou \
+--InstanceId i-bp1aq39j2yul5y01**** \
+--ForceStop false \
+--StoppedMode KeepCharging \
+--DryRun false
+返回示例
+"RequestId": "121B5745-4983-57B1-BC97-C3A3536E****"
+相关文档
+本示例仅使用部分API，更多ECS API信息，请参见API概览。
+在阿里云CLI中，您可根据需要使用命令行选项，用来修改命令的默认行为或为命令提供额外功能，请参见命令行选项。

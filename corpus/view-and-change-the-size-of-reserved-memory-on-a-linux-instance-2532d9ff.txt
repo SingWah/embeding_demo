@@ -1,0 +1,113 @@
+# 配置Linux实例Kdump预留内存以应对内核崩溃
+> https://help.aliyun.com/zh/ecs/user-guide/view-and-change-the-size-of-reserved-memory-on-a-linux-instance
+
+Kdump是Linux系统的一种内核崩溃转储机制，它允许在系统发生内核崩溃（例如内核panic）时，捕获内存的转储信息，从而帮助事后分析故障原因。该过程需要一块预留内存（称为crashkernel内存），以确保即使在系统崩溃时也有足够的内存来保存内核转储信息。本文介绍如何查看并调整Linux实例的预留内存。
+查看系统预留内存
+为了使Kdump服务能够使用预留的内存空间，需要在grub配置文件中添加了crashkernel 参数，并分段式指定内存大小。
+说明
+grub配置文件系统默认在/etc/default/grub ；Alibaba Cloud Linux 3系统中grub配置需在/usr/share/alinux-base-setup/cmdline中配置。
+系统启动时GRUB将配置文件中的crashkernel参数传递给内核，内核在启动时就知道需要预留多少内存空间用于Kdump服务。之后，您就可以在系统运行时检查/proc/cmdline 来确认crashkernel参数是否已正常应用。
+执行以下命令，确认系统是否已开启crashkernel。
+cat /proc/cmdline
+如下示例返回结果中包括了crashkernel选项，说明已开启crashkernel。
+crashkernel选项说明
+crashkernel选项参数以crashkernel=0M-2G:0M,2G-8G:192M,8G-:256M为例进行说明：
+如果您购买的ECS实例内存或手工配置的操作系统内存大小不超过2 GB，由于应用程序本身可用的内存数量已处于紧缺状态，将不再为操作系统预留内存。因此，系统内存小于2 GB时，您将无法使用Kdump功能。
+如果您购买的ECS实例内存或手工配置的操作系统内存大小超过2 GB，但是不超过8 GB时，系统将预留192 MB的内存大小。
+如果您购买的ECS实例内存或手工配置的操作系统内存大小超过8 GB时，系统将预留256 MB的内存大小。
+执行以下命令，查看系统预留内存大小。
+cat /sys/kernel/kexec_crash_size
+返回结果中的kexec crash size值表示系统预留内存大小，单位为字节。如下返回值为201326592字节表示系统预留内存大小为192 MB。
+释放系统预留内存并关闭Kdump服务
+如果您的实例无需启用Kdump服务，并希望将系统预留的内存地址空间归还给操作系统本身，以避免资源浪费，可执行如下操作释放系统预留内存并关闭Kdump服务。
+重要
+释放系统预留内存并关闭Kdump服务，在系统故障时可能无法收集内核崩溃信息，导致无法及时定位和修复内核相关的问题，从而影响服务的连续性和稳定性，请您谨慎操作。
+Alibaba Cloud Linux/CentOS
+执行以下命令，备份grub配置文件。
+Alibaba Cloud Linux 2/CentOS。
+sudo cp /etc/default/grub /etc/default/grub.bak
+Alibaba Cloud Linux 3。
+sudo cp /usr/share/alinux-base-setup/cmdline /usr/share/alinux-base-setup/cmdline.bak
+执行以下命令，删除crashkernel内容并保存grub配置文件。
+Alibaba Cloud Linux 2/CentOS。
+sudo vim /etc/default/grub
+在GRUB_CMDLINE_LINUX行找到crashkernel=内容，删除crashkernel=0M-2G:0M,2G-8G:192M,8G-128G:256M,128G-:384M。修改完成后，按Esc键，输入:wq保存退出。
+Alibaba Cloud Linux 3。
+sudo vim /usr/share/alinux-base-setup/cmdline
+在配置文件中删除crashkernel=0M-2G:0M,2G-8G:192M,8G-128G:256M,128G-:384M行，修改完成后，按Esc键，输入:wq保存退出。
+执行以下命令，更新grub配置。
+sudo grub2-mkconfig -o /boot/grub2/grub.cfg
+说明
+在CentOS Stream 9/AlmaLinux 9/Rocky Linux 9 等基于 RHEL 9 的发行版中，请使用sudo grub2-mkconfig -o /boot/grub2/grub.cfg --update-bls-cmdline命令更新grub配置。
+执行以下命令，关闭Kdump服务。
+sudo systemctl disable kdump
+sudo systemctl stop kdump
+执行以下命令，重启系统以使更改生效。
+sudo reboot
+查看kdump状态与crashkernel参数，确认更改生效。
+执行以下命令，查看kdump状态。确认kdump状态为 inactive (dead)，即 kdump 服务已停止运行。
+sudo systemctl status kdump
+执行以下命令，获取实例grub配置文件，确认crashkernel相关参数已删除。
+cat /proc/cmdline
+Ubuntu/Debian
+执行以下命令，备份grub配置文件。
+sudo cp /etc/default/grub /etc/default/grub.bak
+执行以下命令，删除crashkernel内容并保存grub配置文件。
+sudo vim /etc/default/grub
+在GRUB_CMDLINE_LINUX行找到crashkernel=内容，删除crashkernel=0M-2G:0M,2G-8G:192M,8G-128G:256M,128G-:384M。修改完成后，按Esc键，输入:wq保存退出。
+执行以下命令，更新grub配置。
+sudo update-grub
+执行以下命令，关闭Kdump服务。
+sudo systemctl disable kdump-tools
+sudo systemctl stop kdump-tools
+执行以下命令，重启系统以使更改生效。
+sudo reboot
+查看kdump状态与crashkernel参数，确认更改生效。
+执行以下命令，查看kdump状态。确认kdump状态为 inactive (dead)，即 kdump 服务已停止运行。
+sudo systemctl status kdump
+执行以下命令，获取实例grub配置文件，确认crashkernel相关参数已删除。
+cat /proc/cmdline
+启用系统预留内存和Kdump服务
+如果您的实例需要再次使用Kdump服务捕获内存转储信息，可执行如下操作添加系统预留内存选项并启用Kdump服务。
+Alibaba Cloud Linux/CentOS
+执行以下命令，备份cmdline配置文件。
+Alibaba Cloud Linux 3。
+sudo cp /usr/share/alinux-base-setup/cmdline /usr/share/alinux-base-setup/cmdline.bak
+Alibaba Cloud Linux 2/CentOS。
+sudo cp /etc/default/grub /etc/default/grub.bak
+执行以下命令，添加crashkernel内容并保存cmdline配置文件。
+Alibaba Cloud Linux 3。
+sudo vim /usr/share/alinux-base-setup/cmdline
+添加crashkernel=0M-2G:0M,2G-8G:192M,8G-128G:256M,128G-:384M内容。修改完成后，按Esc键，输入:wq保存退出。
+Alibaba Cloud Linux 2/CentOS。
+sudo vim /etc/default/grub
+在GRUB_CMDLINE_LINUX行找到crashkernel=内容，添加crashkernel=0M-2G:0M,2G-8G:192M,8G-128G:256M,128G-:384M。修改完成后，按Esc键，输入:wq保存退出。
+执行以下命令，更新grub配置。
+sudo grub2-mkconfig -o /boot/grub2/grub.cfg
+说明
+在CentOS Stream 9/AlmaLinux 9/Rocky Linux 9 等基于 RHEL 9 的发行版中，请使用sudo grub2-mkconfig -o /boot/grub2/grub.cfg --update-bls-cmdline命令更新grub配置。
+执行以下命令，启用Kdump服务。
+sudo systemctl enable kdump
+执行以下命令，重启系统以使更改生效。
+sudo reboot
+查看kdump状态与crashkernel参数，确认更改生效。
+执行以下命令，查看kdump状态。确认kdump状态为 active (exited)，即 kdump 服务已正常运行。
+执行以下命令，获取实例grub配置文件，确认crashkernel相关参数已正常添加。
+cat /proc/cmdline
+Ubuntu/Debian
+执行以下命令，备份grub配置文件。
+sudo cp /etc/default/grub /etc/default/grub.bak
+执行以下命令，添加crashkernel内容并保存grub配置文件。
+sudo vim /etc/default/grub
+在GRUB_CMDLINE_LINUX行添加crashkernel=0M-2G:0M,2G-8G:192M,8G-128G:256M,128G-:384M内容。修改完成后，按Esc键，输入:wq保存退出。
+执行以下命令，更新grub配置。
+sudo update-grub
+执行以下命令，启用Kdump服务。
+sudo systemctl enable kdump-tools
+sudo systemctl start kdump-tools
+执行以下命令，重启系统以使更改生效。
+sudo reboot
+查看kdump状态与crashkernel参数，确认更改生效。
+执行以下命令，查看kdump状态。确认kdump状态为 active (exited)，即 kdump 服务已正常运行。
+执行以下命令，获取实例grub配置文件，确认crashkernel相关参数已正常添加。
+cat /proc/cmdline

@@ -1,0 +1,54 @@
+# 流控信息
+> https://help.aliyun.com/zh/ecs/developer-reference/api-ecs-2014-05-26-quota
+
+说明
+API 速率配额详情，请前往配额中心查看。
+地域：*
+API 名称
+API 版本
+配额
+DescribeDedicatedHostTypes
+2014-05-26
+1000/60(s)
+CreateDedicatedHostCluster
+2014-05-26
+1000/60(s)
+ModifyDedicatedHostsChargeType
+2014-05-26
+1000/60(s)
+AllocateDedicatedHosts
+2014-05-26
+1000/60(s)
+ModifyDedicatedHostAutoRenewAttribute
+2014-05-26
+1000/60(s)
+ModifyDedicatedHostAttribute
+2014-05-26
+1000/60(s)
+RenewDedicatedHosts
+2014-05-26
+1000/60(s)
+DescribeDedicatedHosts
+2014-05-26
+1000/60(s)
+ModifyDedicatedHostAutoReleaseTime
+2014-05-26
+1000/60(s)
+ReleaseDedicatedHost
+2014-05-26
+1000/60(s)
+ModifyDedicatedHostClusterAttribute
+2014-05-26
+1000/60(s)
+DeleteDedicatedHostCluster
+2014-05-26
+1000/60(s)
+RedeployDedicatedHost
+2014-05-26
+1000/60(s)
+DescribeDedicatedHostAutoRenew
+2014-05-26
+1000/60(s)
+DescribeDedicatedHostClusters
+2014-05-26
+1000/60(s)

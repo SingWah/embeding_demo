@@ -1,0 +1,86 @@
+# 进入Linux/FreeBSD系统的单用户模式
+> https://help.aliyun.com/zh/ecs/user-guide/boot-a-linux-or-freebsd-like-ecs-instance-into-single-user-mode
+
+因系统配置错误、驱动异常，导致ECS实例无法正常通过Workbench、会话管理或者使用第三方客户端远程连接到实例，可以进入单用户模式（又称维护模式）。此模式会中断常规启动流程，提供一个具备root权限的最小化系统环境便于执行紧急维护操作。
+操作步骤
+重要
+单用户模式提供对系统的完全控制权限。错误的操作会损坏系统文件。执行维护操作前，建议为系统盘手动创建单个快照。
+Alibaba Cloud Linux
+重要
+仅适用于Alibaba Cloud Linux 3。
+通过VNC连接实例。
+运行命令reboot重启操作系统。
+如果VNC无法登录，请重启实例。
+在重启过程中长按E键，编辑系统启动参数。
+找到以linux开头的内核启动行，将ro至行尾的内容替换为rw init=/bin/sh crashkernel=auto，启用读写权限并指定初始化进程。
+原始内容：
+linux (Sroot) /boot/umlinuz-5.10.134-19.1.a18.x86_64 root=UUID=********-****-**\
+**-****-************ ro rhgb quiet cgroup-memory=nokmem crashkernel=0M-2G:0M, \
+2G-8G: 192M, 8G-128G:256M, 128G-3766:384M,376G- :448M spec_rstack overflow-off uri\
+ng_force_dma_api kence-sample_interval=100 kfence.booting_max=0-2G:0,2G-32G :2\
+M.32G-:32M preempt=none biosdeuname=0 net. ifnames=0 console=tty0 console=ttySO\
+, 115200n8 noibrs nume_core.io_timeout=4294967295 nume_core.admin_timeout=42949\
+67295 cryptongr.notests rcupdate.rcu_cpu_stall_timeout=300
+修改后内容：
+linux (Sroot) /boot/umlinuz-5.10.134-19.1.a18.x86_64 root=UUID=********-****-**\
+**-****-************ rw init=/bin/sh crashkernel=auto
+按Ctrl+x或F10。系统将进入单用户模式。
+CentOS/Debian/SLES/Anolis OS
+以CentOS系统为例。
+通过VNC连接实例。
+在VNC窗口中，登录并运行reboot重启实例。
+在重启过程中长按E键，编辑系统启动参数。
+找到以linux开头的内核启动行，在本行末尾添加single。
+原始内容：
+linux16 /boot/vmlinuz-*.**.*-****.***.*.***.***_** root=UUID=********-\
+****-****-****-************ ro crashkernel-auto spectre_v2=retpoline rhgb quie\
+t net. ifnames=0 console=tty0 console=ttySo, 115200n8 noibrs nume_core.io_timeous\
+t=4294967295 nume_core.admin_timeout=4294967295
+修改后内容：
+linux16 /boot/vmlinuz-*.**.*-****.***.*.***.***_** root=UUID=********-\
+****-****-****-************ ro crashkernel-auto spectre_v2=retpoline rhgb quie\
+t net. ifnames=0 console=tty0 console=ttySo, 115200n8 noibrs nume_core.io_timeous\
+t=4294967295 nume_core.admin_timeout=4294967295 single
+按Ctrl+x或F10，并输入root密码。系统将进入单用户模式。
+Ubuntu
+重要
+仅适用于Ubuntu 18.04。
+通过VNC连接实例。
+运行命令reboot重启操作系统。
+如果VNC无法登录，请从控制台重启实例。
+在重启过程中长按Shift键，进入GRUB界面。
+在GRUB界面，选择第二行Advanced options for Ubuntu。在新界面中选择第二行的recovery mode。然后按E编辑启动项。
+找到以linux开头的内核启动行，将ro至行尾的内容替换为rw single init=/bin/bash，启用读写权限并指定初始化进程。
+原始内容：
+linux /boot/vmlinuz-4.15.0-213-generic root=UUID=d406d971-bc6d-40f2-b\
+572-6+74ac689736 ro recovery nomodeset dis_ucode_ldr
+vga=792 console=tty@ console=ttySo, 115\
+200n8 net. ifnames=0 noibrs iommu=pt nvme_core.multipathen nvme_core.io_timeout=4294967295 nv\
+me_core.admin_timeout=4294967295
+修改后内容：
+linux /boot/vmlinuz-4.15.0-213-generic root=UUID=********-****-****-*\
+***-*+********** rw single init=/bin/bash
+按Ctrl+x或F10。系统将进入单用户模式。
+FreeBSD
+通过VNC连接实例。
+运行命令reboot重启操作系统。
+如果VNC无法登录，请重启实例。
+重启系统后，VNC终端将显示Boot Menu界面。按5将Cons输出模式切换为Video primary。
+______ ____ _____ _____
+| ____| | _ \ / ____| __ \
+| |___ _ __ ___ ___ | |_) | (___ | | | |
+| ___| '__/ _ \/ _ \| _ < \___ \| | | |
+| | | | | __/ __/| |_) |____) | |__| |
+|_| |_| \___|\___||____/|_____/|_____/
+Welcome to FreeBSD
+1. Boot Multi user [Enter]
+2. Boot Single user
+3. Escape to loader prompt
+4. Reboot
+5. Cons: Dual (Video primary)
+Options:
+6. Kernel: default/kernel (1 of 1)
+7. Boot Options
+按2选择Boot Single User，进入单用户模式。
+后续操作
+进入单用户/维护模式后，可查看系统日志、检查服务状态、测试网络连接，以诊断并修复故障。例如，当系统因驱动冲突无法启动时，可卸载冲突的驱动，使系统恢复运行。

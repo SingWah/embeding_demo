@@ -1,0 +1,366 @@
+# 配置钉钉、飞书、企业微信 IM 渠道
+> https://help.aliyun.com/zh/ecs/user-guide/ecagent-im-channels
+
+弹性计算 Agent 支持通过钉钉、飞书、企业微信三种 IM 渠道接入，将 Agent 能力延伸到 IM 场景，实现移动运维、告警闭环与团队协同。
+说明
+弹性计算 Agent 目前处于邀测阶段，IM 渠道相关功能持续完善中。
+功能说明
+通过 IM 渠道，您可以获得以下能力：
+群内对话：在 IM 群中 @机器人 发送自然语言指令。
+巡检结果推送：定时任务执行完成后，巡检报告自动推送至配置的 IM 群。
+异常告警触达：健康巡检发现异常时，异常详情与修复建议第一时间推送至群。
+多群管理：支持配置多个机器人，并通过 RAM 角色赋予不同的 IM 资源操作权限。
+重要
+IM 渠道机器人通过所关联的 RAM 角色获取云资源操作权限（详见步骤一：创建 RAM 角色）。机器人被配置入 IM 群后，群内所有可 @机器人 的人员均可通过机器人与 Agent 交互，其可执行的资源操作范围以该 IM 渠道关联的 RAM 角色权限为准。建议仅将机器人加入受控运维群，并通过 RAM 角色最小化授权。
+支持的 IM 平台
+IM 平台
+接入方式
+说明
+钉钉
+钉钉应用
+通过钉钉开放平台创建应用，获取 Client ID / Client Secret。推荐使用一键创建（钉钉开发者后台提供入口，自动预置所需权限），无需手动配置。
+飞书
+飞书智能体应用
+通过飞书开放平台创建智能体应用，获取 App ID / App Secret。推荐使用一键创建（飞书开放平台提供入口，自动预置所需权限），无需手动配置。
+企业微信
+企业微信智能机器人（API 模式）
+通过企业微信管理后台选择「智能机器人」，以 API 模式创建，获取 Bot ID / Secret。当前仅支持手动创建。
+配置步骤
+步骤一：创建 RAM 角色
+IM 渠道机器人需要通过 RAM 角色获取访问其他云产品资源的权限。以下提供两个常用角色示意，您可以按需选择或组合使用。
+角色一：资源探查及分析（推荐）
+适用于资源查询、健康巡检、趋势分析等只读场景，不包含任何写操作。信任策略在 RAM 控制台创建角色时由系统自动生成（信任主体名称选择「计算巢服务 / AppFlow」，即 appflow.computenest.aliyuncs.com），无需手动配置。
+权限策略：
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs:CreateDiagnosticReport",
+"ecs:DescribeAccountAttributes",
+"ecs:DescribeActivations",
+"ecs:DescribeAutoProvisioningGroupHistory",
+"ecs:DescribeAutoProvisioningGroupInstances",
+"ecs:DescribeAutoProvisioningGroups",
+"ecs:DescribeAutoSnapshotPolicyAssociations",
+"ecs:DescribeAutoSnapshotPolicyEx",
+"ecs:DescribeAvailableResource",
+"ecs:DescribeBandwidthLimitation",
+"ecs:DescribeBandwidthPackages",
+"ecs:DescribeCapacityReservationInstances",
+"ecs:DescribeCapacityReservations",
+"ecs:DescribeClassicLinkInstances",
+"ecs:DescribeCloudAssistantSettings",
+"ecs:DescribeCloudAssistantStatus",
+"ecs:DescribeCommands",
+"ecs:DescribeDedicatedHostAutoRenew",
+"ecs:DescribeDedicatedHostClusters",
+"ecs:DescribeDedicatedHostTypes",
+"ecs:DescribeDedicatedHosts",
+"ecs:DescribeDeploymentSetSupportedInstanceTypeFamily",
+"ecs:DescribeDeploymentSets",
+"ecs:DescribeDiagnosticMetricSets",
+"ecs:DescribeDiagnosticMetrics",
+"ecs:DescribeDiagnosticReportAttributes",
+"ecs:DescribeDiagnosticReports",
+"ecs:DescribeDiskDefaultKMSKeyId",
+"ecs:DescribeDiskMonitorData",
+"ecs:DescribeDisks",
+"ecs:DescribeDisksFullStatus",
+"ecs:DescribeElasticityAssuranceAutoRenewAttribute",
+"ecs:DescribeElasticityAssuranceInstances",
+"ecs:DescribeElasticityAssurances",
+"ecs:DescribeEniMonitorData",
+"ecs:DescribeHpcClusters",
+"ecs:DescribeImageComponents",
+"ecs:DescribeImageFromFamily",
+"ecs:DescribeImagePipelineExecutions",
+"ecs:DescribeImagePipelines",
+"ecs:DescribeImageSharePermission",
+"ecs:DescribeImageSupportInstanceTypes",
+"ecs:DescribeImages",
+"ecs:DescribeInstanceAttachmentAttributes",
+"ecs:DescribeInstanceAttribute",
+"ecs:DescribeInstanceAutoRenewAttribute",
+"ecs:DescribeInstanceHistoryEvents",
+"ecs:DescribeInstanceMaintenanceAttributes",
+"ecs:DescribeInstanceModificationPrice",
+"ecs:DescribeInstanceMonitorData",
+"ecs:DescribeInstanceRamRole",
+"ecs:DescribeInstanceStatus",
+"ecs:DescribeInstanceTypeFamilies",
+"ecs:DescribeInstanceTypes",
+"ecs:DescribeInstanceVncUrl",
+"ecs:DescribeInstances",
+"ecs:DescribeInstancesFullStatus",
+"ecs:DescribeInvocationResults",
+"ecs:DescribeInvocations",
+"ecs:DescribeKeyPairs",
+"ecs:DescribeLaunchTemplateVersions",
+"ecs:DescribeLaunchTemplates",
+"ecs:DescribeLockedSnapshots",
+"ecs:DescribeManagedInstances",
+"ecs:DescribeNetworkInterfaceAttribute",
+"ecs:DescribeNetworkInterfacePermissions",
+"ecs:DescribeNetworkInterfaces",
+"ecs:DescribePlanMaintenanceWindows",
+"ecs:DescribePortRangeListAssociations",
+"ecs:DescribePortRangeListEntries",
+"ecs:DescribePortRangeLists",
+"ecs:DescribePrefixListAssociations",
+"ecs:DescribePrefixListAttributes",
+"ecs:DescribePrefixLists",
+"ecs:DescribePrice",
+"ecs:DescribeRecommendInstanceType",
+"ecs:DescribeRegions",
+"ecs:DescribeRenewalPrice",
+"ecs:DescribeReservedInstanceAutoRenewAttribute",
+"ecs:DescribeReservedInstances",
+"ecs:DescribeResourcesModification",
+"ecs:DescribeSecurityGroupAttribute",
+"ecs:DescribeSecurityGroupReferences",
+"ecs:DescribeSecurityGroups",
+"ecs:DescribeSendFileResults",
+"ecs:DescribeSnapshotGroups",
+"ecs:DescribeSnapshotLinks",
+"ecs:DescribeSnapshotMonitorData",
+"ecs:DescribeSnapshotPackage",
+"ecs:DescribeSnapshots",
+"ecs:DescribeSnapshotsUsage",
+"ecs:DescribeStorageCapacityUnits",
+"ecs:DescribeTaskAttribute",
+"ecs:DescribeTasks",
+"ecs:DescribeTerminalSessions",
+"ecs:DescribeUserData",
+"ecs:DescribeVscs",
+"ecs:DescribeZones",
+"ecs:GetInstanceConsoleOutput",
+"ecs:GetInstanceScreenshot",
+"ecs:ListPluginStatus",
+"ecs:ListTagResources",
+"ecs:ReportInstancesStatus",
+"ecagent:*"
+"Resource": "*"
+"Effect": "Allow",
+"Action": [
+"resourcecenter:ExecuteSQLQuery",
+"resourcecenter:GetResourceType"
+"Resource": "*"
+"Effect": "Allow",
+"Action": [
+"resourcemanager:ListResourceGroups"
+"Resource": "*"
+"Effect": "Allow",
+"Action": [
+"ecagent:DescribeAgentService",
+"ecagent:DescribeAgentCreditUsage"
+"Resource": "*"
+"Effect": "Allow",
+"Action": [
+"appflow:InvokeAction"
+"Resource": "*"
+角色二：运维操作角色
+在只读权限基础上，增加响应系统运维事件的能力（如实例维护通知确认），适用于需要在 IM 渠道内直接响应系统事件的场景。
+权限策略：信任策略与角色一相同，由 RAM 控制台自动生成。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs:AcceptInquiredSystemEvent",
+"ecs:CreateDiagnosticReport",
+"ecs:DescribeAccountAttributes",
+"ecs:DescribeActivations",
+"ecs:DescribeAutoProvisioningGroupHistory",
+"ecs:DescribeAutoProvisioningGroupInstances",
+"ecs:DescribeAutoProvisioningGroups",
+"ecs:DescribeAutoSnapshotPolicyAssociations",
+"ecs:DescribeAutoSnapshotPolicyEx",
+"ecs:DescribeAvailableResource",
+"ecs:DescribeBandwidthLimitation",
+"ecs:DescribeBandwidthPackages",
+"ecs:DescribeCapacityReservationInstances",
+"ecs:DescribeCapacityReservations",
+"ecs:DescribeClassicLinkInstances",
+"ecs:DescribeCloudAssistantSettings",
+"ecs:DescribeCloudAssistantStatus",
+"ecs:DescribeCommands",
+"ecs:DescribeDedicatedHostAutoRenew",
+"ecs:DescribeDedicatedHostClusters",
+"ecs:DescribeDedicatedHostTypes",
+"ecs:DescribeDedicatedHosts",
+"ecs:DescribeDeploymentSetSupportedInstanceTypeFamily",
+"ecs:DescribeDeploymentSets",
+"ecs:DescribeDiagnosticMetricSets",
+"ecs:DescribeDiagnosticMetrics",
+"ecs:DescribeDiagnosticReportAttributes",
+"ecs:DescribeDiagnosticReports",
+"ecs:DescribeDiskDefaultKMSKeyId",
+"ecs:DescribeDiskMonitorData",
+"ecs:DescribeDisks",
+"ecs:DescribeDisksFullStatus",
+"ecs:DescribeElasticityAssuranceAutoRenewAttribute",
+"ecs:DescribeElasticityAssuranceInstances",
+"ecs:DescribeElasticityAssurances",
+"ecs:DescribeEniMonitorData",
+"ecs:DescribeHpcClusters",
+"ecs:DescribeImageComponents",
+"ecs:DescribeImageFromFamily",
+"ecs:DescribeImagePipelineExecutions",
+"ecs:DescribeImagePipelines",
+"ecs:DescribeImageSharePermission",
+"ecs:DescribeImageSupportInstanceTypes",
+"ecs:DescribeImages",
+"ecs:DescribeInstanceAttachmentAttributes",
+"ecs:DescribeInstanceAttribute",
+"ecs:DescribeInstanceAutoRenewAttribute",
+"ecs:DescribeInstanceHistoryEvents",
+"ecs:DescribeInstanceMaintenanceAttributes",
+"ecs:DescribeInstanceModificationPrice",
+"ecs:DescribeInstanceMonitorData",
+"ecs:DescribeInstanceRamRole",
+"ecs:DescribeInstanceStatus",
+"ecs:DescribeInstanceTypeFamilies",
+"ecs:DescribeInstanceTypes",
+"ecs:DescribeInstanceVncUrl",
+"ecs:DescribeInstances",
+"ecs:DescribeInstancesFullStatus",
+"ecs:DescribeInvocationResults",
+"ecs:DescribeInvocations",
+"ecs:DescribeKeyPairs",
+"ecs:DescribeLaunchTemplateVersions",
+"ecs:DescribeLaunchTemplates",
+"ecs:DescribeLockedSnapshots",
+"ecs:DescribeManagedInstances",
+"ecs:DescribeNetworkInterfaceAttribute",
+"ecs:DescribeNetworkInterfacePermissions",
+"ecs:DescribeNetworkInterfaces",
+"ecs:DescribePlanMaintenanceWindows",
+"ecs:DescribePortRangeListAssociations",
+"ecs:DescribePortRangeListEntries",
+"ecs:DescribePortRangeLists",
+"ecs:DescribePrefixListAssociations",
+"ecs:DescribePrefixListAttributes",
+"ecs:DescribePrefixLists",
+"ecs:DescribePrice",
+"ecs:DescribeRecommendInstanceType",
+"ecs:DescribeRegions",
+"ecs:DescribeRenewalPrice",
+"ecs:DescribeReservedInstanceAutoRenewAttribute",
+"ecs:DescribeReservedInstances",
+"ecs:DescribeResourcesModification",
+"ecs:DescribeSecurityGroupAttribute",
+"ecs:DescribeSecurityGroupReferences",
+"ecs:DescribeSecurityGroups",
+"ecs:DescribeSendFileResults",
+"ecs:DescribeSnapshotGroups",
+"ecs:DescribeSnapshotLinks",
+"ecs:DescribeSnapshotMonitorData",
+"ecs:DescribeSnapshotPackage",
+"ecs:DescribeSnapshots",
+"ecs:DescribeSnapshotsUsage",
+"ecs:DescribeStorageCapacityUnits",
+"ecs:DescribeTaskAttribute",
+"ecs:DescribeTasks",
+"ecs:DescribeTerminalSessions",
+"ecs:DescribeUserData",
+"ecs:DescribeVscs",
+"ecs:DescribeZones",
+"ecs:GetInstanceConsoleOutput",
+"ecs:GetInstanceScreenshot",
+"ecs:ListPluginStatus",
+"ecs:ListTagResources",
+"ecs:ReportInstancesStatus",
+"ecagent:*"
+"Resource": "*"
+"Effect": "Allow",
+"Action": [
+"resourcecenter:ExecuteSQLQuery",
+"resourcecenter:GetResourceType"
+"Resource": "*"
+"Effect": "Allow",
+"Action": [
+"resourcemanager:ListResourceGroups"
+"Resource": "*"
+"Effect": "Allow",
+"Action": [
+"ecagent:DescribeAgentService",
+"ecagent:DescribeAgentCreditUsage"
+"Resource": "*"
+"Effect": "Allow",
+"Action": [
+"appflow:InvokeAction"
+"Resource": "*"
+创建步骤：
+登录 RAM 控制台。
+选择 身份管理 > 角色，单击 创建角色。
+信任主体类型选择云服务，信任主体名称选择「计算巢服务 / AppFlow」，对应服务标识为 appflow.computenest.aliyuncs.com。
+填写角色名称（如 RoleForECAgentIM-Explorer 或 RoleForECAgentIM-Operator），单击 确定。
+在角色详情页单击 权限管理 > 新增授权，创建自定义权限策略并粘贴上述权限策略 JSON，然后授权给该角色。
+记录角色名称，后续创建 IM 渠道时需选择此角色。
+步骤二：创建 IM 渠道
+登录 弹性计算 Agent 控制台。
+在控制台左下角，点击 设置 > IM 渠道，单击添加 IM 渠道。
+填写渠道名称并选择 IM 平台（钉钉、飞书、企微）。
+配置凭证（详见步骤三：按平台配置 IM 机器人）。
+角色配置选择步骤一创建的 RAM 角色。
+点击确定。
+步骤三：按平台配置 IM 机器人
+在步骤二创建渠道时选择的 IM 平台不同，需在对应平台完成应用创建并回填凭证。选择您使用的平台查看配置流程：
+钉钉
+推荐使用一键创建。在钉钉开发者后台的应用创建界面，按提示单击一键创建即可完成应用创建与权限预置，无需手动配置。
+登录 钉钉开放平台。
+单击开发者后台。
+选择 应用开发 > 钉钉应用，在应用创建界面按提示单击一键创建（推荐）；若需手动创建，则单击立刻创建。
+填写智能体应用名称，单击创建。
+创建成功后在应用凭证页复制 Client ID 与 Client Secret。
+将 Client ID 与 Client Secret 填入弹性计算 Agent 控制台的 IM 渠道创建表单。
+飞书
+推荐使用一键创建。飞书开放平台已提供智能体应用一键创建入口，系统自动预置智能体机器人所需权限，创建后即可直接获取 App ID 与 App Secret，无需手动配置权限范围。
+访问 飞书开放平台 · 一键创建智能体应用（推荐），或登录 飞书开放平台后台手动创建。
+填写智能体应用名称，单击立即创建。
+在应用凭证页复制 App ID 与 App Secret。
+将 App ID 与 App Secret 填入弹性计算 Agent 控制台的 IM 渠道创建表单。
+企业微信
+登录企业微信管理后台。
+选择 安全与管理 > 管理与工具 > 智能机器人，单击创建机器人。
+选择手动创建，在底部选择 API 模式创建。
+添加可见范围，连接方式选择使用长连接，在配置方法中单击点击获取 Secret，点击可使用授权，按需完成授权。
+单击保存，按照提示完成智能机器人信息填写。
+在配置详情中复制 Bot ID 与 Secret。
+将 Bot ID 与 Secret 填入弹性计算 Agent 控制台的 IM 渠道创建表单。
+步骤四：验证与使用
+说明
+如果您使用飞书或企微渠道，请先将机器人添加到目标运维群，并在群内 @机器人 发送任意一条消息（例如 @机器人 hello）激活机器人。完成后，在定时任务表单的 群组 ID 下拉框中即可选择该群，无需手动复制群组 ID。钉钉渠道使用 Webhook 地址，无此前置操作。
+在 IM 群中 @机器人 发送测试消息（如「查询杭州地域 ECS 实例信息」），机器人应正常回复。
+在弹性计算 Agent 控制台创建定时任务时，将结果推送到该 IM 渠道。具体操作：
+在弹性计算 Agent 控制台左侧导航栏，单击 定时任务，切换到 任务模版 页签。
+选择一个内置模版（如 GPU 资源健康巡检 或 ECS 资源探查分析），单击 创建任务。
+说明
+定时任务当前仅支持通过内置模版创建，暂不支持自定义模版。
+在任务表单中打开 开启 IM 通道 开关。
+先在渠道类型下拉框中选择 钉钉、飞书 或 企微，然后在 选择 IM 渠道已配置的凭证 下拉框中选择步骤二创建的 IM 渠道（例如「钉钉测试渠道」）。
+指定推送目标群：
+钉钉：在 输入 webhook 输入框中填入自定义机器人的 Webhook 地址。Webhook 地址通过钉钉群自定义机器人获取，具体操作参见 钉钉自定义机器人接入指南。
+飞书 / 企微：在 群组 ID 下拉框中选择目标运维群。请确认已完成本步骤开头的前置操作（将机器人拉入群并在群内 @机器人 发送任意一条消息激活），激活后目标群会自动出现在下拉列表中。
+说明
+「凭证」下拉框用于选择在步骤二创建的 IM 渠道（承载机器人身份鉴权），钉钉的「输入 webhook」输入框或飞书 / 企微的「群组 ID」下拉框用于指定接收推送的目标群，两者需分别填写。选择凭证后，目标群字段不会自动填充。
+保存任务，可在 已配置任务 页签单击 立即执行 手动触发一次。执行结果会推送到指定的 IM 群。
+使用示例
+以下是 IM 群内典型的对话示例（当前 IM 渠道机器人仅支持只读操作，写操作请在控制台手动执行）：
+群成员 A：@弹性计算 Agent 杭州地域有多少台 ECS 实例？
+机器人：杭州地域（cn-hangzhou）共有 11 台 ECS 实例。
+如需进一步了解这些实例的详细配置、状态或其他信息，请继续告诉我。
+群成员 B：@弹性计算 Agent i-bp10z7bsw2iofg6r8i0c SSH 连不上了，帮我看下
+机器人：正在委托 ECS 诊断 Agent 进行 SSH 连接失败的诊断...
+诊断结果：检测到该实例安全组入方向规则中 22 端口被删除，
+导致 SSH 无法访问。
+修复建议：请前往 ECS 控制台恢复该安全组入方向 22/TCP 端口规则，
+或联系有安全组管理权限的运维人员协助处理。
+常见问题
+IM 渠道接入支持多少个群？
+单个 IM 渠道对应一个 IM 群。如需推送多个群，可创建多个 IM 渠道。
+IM 机器人是否支持主动发起对话？
+支持。定时任务执行结果、告警事件等可通过 IM 机器人主动推送到关联的 IM 群。
+通过 IM 渠道执行资源操作是否安全？
+安全。执行前 Agent 会请求确认，仅当群内成员明确回复"确认执行"后才会执行相关操作。
+IM 渠道的权限如何控制？
+支持独立配置 RAM 角色，不同 IM 渠道可绑定不同的 RAM 角色，实现按群维度的最小化授权。

@@ -1,0 +1,56 @@
+# API错误码排查思路
+> https://help.aliyun.com/zh/ecs/developer-reference/error-code-error-code-troubleshooting-ideas
+
+在使用阿里云ECS API/SDK或CLI进行云服务器操作时，执行可能会出错，会遇到不同的错误码（ErrorCode）。这些错误码通常是因为参数不正确、权限问题或凭证等原因导致的。本文将帮助您通过系统化的方法排查和解决这些错误。
+出错的数据格式
+调用ECS API出错的数据格式如下。
+"RequestId": "06DD587E-599A-55C6-83BB-EC5******F2",
+"HostId": "ecs.cn-hangzhou.aliyuncs.com",
+"Code": "InvalidP******",
+"Message": "The specified parameter **** is not valid.",
+"Recommend": "https://api.aliyun.com/troubleshoot?q=InvalidP******&product=Ecs&requestId=06DD587E-599A-55C6-83BB-EC5******F2"
+各参数解释如下：
+RequestId：请求唯一标识。
+HostId：服务端主机标识。
+Code：错误码信息。
+Message：详细错误信息。
+Recommend：错误诊断链接，可直接复制该字段跳转到错误诊断页面获取解决方案。
+一个ECS实例不存在的示例如下。
+"RequestId": "81EF1E7D-0D15-5CAF-B602-3487FAFA88D5",
+"HostId": "ecs.cn-hangzhou.aliyuncs.com",
+"Code": "InvalidInstanceId.NotFound",
+"Message": "The specified InstanceId does not exist.",
+"Recommend": "https://api.aliyun.com/troubleshoot?q=InvalidInstanceId.NotFound&product=Ecs&requestId=81EF1E7D-0D15-5CAF-B602-3487FAFA88D5"
+常见报错
+以下是一些常见的错误，可以快速解决API调用报错问题：
+指定区域：指定资源所在地域拼写错误或者Endpoint错误。您可能会收到类似InvalidRegionId/NotSupportedEndpoint的错误信息。
+检查VPC：某些资源不属于指定VPC。例如指定的安全组ID属于不同的VPC。
+检查权限：确保您拥有执行请求所需的权限。如果您没有授权，您可能会收到类似Unauthorized和NoPermission的错误信息。
+检查凭证：确保您输入的凭证正确；如果有多个账户，确保您使用的是正确账户的凭证。如果提供的凭证不正确，您可能会收到类似AuthFailure/Invalid/not belong to you的错误信息。
+账号欠费：因账号欠费或者包年包月资源过期导致API调用失败。更多信息，请参见欠费时的API行为。
+流量控制：为保障服务的稳定，云服务器ECS开启了API访问的流量控制。如果请求被节流，您可能会收到类似request throttling错误信息。请在请求频率之间增加时间间隔。更多信息，请参见流量控制。
+配额限制：资源项超过配额限制。您可能会收到类似QuotaExceed错误信息。请确认资源是否已经超过配额限制。更多信息，请参见ECS配额限制。
+ECS被安全锁定：ECS实例因存在安全违规内容被锁定。您可能会收到类似InstanceLockedForSecurity错误信息。更多信息，请参见ECS被安全锁定对API调用的影响。
+考虑一致性，避免多次重试：请求超时或服务器内部错误，客户端可能会尝试重发请求。更多信息，请参见如何保证幂等性。
+排查思路
+第一步：通过错误Code和Message判断
+错误响应中通常包含错误码（Code）和错误信息（Message），以便初步判断错误原因。
+查看返回的错误码及错误信息。
+检查请求中包含的参数，确认其正确性（包括但不限于地域ID、实例ID、资源类型、取值范围、取值类型等）。
+根据错误码定位问题
+InvalidParameter：说明参数无效。
+InvalidHostName.Malformed：说明指定的参数 HostName不合法。
+InvalidInstanceName.Malformed：说明InstanceName参数不符合规则。
+根据错误消息定位问题
+The specified InstanceId does not exist：说明传入的InstanceId不存在。
+The specified RegionId does not exist：说明传入的地域ID不存在。
+第二步：查阅API接口文档的错误码指引
+在不确定错误原因时，可根据对应ECS API文档进行更详细的参数配置和检查。
+查阅对应ECS API接口文档，搜索对应的错误码。公共错误码清单请参考ECS公共错误码。
+根据文档中提供的可能原因和解决方案进行调整。
+第三步：使用OpenAPI门户-问题诊断进行定位
+如果经过之前步骤后问题仍未能解决或是复杂问题，可使用OpenAPI问题诊断工具。在诊断输入框中粘贴包含 RequestId 或 Code 的报错信息（JSON 格式，包含 RequestId、Code、Message 字段），单击诊断。
+访问错误诊断页面：问题诊断
+输入错误信息，使用其提供的诊断信息，帮助您进一步识别问题根源。
+根据诊断方案和日志信息采取相应措施。
+诊断方案示例：云产品为云服务器 ECS，ErrorCode为InvalidInstanceId.NotFound，ErrorMessage为The specified InstanceId does not exist.（指定的实例ID不存在）。触发条件：在调用API时输入了错误的实例ID。解决步骤：检查输入的实例ID，调用DescribeInstances接口查询是否为自己拥有的实例资源。

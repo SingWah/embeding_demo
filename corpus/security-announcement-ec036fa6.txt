@@ -1,0 +1,24 @@
+# 安全公告
+> https://help.aliyun.com/zh/ecs/security-announcement
+
+2025年
+漏洞公告| Linux sudo 本地提权漏洞（CVE-2025-32463）
+2023年
+漏洞公告 | Intel CPU CVE-2023-23583 漏洞
+2022年
+漏洞公告 | Linux 内核本地权限提升漏洞（CVE-2022-0847）
+2021年
+漏洞公告 | Linux Polkit权限提升漏洞风险（CVE-2021-4034）
+漏洞公告 | NSS内存损坏漏洞（CVE-2021-43527）
+漏洞公告 | Linux Netfilter本地权限提升漏洞（CVE-2021-22555）
+漏洞公告 | Windows Print Spooler 0day漏洞预警（CVE-2021-34527）
+漏洞公告 | Windows Print Spooler权限提升漏洞预警（CVE-2021-1675）
+漏洞公告 | Windows HTTP协议远程代码执行漏洞预警（CVE-2021-31166）
+漏洞公告 | Windows多个严重高危漏洞预警（CVE-2021-24074、CVE-2021-24078等）
+漏洞公告 | Linux sudo权限漏洞（CVE-2021-3156）
+2020年
+漏洞公告 | Windows TCP/IP远程执行代码漏洞（CVE-2020-16898）
+漏洞公告 | Linux内核漏洞（CVE-2020-14386）
+漏洞公告 | Windows SMBv3远程执行代码漏洞（CVE-2020-0796）
+漏洞公告 | Windows加密库漏洞（CVE-2020-0601）
+漏洞公告 | 虚拟化逃逸0day漏洞

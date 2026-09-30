@@ -1,0 +1,113 @@
+# 搭建FTP常见问题
+> https://help.aliyun.com/zh/ecs/user-guide/faq-about-building-ftp-sites
+
+本文汇总了在搭建FTP站点过程中常见的问题及其解决方法，旨在帮助您快速排查和解决FTP服务安装、配置、安全性和连接等方面的常见问题，确保FTP站点的稳定运行和数据安全。
+无法下载FTP服务器中的文件如何处理？
+您需要根据以下操作步骤，开启IE浏览器的下载权限。
+在本地主机中打开IE浏览器。
+在浏览器的右上角单击图标，然后单击Internet 选项。
+在Internet 选项对话框的顶部，单击安全页签。
+在选择一个区域以查看或更改安全设置区域，单击Internet，然后在该区域的安全级别区域，单击自定义级别。
+选择 Internet 区域，然后单击 自定义级别(C)... 按钮。
+选择下载 > 文件下载 > 启用，然后单击确定。
+单击应用，然后单击确定。
+连接FTP服务器报错如何处理？
+您可以根据FTP的报错信息手动排查问题。当您的报错难以排查解决时，建议您使用第三方FTP客户端连接工具。例如：FileZilla。下载地址为FileZilla官网。本示例介绍使用FileZilla连接匿名模式的FTP服务器。
+配置vsftpd为匿名模式。
+运行以下命令，修改配置文件/etc/vsftpd/vsftpd.conf。
+如果您在安装vsftpd时，使用的是apt install vsftpd安装命令，则配置文件路径为/etc/vsftpd.conf。
+sudo vim /etc/vsftpd/vsftpd.conf
+按i进入编辑模式。
+将匿名上传权限的注释去掉，修改为anon_upload_enable=YES。
+按Esc退出编辑模式，然后输入:wq并回车以保存并关闭文件。
+确保配置文件中 anon_upload_enable=YES 已取消注释并启用。vsftpd 配置文件相关内容：
+# Allow anonymous FTP? (Beware - allowed by default if you comment this out).
+anonymous_enable=YES
+# Uncomment this to allow local users to log in.
+# When SELinux is enforcing check for SE bool ftp_home_dir
+local_enable=YES
+# Uncomment this to enable any form of FTP write command.
+write_enable=YES
+# Default umask for local users is 077. You may wish to change this to 022,
+# if your users expect that (022 is used by most other ftpd's)
+local_umask=022
+# Uncomment this to allow the anonymous FTP user to upload files. This only
+# has an effect if the above global write enable is activated. Also, you will
+# obviously need to create a directory writable by the FTP user.
+# When SELinux is enforcing check for SE bool allow_ftpd_anon_write, allow_ftpd_full_access
+anon_upload_enable=YES
+运行以下命令更改/var/ftp/pub目录的权限，为FTP用户添加写权限。
+/var/ftp/pub为FTP服务默认的文件目录。
+sudo chmod o+w /var/ftp/pub/
+运行以下命令重新加载配置文件。
+sudo systemctl restart vsftpd
+下载并安装FileZilla。
+通过FileZilla连接匿名模式的FTP服务器。
+打开FileZilla客户端。
+在顶部菜单栏，选择文件 > 站点管理器。
+在站点管理器对话框的左下角，单击新站点(N)。
+输入新站点的名称，并完成站点配置。
+具体的配置项说明如下：
+新站点名称：您自定义的站点名称。例如test-01。
+协议：FTP-文件传输协议。
+主机：FTP服务器公网IP地址。本文中为Linux实例的公网IP地址，例如121.43.XX.XX。
+端口：21。
+登录类型：匿名。
+本示例中使用FTP客户端连接匿名模式的FTP服务器。如果您需要使用FTP用户密码连接FTP服务器，则登录类型需要设置为正常，并需要配置用户和密码信息。
+单击连接(C)。
+连接成功后，您可以对文件进行上传、下载和删除等操作。各区域的信息说明如下表所示。
+序号
+说明
+①
+显示命令、FTP连接状态和任务执行结果。
+②
+本地区域，显示本地主机的目录信息。
+③
+远程区域，显示FTP服务器的目录信息。匿名模式下，默认目录为/pub。
+④
+记录区域，可查看FTP任务的队列信息和日志信息。
+文件夹权限设置没有Everyone选项该如何处理？
+如果设置文件夹的属性时，安全页签属性中没有Everyone用户可直接选择，可按照如下步骤添加Everyone用户。
+在安全页签，单击编辑。
+在组或用户名列表中，仅显示 CREATOR OWNER、SYSTEM、Administrators、Users，没有 Everyone 选项。
+在新弹出的窗口中，单击添加。
+在新弹出的窗口中，单击高级。
+在新弹出的窗口中，单击立即查找(N)，在搜索结果中选择Everyone并单击确定。
+单击确定，返回权限窗口。
+单击确定，完成添加。
+如何制作服务器证书？
+如果需要使用安全的FTP传输协议（如FTPS或SFTP），则需要服务器证书来加密FTP会话。这样可以保护数据在传输过程中的安全，防止被窃取或篡改。则可以参考以下步骤制作服务器证书。
+在服务器管理器中，选择仪表板 > 工具 > Internet Information Services (IIS)管理器。
+在左侧列表单击服务器ID，然后在服务器主页IIS区域，双击服务器证书，进入服务器证书页面。
+单击创建自签名证书。
+该选项位于服务器证书页面右侧操作面板中。
+输入证书的名称，并选择证书存储类型，单击确定。
+例如，证书名称填写 SSL-FTP，证书存储选择个人。
+创建成功后会在服务器证书界面显示已经创建的证书。
+证书名称为SSL-FTP，证书存储为Personal。
+FTP被动模式端口配置建议
+配置FTP被动模式时，选择一个端口范围而不是单一的端口，这涉及到性能、并发能力和安全性之间的平衡。开放范围端口的主要原因如下。
+支持并发连接：
+使用端口范围允许多个客户端同时进行数据传输。每个传输会占用一个端口，因此多个端口可以支持多次并发连接。
+如果你的FTP服务器需要服务于大量并发用户（如文件下载或上传），一个足够宽的端口范围非常重要以免延迟或连接被拒。
+网络灵活性：
+在一个庞大、高流量的环境中，如企业或数据中心，有时需要动态分配端口以应对不同类型的请求和流量模式。
+更大范围的端口能确保在不同网络条件下（如负载均衡、不同子网）也能保持稳定连接。
+配置建议
+评估并发需求：
+估算您需要支持的最大并发连接数。如果有大量用户或大量数据传输，更宽的端口范围更适合。
+小型网络或仅有少量用户访问时，可以考虑使用较小的端口范围。
+选择合理的端口范围：
+对于中小型企业，一般选择使用 100~200 个端口范围，虽然不大但足以应对常见的并发需求。
+对于流量更大的环境，端口范围可以更大，同时结合负载测试来确定适合的规模。
+安全性考虑：
+使用防火墙规则限制到特定端口范围的访问，仅接受来自信任主机或网络的连接。
+启用 IP、用户黑名单和白名单功能加强安全性。
+监控和调节：
+实施实时监控网络端口使用情况，通过工具和日志分析来检测异常活动和流量模式。
+基于监控数据调整端口范围大小或策略，以更好地匹配业务需求。
+自动化和简化管理：
+使用配置管理工具（如 Ansible、Puppet）自动化端口设置和安全策略部署，减少手动管理的错误风险。
+将端口范围配置纳入定期审查和更新流程，确保其能够适应变化的业务需求。
+安全协议：
+如可能，设置 FTPS（FTP Secure）或 SFTP（SSH FTP）来加密传输，以增加保密性，尤其是在传输敏感数据时。

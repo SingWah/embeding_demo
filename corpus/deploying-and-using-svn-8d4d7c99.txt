@@ -1,0 +1,415 @@
+# SVN服务器搭建
+> https://help.aliyun.com/zh/ecs/user-guide/deploying-and-using-svn
+
+Subversion（简称SVN）是一个开源的版本控制系统，通过分支管理系统，可以高效管理随时间变化的数据。本文介绍如何基于ECS部署和使用SVN。
+准备工作
+创建用于部署SVN的ECS实例，具体操作，请参见自定义购买实例。
+该实例必须满足以下条件：
+实例已分配固定公网IP地址或绑定弹性公网IP（EIP）。如您不清楚如何开通公网，请参见开通公网。
+操作系统：Alibaba Cloud Linux 3、Alibaba Cloud Linux 2、CentOS 7.x。
+实例规格：部署SVN服务所需的实例规格与项目规格和团队规模有关，建议您使用4 vCPU、4 GiB以上的实例规格。
+实例安全组的入方向规则已放行22、80、443端口。具体操作，请参见添加安全组规则。
+说明
+svnserve模式还需要放行3690端口。
+说明
+本教程部署和使用SVN支持一键运行完成环境安装，您可以直接运行代码部署。 一键运行
+部署SVN
+SVN具有HTTP和svnserve两种访问模式，这两种模式主要存在以下区别。您可以根据业务需要，选择以下其中一种部署方式。
+功能
+HTTP模式
+svnserve模式
+协议
+使用HTTP协议进行通信。
+使用自定义的SVN协议进行通信。
+访问方式
+支持通过Web浏览器或者SVN客户端进行访问。
+仅支持通过SVN客户端进行访问。
+端口
+使用80端口进行通信。
+使用3690端口进行通信。
+安全性
+通过HTTPS进行加密通信。
+默认使用明文通信，可以通过启用加密选项进行加密通信。
+配置
+需要在Web服务器上进行配置。
+需要在SVN服务器上进行配置。
+功能支持
+支持更多的功能，比如权限管理、日志查看等。
+相对简单，功能较少。
+部署HTTP访问SVN
+步骤一：安装SVN
+远程连接安装SVN的Linux实例。
+具体操作，请参见使用Workbench登录Linux实例。
+运行以下命令，安装SVN。
+sudo yum install -y subversion
+运行以下命令，查看SVN版本。
+svnserve --version
+当回显类似如下所示时，说明SVN已安装。
+[ecs-user@iZ2zeczc ~]$ svnserve --version
+svnserve, version 1.14.1 (r1886195)
+compiled Sep 29 2022
+步骤二：安装Apache
+运行以下命令，安装httpd。
+sudo yum install httpd -y
+运行以下命令，查看httpd版本。
+httpd -version
+返回以下信息时，表示httpd服务已安装。
+[ecs-user@iZ2zeczd ~]$ httpd -version
+Server version: Apache/2.4.6 (AlibabaCloudLinux)
+Server built: May 26 2023 16:19:35
+步骤三：安装mod_dav_svn
+mod_dav_svn是一个Apache HTTP服务器的模块，用于提供SVN（Subversion）版本控制系统的Web访问功能。
+运行以下命令，安装mod_dav_svn。
+sudo yum install mod_dav_svn -y
+步骤四：配置SVN
+依次运行以下命令，创建SVN版本库。
+sudo mkdir /var/svn
+cd /var/svn
+sudo svnadmin create /var/svn/svnrepos
+运行以下命令，将SVN仓库的用户组修改为apache。
+sudo chown -R apache:apache /var/svn/svnrepos
+依次运行以下命令，查看自动生成的版本库文件。
+cd svnrepos
+ls
+Subversion目录说明如下表：
+目录
+说明
+db
+存放所有的版本控制数据文件。
+hooks
+放置hook脚本文件。
+locks
+用来追踪存取文件库的客户端。
+format
+一个文本文件，文件中只包含一个整数，表示当前文件库配置的版本号。
+conf
+SVN版本库的配置文件（版本库的访问账号、权限等）。
+运行以下命令，增加SVN版本库的用户和密码。
+SVN默认使用明文密码，而HTTP并不支持明文密码，所以需要单独生成passwd文件。本示例中，增加用户userTest，密码设置为passWDTest。请根据实际情况选择并运行以下命令：
+如果您第一次增加用户，运行命令时需要带上参数-c生成文件。
+sudo htpasswd -c /var/svn/svnrepos/conf/passwd userTest
+如果您已经增加过用户，当后续还需要增加用户时，请运行以下命令。
+sudo htpasswd /var/svn/svnrepos/conf/passwd userTest
+根据提示设置用户的密码。
+运行以下命令，进入conf目录。
+cd /var/svn/svnrepos/conf/
+设置账号的读写权限。
+运行以下命令，打开权限控制文件。
+sudo vim authz
+按i键进入编辑模式。
+移动光标至文件末尾，并添加如下代码（其中，userTest表示账号，r表示读权限，w表示写权限）。
+userTest=rw
+[aliases]
+# joe = /C=XZ/ST=Dessert/L=Snake City/O=Snake Oil, Ltd./OU=Research Institute/CN=Joe Average
+[groups]
+# harry_and_sally = harry,sally
+# harry_sally_and_joe = harry,sally,&joe
+# [/foo/bar]
+# harry = rw
+# &joe = r
+# * =
+# [repository:/baz/fuz]
+# @harry_and_sally = rw
+# * = r
+userTest=rw
+按Esc键后，输入:wq保存并退出文件。
+修改SVN服务配置。
+运行以下命令，打开SVN服务配置文件。
+sudo vim svnserve.conf
+按i键进入编辑模式。
+移动光标找到如下配置行，删除行前面的注释符#和空格。
+说明
+每行不能以空格开始，且等号两端要有一个空格。
+anon-access = read
+auth-access = write
+password-db = passwd
+authz-db = authz
+realm = /var/svn/svnrepos
+[general]
+### The anon-access and auth-access options control access to the
+### repository for unauthenticated (a.k.a. anonymous) users and
+### authenticated users, respectively.
+### Valid values are "write", "read", and "none".
+### Setting the value to "none" prohibits both reading and writing;
+### "read" allows read-only access, and "write" allows complete
+### read/write access to the repository.
+### The sample settings below are the defaults and specify that anonymous
+### users have read-only access to the repository, while authenticated
+### users have read and write access to the repository.
+anon-access = read
+auth-access = write
+### The password-db option controls the location of the password
+### database file. Unless you specify a path starting with a /,
+### the file's location is relative to the directory containing
+### this configuration file.
+### If SASL is enabled (see below), this file will NOT be used.
+### Uncomment the line below to use the default password file.
+password-db = passwd
+### The authz-db option controls the location of the authorization
+### rules for path-based access control. Unless you specify a path
+### starting with a /, the file's location is relative to the
+### directory containing this file. The specified path may be a
+### repository relative URL (^/) or an absolute file:// URL to a text
+### file in a Subversion repository. If you don't specify an authz-db,
+### no path-based access control is done.
+### Uncomment the line below to use the default authorization file.
+authz-db = authz
+### The groups-db option controls the location of the file with the
+### group definitions and allows maintaining groups separately from the
+### authorization rules. The groups-db file is of the same format as the
+### authz-db file and should contain a single [groups] section with the
+### group definitions. If the option is enabled, the authz-db file cannot
+### contain a [groups] section. Unless you specify a path starting with
+### a /, the file's location is relative to the directory containing this
+### file. The specified path may be a repository relative URL (^/) or an
+### absolute file:// URL to a text file in a Subversion repository.
+### This option is not being used by default.
+# groups-db = groups
+### This option specifies the authentication realm of the repository.
+### If two repositories have the same authentication realm, they should
+### have the same password database, and vice versa. The default realm
+### is repository's uuid.
+realm = /var/svn/svnrepos
+### The force-username-case option causes svnserve to case-normalize
+### usernames before comparing them against the authorization rules in the
+### authz-db file configured above. Valid values are "upper" (to upper-
+按Esc键后，输入:wq保存并退出文件。
+运行以下命令，启动SVN版本库。
+本文示例中，启动命令直接指定到版本库。
+sudo svnserve -d -r /var/svn/svnrepos/
+说明
+运行killall svnserve命令可停止SVN服务。
+运行命令，查看SVN服务是否开启。
+ps -ef |grep svn
+返回以下信息时，表示SVN服务已经开启。
+[ecs-user@iZ2zeczdpa5xxx conf]$ ps -ef |grep svn
+ecs-user 2767 1 0 16:50 ? 00:00:00 svnserve -d -r /var/svn/svnrepos/
+ecs-user 2808 2568 1 0 16:50 pts/0 00:00:00 grep --color=auto svn
+步骤五：配置Apache
+运行以下命令，新增并编辑httpd配置文件。
+sudo vim /etc/httpd/conf.d/subversion.conf
+按i键进入编辑模式。
+在subversion.conf文件中输入以下配置信息。
+<Location /svn>
+DAV svn
+SVNParentPath /var/svn
+AuthType Basic
+AuthName "Authorization SVN"
+AuthzSVNAccessFile /var/svn/svnrepos/conf/authz
+AuthUserFile /var/svn/svnrepos/conf/passwd
+Require valid-user
+</Location>
+按Esc键后，输入:wq保存并退出文件。
+运行以下命令，启动Apache服务。
+sudo systemctl start httpd.service
+部署svnserve访问SVN
+步骤一：安装SVN
+远程连接安装SVN的Linux实例。
+具体操作，请参见使用Workbench登录Linux实例。
+运行以下命令，安装SVN。
+sudo yum install -y subversion
+运行以下命令，查看SVN版本。
+svnserve --version
+当回显类似如下所示时，说明SVN已安装。
+[ecs-user@iZ2zeczc ~]$ svnserve --version
+svnserve, version 1.14.1 (r1886195)
+compiled Sep 29 2022
+步骤二：配置SVN
+依次运行以下命令，创建SVN版本库。
+sudo mkdir /var/svn
+cd /var/svn
+sudo svnadmin create /var/svn/svnrepos
+依次运行以下命令，查看自动生成的版本库文件。
+cd svnrepos
+ls
+Subversion目录说明如下表：
+目录
+说明
+db
+存放所有的版本控制数据文件。
+hooks
+放置hook脚本文件。
+locks
+用来追踪存取文件库的客户端。
+format
+一个文本文件，文件中只包含一个整数，表示当前文件库配置的版本号。
+conf
+SVN版本库的配置文件（版本库的访问账号、权限等）。
+设置SVN版本库的账号和密码。
+运行以下命令，打开用户配置文件。
+cd conf/
+sudo vim passwd
+按i键进入编辑模式。
+移动光标至[users]下，添加用户账号和密码。
+说明
+添加账号和密码的格式为：账号 = 密码。例如，userTest（账号） = passWDTest（密码）（注意等号两端要有一个空格）。
+### This file is an example password file for svnserve.
+### Its format is similar to that of svnserve.conf. As shown in the
+### example below it contains one section labelled [users].
+### The name and password for each user follow, one account per line.
+[users]
+# harry = harrysecret
+# sally = sallyssecret
+userTest = passWDTest
+按Esc键退出编辑模式，并输入:wq保存并退出。
+设置账号的读写权限。
+运行以下命令，打开权限控制文件。
+sudo vim authz
+按i键进入编辑模式。
+移动光标至文件末尾，并添加如下代码（其中，userTest表示账号，r表示读权限，w表示写权限）。
+userTest=rw
+[aliases]
+# joe = /C=XZ/ST=Dessert/L=Snake City/O=Snake Oil, Ltd./OU=Research Institute/CN=Joe Average
+[groups]
+# harry_and_sally = harry,sally
+# harry_sally_and_joe = harry,sally,&joe
+# [/foo/bar]
+# harry = rw
+# &joe = r
+# * =
+# [repository:/baz/fuz]
+# @harry_and_sally = rw
+# * = r
+userTest=rw
+按Esc键后，输入:wq保存并退出文件。
+修改SVN服务配置。
+运行以下命令，打开SVN服务配置文件。
+sudo vim svnserve.conf
+按i键进入编辑模式。
+移动光标找到如下配置行，删除行前面的注释符#和空格。
+说明
+每行不能以空格开始，且等号两端要有一个空格。
+anon-access = read
+auth-access = write
+password-db = passwd
+authz-db = authz
+realm = /var/svn/svnrepos
+[general]
+### The anon-access and auth-access options control access to the
+### repository for unauthenticated (a.k.a. anonymous) users and
+### authenticated users, respectively.
+### Valid values are "write", "read", and "none".
+### Setting the value to "none" prohibits both reading and writing;
+### "read" allows read-only access, and "write" allows complete
+### read/write access to the repository.
+### The sample settings below are the defaults and specify that anonymous
+### users have read-only access to the repository, while authenticated
+### users have read and write access to the repository.
+anon-access = read
+auth-access = write
+### The password-db option controls the location of the password
+### database file. Unless you specify a path starting with a /,
+### the file's location is relative to the directory containing
+### this configuration file.
+### If SASL is enabled (see below), this file will NOT be used.
+### Uncomment the line below to use the default password file.
+password-db = passwd
+### The authz-db option controls the location of the authorization
+### rules for path-based access control. Unless you specify a path
+### starting with a /, the file's location is relative to the
+### directory containing this file. The specified path may be a
+### repository relative URL (^/) or an absolute file:// URL to a text
+### file in a Subversion repository. If you don't specify an authz-db,
+### no path-based access control is done.
+### Uncomment the line below to use the default authorization file.
+authz-db = authz
+### The groups-db option controls the location of the file with the
+### group definitions and allows maintaining groups separately from the
+### authorization rules. The groups-db file is of the same format as the
+### authz-db file and should contain a single [groups] section with the
+### group definitions. If the option is enabled, the authz-db file cannot
+### contain a [groups] section. Unless you specify a path starting with
+### a /, the file's location is relative to the directory containing this
+### file. The specified path may be a repository relative URL (^/) or an
+### absolute file:// URL to a text file in a Subversion repository.
+### This option is not being used by default.
+# groups-db = groups
+### This option specifies the authentication realm of the repository.
+### If two repositories have the same authentication realm, they should
+### have the same password database, and vice versa. The default realm
+### is repository's uuid.
+realm = /var/svn/svnrepos
+### The force-username-case option causes svnserve to case-normalize
+### usernames before comparing them against the authorization rules in the
+### authz-db file configured above. Valid values are "upper" (to upper-
+按Esc键后，输入:wq保存并退出文件。
+运行以下命令，启动SVN版本库。
+本文示例中，启动命令直接指定到版本库。
+sudo svnserve -d -r /var/svn/svnrepos/
+说明
+运行killall svnserve命令可停止SVN服务。
+运行命令，查看SVN服务是否开启。
+ps -ef |grep svn
+返回以下信息时，表示SVN服务已经开启。
+[ecs-user@iZ2zeczdpa5xxx conf]$ ps -ef |grep svn
+ecs-user 2767 1 0 16:50 ? 00:00:00 svnserve -d -r /var/svn/svnrepos/
+ecs-user 2808 2568 1 0 16:50 pts/0 00:00:00 grep --color=auto svn
+使用SVN
+使用SVN管理代码的常见流程为：
+Checkout（您提取源代码到本地）。
+其他人修改并提交源代码到Repository。
+Update（您获得最新的代码）。
+您修改并调试成功源代码。
+Commit（提交修改后的代码到Repository，其他程序员即可看到您的修改）。
+提取源代码到本地（Checkout）
+在本地Windows环境中下载并安装TortoiseSVN客户端。
+在本地项目文件夹内的空白区域单击鼠标右键。
+本示例中，项目文件夹为C:\Test。
+在弹出菜单中，选择SVN Checkout...。
+填写如下信息后，单击OK。
+URL of repository：版本库URL，源代码统一存放的地址。
+HTTP访问模式：URL格式为http://<ECS实例公网IP>/svn/<SVN版本库名>。
+svnserve访问模式：URL格式为svn://实例公网IP地址/。
+说明
+当在版本库的上层目录启动SVN服务时，SVN检出的URL要对应加上版本库的名称。
+Checkout directory：检出到本地的目录，本文示例中，目录为C:\Test。
+说明
+第一次登录需要输入账号和密码，即您在passwd文件中设置的用户名和密码。
+Checkout 完成后，弹出 Checkout Finished! 对话框，显示 At revision: 0，表示源代码提取成功。
+获取更新（Update）
+SVN服务端系统库上的项目更新后，您可在本地项目文件空白处单击右键，选择SVN Update，即可自动完成下载最新项目，并会显示所有更新内容。
+说明
+在原项目文件夹内选择SVN更新，会自动覆盖原有内容。建议您先备份，再更新，防止自己原有的项目内容丢失。
+提交修改（Commit）
+完成以下操作，提交本地修改到服务端系统库中。
+在项目文件空白处单击右键，选择SVN Commit...。
+输入本次提交的版本更新信息（所做修改的注释），选中要提交的操作内容，单击OK。
+即可将本地项目提交到SVN服务器资源库，覆盖资源库项目从而实现更新。
+说明
+如果发生提交冲突，即两人都提交修改，后提交者由于版本落后会提交失败。这时，您可以先备份自己的项目，然后从服务端下载最新的项目，并将自己的项目覆盖到本地项目文件夹，再单击SVN提交即可成功提交。
+若您提交的项目中删除了某个文件，在 Commit 对话框中，Message 区域填写提交说明，Changes made 区域列出待提交文件及其状态（如 test1.txt 状态为 missing，表示该文件已从工作副本中删除）。确认后单击 OK 完成提交。
+还原文件
+完成以下操作，还原SVN中被删除的文件。
+打开本地项目文件夹，右键单击选择SVN Checkout...来检出数据。
+删除其中一个文件。
+根据您是否已提交修改选择相应的操作：
+未提交时，右键单击空白处，选择TortoiseSVN > Revert...。
+已提交时，服务端系统库中数据已得到同步，系统也会将其保存的数据删除。此时，您需要采取以下方法还原数据：
+右键单击空白处，选择TortoiseSVN > Show log查看操作日志。
+在日志中，单击删除的日志行，下方会显示已删除的数据。
+Changed Paths 区域显示被删除文件的路径（如 /test2.txt）及操作类型 Deleted。
+右键单击已删除的数据，然后单击Save revision to...。
+在弹出的保存对话框中，选择保存路径（如 C:\Test），在文件名输入框中输入 test2.txt，然后单击保存(S)。
+打开原文件夹，单击SVN Commit...，即可同步文件和系统库中的数据。
+常见问题
+为什么使用TortoiseSVN访问SVN服务器时服务连接，提示“主机没有反应”？
+出现“主机没有反应”可能有以下原因：
+SVN服务器未启动
+安全组中未开放SVN服务器所需端口
+ECS实例开启了firewalld防火墙，但是未放行SVN服务器所需的端口
+您可以按照以下步骤排查：
+查看SVN服务状态。
+ps -ef |grep svn
+返回相关信息时，表示SVN服务已经开启。如果未返回相关信息，请执行sudo svnserve -d -r /var/svn/svnrepos/启动SVN服务。
+查看ECS实例所在安全组规则是否满足SVN服务器要求。
+HTTP模式：开放22、80、443
+svnserve模式：开放22、80、443、3690
+查看firewalld防火墙
+查看firewalld防火墙状态。
+sudo firewall-cmd --state
+回显信息为not running说明firewalld防火墙未开启，对SVN服务器无影响。
+回显信息为running说明firewalld防火墙已开启，请继续执行下一步。
+在firewalld规则中放行SVN服务器所需端口（例如3690）。
+sudo firewall-cmd --add-port=3690/tcp --permanent
+重新加载firewalld服务配置，使配置生效。
+sudo systemctl reload firewalld

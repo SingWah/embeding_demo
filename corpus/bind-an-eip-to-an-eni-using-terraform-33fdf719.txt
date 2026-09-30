@@ -1,0 +1,117 @@
+# Terraform绑定EIP至辅助弹性网卡
+> https://help.aliyun.com/zh/ecs/developer-reference/bind-an-eip-to-an-eni-using-terraform
+
+弹性公网IP（Elastic IP Address）是可以独立购买和持有的公网IP地址资源，当EIP和云资源绑定后，云资源可以通过EIP与公网通信。例如在单个ECS实例上托管多个应用时，可以通过为每个应用分配独立的辅助弹性网卡并绑定独立的弹性公网IP（EIP），实现每个应用对外呈现一个独立的公网IP地址。本文将为您介绍如何为辅助弹性网卡绑定弹性公网IP。
+说明
+本教程所含示例代码支持一键运行，您可以直接运行代码。一键运行
+所涉及资源
+alicloud_eip_address：创建EIP。
+alicloud_eip_association：将EIP绑定至云资源，例如将EIP绑定至ECS实例或者弹性网卡。
+alicloud_vpc：创建专有网络VPC。
+alicloud_vswitch：创建虚拟交换机。
+alicloud_security_group：创建安全组。
+alicloud_security_group_rule：为安全组添加访问控制规则。
+alicloud_ecs_network_interface：创建弹性网卡。
+编写配置文件
+创建terraform.tf文件，输入以下内容并保存。
+provider "alicloud" {
+region = var.region
+# 资源将要创建的地域
+variable "region" {
+default = "cn-beijing"
+description = "The region where the resources will be created."
+# 输入已有的VPC ID，当为已有ECS实例绑定弹性网卡时，该值必填，且值为ECS实例所对应的VPC。
+variable "vpc_id" {
+default = ""
+description = "When binding an ENI to an existing ECS instance, this value is required and must be the VPC associated with the ECS instance."
+# 指定VPC的CIDR块，当填入vpc_id时，该值可不填。
+variable "vpc_cidr_block" {
+default = "192.168.0.0/16"
+description = "Specify the CIDR block of the VPC. If the vpc_id is provided, this value can be left blank."
+# 输入可用区，当为已有ECS实例绑定弹性网卡时，该值必填，且值为ECS实例所在可用区。
+variable "zone_id" {
+default = ""
+description = "When binding an ENI to an existing ECS instance, this value is required and must be the zone where the ECS instance is located."
+# 指定VSwitch的CIDR块，CIDR块需在VPC CIDR块的范围内
+variable "vswitch_cidr_block" {
+default = "192.168.0.0/24"
+description = "Specify the CIDR block of the VSwitch. The CIDR block must be within the range of the VPC CIDR block."
+# 访问弹性网卡的源地址
+variable "source_ip" {
+description = "The IP address you used to access the ENI."
+type = string
+default = "0.0.0.0/0"
+# 指定弹性网卡的私网IP地址
+variable "private_ip" {
+description = "The primary private IP address of the ENI. The specified IP address must be available within the CIDR block of the VSwitch. If this parameter is not specified, an available IP address is assigned from the VSwitch CIDR block at random."
+type = string
+default = ""
+locals {
+new_zone_id = var.zone_id == ""
+create_vpc = var.vpc_id == ""
+resource "alicloud_eip" "eip" {
+address_name = "test_eip"
+resource "alicloud_vpc" "vpc" {
+count = local.create_vpc ? 1 : 0
+vpc_name = "test_vpc"
+cidr_block = var.vpc_cidr_block
+data "alicloud_zones" "default" {
+count = local.new_zone_id ? 1 : 0
+available_resource_creation = "VSwitch"
+resource "alicloud_vswitch" "vswitch" {
+vswitch_name = "test_vswitch"
+cidr_block = var.vswitch_cidr_block
+zone_id = local.new_zone_id ? data.alicloud_zones.default[0].zones.0.id : var.zone_id
+vpc_id = local.create_vpc ? alicloud_vpc.vpc[0].id : var.vpc_id
+resource "alicloud_security_group" "group" {
+security_group_name = "test_sg"
+vpc_id = local.create_vpc ? alicloud_vpc.vpc[0].id : var.vpc_id
+# 添加允许TCP 80端口入方向流量的规则
+resource "alicloud_security_group_rule" "allow_80_tcp" {
+type = "ingress"
+ip_protocol = "tcp"
+nic_type = "intranet"
+policy = "accept"
+port_range = "80/80"
+priority = 1
+security_group_id = alicloud_security_group.group.id
+cidr_ip = var.source_ip
+resource "alicloud_network_interface" "default" {
+network_interface_name = "test_eni"
+vswitch_id = alicloud_vswitch.vswitch.id
+security_group_ids = [alicloud_security_group.group.id]
+primary_ip_address = var.private_ip
+secondary_private_ip_address_count = 1
+resource "alicloud_eip_association" "default" {
+allocation_id = alicloud_eip.eip.id
+instance_type = "NetworkInterface"
+instance_id = alicloud_network_interface.default.id
+创建资源
+以下命令需要在terraform.tf文件所在目录执行。
+运行terraform init进行初始化，当返回如下信息时，表示初始化完成。
+Terraform has been successfully initialized!
+You may now begin working with Terraform. Try running "terraform plan" to see
+any changes that are required for your infrastructure. All Terraform commands
+should now work.
+If you ever set or change modules or backend configuration for Terraform,
+rerun this command to reinitialize your working directory. If you forget, other
+commands will detect it and remind you to do so if necessary.
+运行terraform apply并根据提示输入yes创建资源，当返回如下信息时，表示资源创建完成。
+Do you want to perform these actions?
+Terraform will perform the actions described above.
+Only 'yes' will be accepted to approve.
+Enter a value: yes
+alicloud_vpc.vpc: Creating...
+alicloud_eip.eip: Creating...
+Apply complete! Resources: 7 added, 0 changed, 0 destroyed.
+说明
+当您创建弹性网卡是为了绑定到已有ECS实例时，可以执行terraform apply传相应的参数，例如terraform apply -var source_ip=XX.XX.XX.XX -var vpc_id=vpc-2vc4ctyuxpq6nXXXXXXXXX -var zone_id=cn-beijing-a -var vswitch_cidr_block=XX.XX.XX.XX/XX。
+运行terraform show查看已创建的资源，包括VPC、弹性公网IP、弹性网卡等。
+说明
+您也可以在控制台查看所创建的资源。
+清理资源
+当您不再需要上述通过Terraform创建或管理的资源时，请运行terraform destroy命令以释放资源。
+terraform destroy
+相关文档
+在弹性网卡创建完成后，您可以将其绑定至同一VPC内的同一可用区的ECS实例上。具体操作，请参见创建并使用弹性网卡。
+Terraform更多命令，请参见Terraform常用命令。

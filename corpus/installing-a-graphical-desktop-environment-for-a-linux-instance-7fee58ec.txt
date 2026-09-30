@@ -1,0 +1,221 @@
+# 如何在Linux系统上安装图形化界面
+> https://help.aliyun.com/zh/ecs/user-guide/installing-a-graphical-desktop-environment-for-a-linux-instance
+
+阿里云提供的公共Linux镜像默认不安装桌面环境，以保证服务器性能和稳定性。通过安装图形化用户界面（GUI）能够极大地提升操作体验和工作效率。
+适用性与风险评估
+在开始前，请务必阅读并确认以下关键限制与风险。
+操作系统兼容性：阿里云官方的Alibaba Cloud Linux操作系统不支持安装图形化界面。
+远程连接工具限制： 安装图形化界面后，通过VNC登录后默认界面为图形化界面，Workbench和会话管理连接后界面不受影响。
+性能影响：图形化界面会持续占用大量CPU和内存资源（通常至少需要额外1-2 GiB内存），可能导致低配实例响应减缓。建议仅为特定、必要的业务场景（如自动化测试、图形渲染）安装GUI。对于常规的服务器管理，建议使用命令行工具。
+快速选型
+请根据实例规格和需求，选择合适的桌面环境和远程访问协议。选择更轻量的桌面环境可以有效降低资源消耗。
+桌面环境 (DE)
+资源占用 (内存)
+推荐最低实例规格
+XFCE
+低 (约 500-800 MB)
+2 vCPU, 2 GiB
+MATE
+中 (约 800 MB-1.2 GiB)
+2 vCPU, 4 GiB
+GNOME
+高 (约 1.5 GiB+)
+4 vCPU, 8 GiB
+操作指南
+重要
+在执行任何安装操作前，建议先为ECS实例手动创建单个快照，以便在发生意外时能够快速恢复数据。
+为Ubuntu 18/20/22/24安装XFCE桌面
+通过VNC连接实例。
+更新软件包列表和已安装的包。
+sudo apt update && sudo apt upgrade -y
+安装XFCE桌面环境。
+sudo apt install -y xfce4 xfce4-goodies lightdm lightdm-gtk-greeter
+LightDM是轻量级显示管理器，负责在系统启动时加载登录窗口，验证用户身份，并启动桌面会话。
+重启ECS实例。
+sudo reboot
+连接并验证。
+等待系统重启完成，出现图形化界面，确认安装成功。
+Ubuntu 默认不允许 root 进行图形登录。请创建普通用户用于桌面会话，必要时赋予 sudo 权限，避免以 root 直接操作桌面。
+取消图形化界面
+如果需要移除图形化界面，请执行以下命令：
+# 1. 停止并卸载XFCE相关包
+sudo apt-get purge -y xfce4* lightdm*
+# 2. 自动移除不再需要的依赖包
+sudo apt-get autoremove -y --purge
+# 3. 重启系统
+sudo reboot
+为Anolis 8/CentOS Stream安装GNOME桌面
+通过VNC连接实例。
+更新软件包。
+sudo dnf update -y
+安装GNOME桌面环境。
+sudo dnf groupinstall "Server with GUI" -y
+Server with GUI 是一个包含GNOME及常用工具的软件包组。
+设置系统默认以图形化模式启动。
+sudo systemctl set-default graphical.target
+重启实例以应用更改。
+sudo reboot
+重启后，通过控制台VNC登录，即可看到GNOME登录界面。输入实例的用户名和密码即可进入桌面。
+取消图形化界面
+如果需要移除图形化界面，请执行以下命令：
+# 1. 切换回命令行启动模式
+sudo systemctl set-default multi-user.target
+# 2. 卸载图形化界面软件包组
+sudo dnf groupremove "Server with GUI" -y
+# 3. 自动移除不再需要的依赖包
+sudo dnf autoremove -y
+# 4. 重启实例
+sudo reboot
+为CentOS 7/8安装MATE桌面
+重要
+CentOS 7/8已结束生命周期（EOL）。官方软件源已失效，继续使用存在安全风险且可能安装失败。
+通过VNC连接实例。
+更新软件包。
+sudo yum -y upgrade
+安装MATE桌面环境。
+sudo yum groups install "X Window System"
+sudo yum groups install "MATE Desktop"
+设置默认以图形化桌面环境启动实例。
+sudo systemctl set-default graphical.target
+重启ECS实例。
+sudo reboot
+取消图形化界面
+# 查看已安装的组
+sudo yum group list installed
+# 卸载 MATE 桌面环境
+sudo yum groupremove "MATE Desktop"
+sudo yum groupremove "X Window System"
+# 自动移除不需要的依赖包
+sudo yum autoremove
+# 设置系统启动到多用户（文本）模式
+sudo systemctl set-default multi-user.target
+# 重启系统
+sudo reboot
+应用于生产环境
+在生产环境中使用图形化界面需要审慎评估，并遵循以下最佳实践。
+资源规划：根据选择的桌面环境，预留足够的CPU和内存资源以保证正常安装并使用。通过查看实例监控信息持续观察资源使用率，必要时升级实例配置。
+安全加固：
+最小权限原则：创建一个专用于GUI登录的非root普通用户，避免使用root用户直接操作桌面。
+系统更新：定期执行 sudo dnf update 或 sudo apt upgrade，及时修补桌面环境和底层系统的安全漏洞。
+常见问题
+CentOS系统在安装图形化桌面后无法使用键盘和鼠标如何解决？
+问题现象
+安装桌面环境后，通过ECS管理控制台的VNC连接ECS实例时，发现无法使用鼠标和键盘。
+问题原因
+键盘和鼠标驱动异常所导致。
+解决方法
+请参考以下步骤，将驱动类型修改为evdev。
+安装evdev程序。
+yum install xorg-x11-drv-evdev
+创建/etc/X11/xorg.conf配置文件。
+Xorg -configure
+备份配置文件。
+cp xorg.conf.new /etc/X11/xorg.conf
+编辑/etc/X11/xorg.conf配置文件，将鼠标和键盘驱动类型修改为evdev。
+Identifier "Keyboard0"
+Driver "evdev" #修改为 evdev
+Option "Device" "/dev/input/event3"
+EndSection
+Section "InputDevice"
+Identifier "Mouse0"
+Driver "evdev" #修改为 evdev
+Option "Device" "/dev/input/event5"
+Option "Mode" "Absolute"
+EndSection
+修改前的配置文件类似如下。
+Section "InputDevice"
+Identifier "keyboard0"
+Driver "kbd"
+EndSection
+Section "InputDevice"
+Identifier "Mouse0"
+Driver "mouse"
+Option "Protocol" "auto"
+Option "Device" "/dev/input/mice"
+Option "ZAxisMapping" "4 5 6 7"
+EndSection
+修改后的配置文件类似如下。
+Section "InputDevice"
+Identifier "Keyboard0"
+Driver "evdev"
+Option "Device" "/dev/input/event3"
+EndSection
+Section "InputDevice"
+Identifier "Mouse0"
+Driver "evdev"
+Option "Device" "/dev/input/event5"
+Option "Mode" "Absolute"
+EndSection
+重启ECS实例，确认正常使用鼠标和键盘。
+CentOS系统开机时未启动messagebus和haldaemon服务导致无法使用GNOME桌面，如何解决？
+问题现象
+安装GNOME桌面环境并重启ECS实例后，输入账号和密码后，无法登录ECS实例，并提示以下错误。
+"You are currently trying to run as the root super user. The super user is a specialized account that is not designed to run a normal user session. Various programs will not function properly, and actions performed under this account can cause unrecoverable damage to the operating system."
+问题原因
+messagebus和haldaemon服务没有自动启动所致，为了提高系统性能和稳定性，默认情况下，Linux官网公共镜像未自动启动messagebus和haldaemon服务。
+解决方法
+通过历史快照回滚操作系统，详情请参见使用快照回滚云盘。
+按照安装GUI步骤，重新安装图形化桌面。
+配置messagebus和haldaemon服务开机自动启动。
+chkconfig --level 35 messagebus on
+chkconfig --level 35 haldaemon on
+建议将启动级别修改为“Level 3”，然后通过startx命令启动桌面环境，测试桌面环境的可用性。当出现问题时，还可以切换到终端模式进行问题排查和处理。最后，在确保桌面环境启动无误后，再将启动级别修改为“Level 5”。
+Ubuntu安装图形化界面提示unmet dependencies，如何解决？
+问题现象
+安装Ubuntu 18图形化桌面过程中可能出现如下报错。
+root@iZxxx:~# apt install ubuntu-desktop
+Reading package lists... Done
+Building dependency tree
+Reading state information... Done
+Some packages could not be installed. This may mean that you have
+requested an impossible situation or if you are using the unstable
+distribution that some required packages have not yet been created
+or been moved out of Incoming.
+The following information may help to resolve the situation:
+The following packages have unmet dependencies:
+ubuntu-desktop : Depends: nautilus but it is not going to be installed
+Depends: ubuntu-release-upgrader-gtk but it is not going to be installed
+Depends: update-manager but it is not going to be installed
+Recommends: gnome-disk-utility but it is not going to be installed
+Recommends: gvfs-fuse but it is not going to be installed
+Recommends: nautilus-share but it is not going to be installed
+Recommends: usb-creator-gtk but it is not going to be installed
+E: Unable to correct problems, you have held broken packages.
+root@iZxxx:~#
+问题原因
+该报错是由于安装ubuntu-desktop所需要的软件包列表中，依赖较低版本的update-manager-core、libparted2和python3-update-manager软件包，需要删除较高版本的软件包，系统会根据软件包依赖树重新安装软件包。
+解决方案
+卸载较高版本的软件包。
+apt-get remove update-manager-core libparted2 python3-update-manager
+重新安装图形化桌面。
+apt-get update
+apt-get install ubuntu-desktop
+执行 yum groupinstall "Server with GUI" -y 命令时遇到错误Invalid configuration value: failovermethod=priority，如何解决？
+问题现象
+Invalid configuration value: failovermethod=priority in /etc/yum.repos.d/CentOS-epel.repo; Configuration: OptionBinding with id "failovermethod" does not exist
+CentOS Linux 8 - AppStream
+问题原因
+由于 EPEL（Extra Packages for Enterprise Linux）仓库配置文件 /etc/yum.repos.d/CentOS-epel.repo 中包含了一个无效的配置选项 failovermethod=priority。在 CentOS 8 中，yum 实际上是基于 dnf 的，而 dnf 不再支持 failovermethod 这个配置选项。因此，当 dnf 解析该仓库配置文件时，会报出上述错误。
+解决方法
+修改 EPEL 仓库的配置文件，移除或注释掉 failovermethod=priority，步骤如下。
+编辑 EPEL 仓库配置文件。
+打开 /etc/yum.repos.d/CentOS-epel.repo 文件。例如：
+sudo vi /etc/yum.repos.d/CentOS-epel.repo
+查找并移除 failovermethod=priority。
+在打开的文件中，找到包含 failovermethod=priority 的行。
+注释掉该行：在行首添加 #，使其变为注释。
+# failovermethod=priority
+清理 YUM 缓存，确保新的配置生效。
+sudo yum clean all
+sudo yum makecache
+再次尝试安装 GUI。
+sudo yum groupinstall "Server with GUI" -y
+在安装完图形化界面之后，进入系统出现卡顿如何解决？
+安装图形化界面后系统运行缓慢，可能是由于所选桌面环境资源消耗较大或系统配置较低。
+Xrdp可以调用本地Windows自带的远程桌面mstsc程序，稳定性更好。尤其是在网络条件良好的情况下，Xrdp可以在远程使用时提供更流畅的体验。安装Xrdp的参考命令如下：
+sudo apt install xrdp -y
+sudo adduser xrdp ssl-cert
+sudo ufw allow 3389/tcp
+sudo systemctl status xrdp
+sudo systemctl enable xrdp
+如果Linux系统本身资源不足或桌面环境过于沉重，建议使用更轻量级的桌面环境来提升性能。

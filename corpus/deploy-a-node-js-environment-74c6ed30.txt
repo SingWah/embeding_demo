@@ -1,0 +1,15 @@
+# 部署Node.js环境
+> https://help.aliyun.com/zh/ecs/user-guide/deploy-a-node-js-environment/
+
+Node.js是一个基于Chrome V8引擎的JavaScript运行环境，用来方便快速地搭建易于扩展的网络应用。
+应用场景
+Node.js使用了一个事件驱动、非阻塞式I/O的模型，使其轻量又高效，非常适合运行在分布式设备的数据密集型的实时应用。Node.js的包管理器npm，是一个开源库生态系统。Node.js的典型应用场景包括：
+实时应用：如在线聊天，实时通知推送等（例如socket.io）。
+分布式应用：通过高效的并行I/O使用现有的数据。
+工具类应用：海量的工具，小到前端压缩部署（例如grunt），大到桌面图形界面应用程序。
+游戏类应用：游戏领域对实时和并发有很高的要求（例如网易的Pomelo框架）。
+Web渲染：利用稳定接口提升Web渲染能力。
+前后端编程语言环境统一：前端开发人员可以非常快速地切入到服务器端的开发（例如著名的纯JavaScript全栈式MEAN架构）。
+部署方式
+快捷部署Node.js环境：使用扩展程序在您的Linux系统上快速部署Node.js环境，以节省时间。
+手动部署Node.js环境：指导您如何手动安装Node.js的多个版本，支持Linux和Windows操作系统。

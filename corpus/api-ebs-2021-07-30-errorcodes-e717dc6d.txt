@@ -1,0 +1,394 @@
+# 公共错误码含义及排查方法
+> https://help.aliyun.com/zh/ecs/developer-reference/api-ebs-2021-07-30-errorcodes
+
+错误码
+HTTP status code
+错误码
+错误信息
+描述
+操作
+403
+AliCroup2CloudUserCannotBuyNotInnerCommodity
+There is no group cloud commodity label, and users within the group are not allowed to purchase.
+无集团上云商品标签，不允许集团内部用户购买。
+诊断
+400
+App.NumberExceed
+The number of apps exceeded.
+app数量超过限制
+诊断
+429
+BLOCK.LimitedRquest
+BLOCK.LimitedRequest
+接口限流
+诊断
+400
+ControllerDevice.AlreadyAttached
+The specified disk as controller channel already attached.
+指定磁盘为挂载状态
+诊断
+400
+DocumentConvertFailed.ExceedFileSizeLimit
+The conversion has been failed, exceed file size limit.
+文档转换失败，文件大小超过系统限额。
+诊断
+400
+Duplicate.TagKey
+The Tag.N.Key contain duplicate key.
+标签中存在重复的键，请保持键的唯一性。
+诊断
+403
+Forbidden
+User is not authorized to operate.
+当前用户无权限对当前资源执行任何操作。请检查您的账号权限或者咨询您的主账号管理员。
+诊断
+403
+Forbidden.Action
+User is not authorized to operate this action.
+当前用户无权限执行该操作。请检查您的账号权限或者咨询您的主账号管理员。
+诊断
+400
+IdempotentParameterMismatch
+The specified parameter has changed while using an already used clientToken.
+如果您提供了一个已经使用过的ClientToken，但其他请求参数有变化。
+诊断
+403
+IncorrectDiskStatus.CreatingSnapshot
+A previous snapshot creation is in process.
+创建快照时有前序快照正在被创建
+诊断
+500
+InternalError
+The request processing has failed due to some unknown error, exception or failure.
+内部错误。
+诊断
+400
+InternalInvokeError
+The internal invoking has failed.
+服务不可用，请过一段时间后再重试
+诊断
+403
+InvalidAccountStatus.NotEnoughBalance
+Your account does not have enough balance.
+您的账户余额不足。
+诊断
+403
+InvalidDiskCategory.NotSupported
+The specified disk category is not supported.
+当前操作不支持您指定的磁盘类型。请检查您的输入参数和API文档。
+诊断
+400
+InvalidDiskSize.NotSupported
+The specified parameter size is not valid.
+不支持的云盘大小
+诊断
+400
+InvalidMetric
+The metric is invalid.
+无效的指标名。
+诊断
+400
+InvalidParameter
+The parameter %s is invalid.
+参数错误
+诊断
+400
+InvalidParameter.Conflict
+The specified parameter %s and %s are not blank at the same time.
+参数冲突
+诊断
+400
+InvalidParameter.EndTime
+The specified parameter EndTime is earlier than StartTime.
+参数 EndTime 早于 StartTime。
+诊断
+400
+InvalidParameter.Format
+Specified parameter format is not valid.
+返回值格式不正确（Format 不支持）。返回格式支持 XML 与 JSON，默认为 XML。
+诊断
+400
+InvalidParameter.TooManyDataQueried
+Too many data queried.
+查询数据过多。
+诊断
+400
+InvalidParameter.TooManyDataQueried
+Too many data queried in request.
+查询过多数据。
+诊断
+403
+InvalidPayMethod
+The specified pay method is not valid.
+不支持该购买方式。请检查您传入的参数chargeType是否正确。
+诊断
+400
+InvalidPeriod.ValueNotSupported
+The specified parameter Period is not valid
+参数Period不合法。
+诊断
+400
+InvalidPeriod.ValueNotSupported
+The specified parameter "Period" is not valid.
+"Period"字段无效。
+诊断
+404
+InvalidRegionId.NotFound
+The specified RegionId does not exist.
+指定的RegionId不存在。
+诊断
+404
+InvalidResourceGroup.NotFound
+The ResourceGroup provided does not exist in our records.
+资源组并不在记录中。
+诊断
+404
+InvalidResourceId.NotFound
+The specified ResourceId is not found in our records.
+指定的资源不存在，请检查参数ResourceId是否正确。
+诊断
+404
+InvalidResourceId.NotFound
+The specified ResourceIds are not found in our records.
+指定的资源不存在，请检查参数ResourceId是否正确。
+诊断
+404
+InvalidResourceType.NotFound
+The ResourceType provided does not exist in our records.
+指定的资源类型不存在。
+诊断
+400
+InvalidTime.Malformed
+The specified parameter StartTime or EndTime is not valid.
+参数StartTime或EndTime不合法。
+诊断
+400
+InvalidTime.Malformed
+The specified parameter "StartTime" or "EndTime" is not valid.
+"StartTime"或“EndTime”参数字段格式错误。
+诊断
+404
+InvalidZoneId.NotFound
+The specified ZoneId does not exist.
+指定的ZoneId不存在。
+诊断
+403
+INVALID_COMPONENT
+The order configuration parameters do not meet the validation criteria. Please reselect the parameters.
+订单配置参数不符合校验条件，请重新选配商品！
+诊断
+403
+LastTokenProcessing
+The last token request is processing.
+相同clientToken的请求正在执行，请稍后再重试。
+诊断
+400
+MissingParameter
+The input parameter %s that is mandatory for processing this request is not supplied.
+参数缺失。
+诊断
+404
+MissingParameter.ResourceGroup
+The parameter - Resource Group should not be null
+参数ResourceGroup不能为空。
+诊断
+404
+MissingParameter.ResourceIdsOrTags
+You must specify ResourceId.N or Tags
+参数ResourceId.N和Tags不得同时为空，您必须至少指定参数ResourceId.N或Tags中的一个。
+诊断
+404
+MissingParameter.ResourceType
+The parameter - ResourceType should not be null
+参数ResourceType不能为空。
+诊断
+403
+NoPermission.SLR
+The RAM user does not have the permission to create service linked role: AliyunServiceLinkedRoleForEBS.
+当前用户无权限创建SLR。
+诊断
+404
+NoSuchResource
+The specified resource does not exist.
+指定的资源不存在。
+诊断
+404
+NoSuchResource.Disk
+The specified disk does not exist.
+磁盘不存在。
+诊断
+404
+NoSuchResource.Pair
+The specified replica pair does not exist.
+复制对不存在。
+诊断
+404
+NoSuchResource.SlnInst
+The specified solution instance is not found.
+指定的解决方案实例未找到
+诊断
+404
+NoSuchResource.Solution
+The specified solution is not found.
+指定的解决方案未找到
+诊断
+403
+NotOnSale.Region
+The specified region is not on sale.
+当前Region停售或无库存。
+诊断
+403
+NotOnSale.Zone
+The specified zone is not on sale.
+当前Zone停售或无库存。
+诊断
+400
+NumberExceed.ResourceIds
+The ResourceIds parameter number is exceed , Valid : 50
+参数“ResourceIds”中包含的“ResourceId”不能超过 50 个。
+诊断
+400
+NumberExceed.Tags
+NumberExceed.Tags
+标签个数超过最大限制，本操作最多可以操作 20 个标签。
+诊断
+403
+OperationDenied
+The operation is not allowed.
+当前操作不允许执行。
+诊断
+403
+OperationDenied.GroupHasPair
+The group cannot be deleted due to not empty.
+当前一致性组中包含有复制对，不能被删除。
+诊断
+403
+OperationDenied.GroupStatusCannotAddPair
+The pair cannot be added in group current status.
+一致性组的当前状态不允许复制对加入。
+诊断
+403
+OperationDenied.GroupStatusCannotRemovePair
+The pair cannot be removed in group current status.
+一致性组的当前状态不允许复制对移除。
+诊断
+403
+OperationDenied.GroupTotalDiskCapacityLimit
+The disk space in the replication pair-consistent group exceeds the upper limit.
+复制组中的云盘总容量过大。
+诊断
+403
+OperationDenied.InvalidStatus
+The operation is not allowed in current status.
+当前状态下该操作不允许执行。
+诊断
+403
+OperationDenied.ManualSyncLimit
+One shot start manual syncing too frequently, please try again later.
+手动同步冷却时间未满足。
+诊断
+403
+OperationDenied.NoPairInGroup
+The operation is not allowed because no pair in the group.
+当前操作不允许执行，因为指定的一致性组中没有复制对。
+诊断
+403
+OperationDenied.OperateNotAllowedForPrimary
+Operation is not allowed on the primary site.
+当前操作在主端不被允许。
+诊断
+403
+OperationDenied.OperateNotAllowedForStandby
+Operation is not allowed on the secondary site.
+当前操作在从端不被允许。
+诊断
+403
+OperationDenied.PairGroupAZoneConflict
+The operation is not allowed due to pair and group having different RegionId or ZoneId.
+当前操作不允许执行，因为复制对和一致性组所属的RegionId和ZoneId不一致。
+诊断
+403
+OperationDenied.PairGroupStatusConflict
+The operation is not allowed due to pair and group status are not consistent.
+当前操作不允许执行，因为复制对和一致性组的状态不一致。
+诊断
+403
+OperationDenied.PairInAnotherGroup
+The operation is not allowed because pair is already in another group.
+当前操作不允许执行，因为复制对已被加入另一个一致性组中。
+诊断
+403
+OperationDenied.PairInitializing
+The operation is not allowed due to pair initializing, please try again later.
+当前操作不允许执行，因为复制对仍在初始化中，请稍后再重试。
+诊断
+403
+OperationDenied.PairNotInGroup
+The operation is not allowed because pair is not in any group.
+当前操作不允许执行，因为指定的异步复制对未加入任何一致性组中。
+诊断
+403
+OperationDenied.PairsExceedInGroup
+The operation is not allowed due to too much pair in the group.
+当前操作不允许执行，因为已超过一致性组可支持的最大复制对数量。
+诊断
+403
+OperationDenied.PairStatusCannotAddToGroup
+The pair cannot be added in pair current status.
+复制对的当前状态不允许复制对加入到一致性组中。
+诊断
+403
+OperationDenied.PairStatusCannotRemoveFromGroup
+The pair cannot be removed in pair current status.
+复制对的当前状态不允许复制对从一致性组中移除。
+诊断
+403
+OperationDenied.QuotaExceed
+The operation is not allowed due to quota exceed.
+当前操作已超过使用配额。
+诊断
+400
+OperationDenied.QuotaExceed
+The quota of tags on resource is beyond permitted range.
+资源标签已达上限。
+诊断
+403
+OperationDenied.QuotaExceed
+The operation is denied due to quota exceed.
+您的请求超过了配额上限。
+诊断
+403
+OperationDenied.RecoverPointNotFound
+Recover point is not found.
+当前复制对或复制组不存在可用的恢复点。
+诊断
+400
+OperationDenied.StandbyDeviceAttached
+The secondary disk is attached.
+从盘已挂载，请关闭从端虚拟机或卸载云盘。
+诊断
+403
+OperationDenied.StartDrillShouldOnDestRegion
+Operation should be executed on the secondary region.
+当前操作应当在从端执行。
+诊断
+403
+OperationDenied.TooMuchEmptyGroup
+Operation failed because of too many empty groups.
+同一用户创建了过多的空复制组。
+诊断
+504
+RequestTimeout
+The request is timeout, please try again later.
+该请求超时，请稍后再重试。
+诊断
+403
+AssumeRoleFail.solution
+Assume role fail, please check RamRole for EBS Laboratory already exist and policy is correct.
+角色扮演失败，请检查EBS实验室所需要的RAM角色是否存在且关联的权限策略正确。
+诊断
+404
+InvalidResource.NotFound
+The specified Resource is not found in our records.
+指定的资源不存在，请检查参数ResourceId是否正确。
+诊断

@@ -1,0 +1,188 @@
+# 弹性计算 Agent 服务关联角色 AliyunServiceRoleForECAgent
+> https://help.aliyun.com/zh/ecs/user-guide/service-linked-role-for-ecagent
+
+弹性计算 Agent 服务关联角色（Service Linked Role，简称 SLR）AliyunServiceRoleForECAgent 用于 Agent 完成 ECS 业务相关的定时任务（包括健康巡检、资源查询等场景）时，获取其他云服务的访问权限。
+应用场景
+当您在弹性计算 Agent 中创建定时任务时，系统会自动创建服务关联角色 AliyunServiceRoleForECAgent，用于 GPU 集群健康巡检、ECS 资源趋势分析等 ECS 业务相关的定时任务场景。弹性计算 Agent 通过扮演该角色，即可成功调用 ECS、云监控、资源中心等服务的 OpenAPI。
+角色信息
+项目
+说明
+角色名称
+AliyunServiceRoleForECAgent
+权限策略名称
+AliyunServiceRolePolicyForECAgent
+信任的云服务
+ecagent.aliyuncs.com
+适用场景
+弹性计算 Agent 定时任务（健康巡检、资源查询等）
+权限说明
+服务关联角色策略 AliyunServiceRolePolicyForECAgent 的权限内容：
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs:CreateDiagnosticReport",
+"ecs:AcceptInquiredSystemEvent",
+"ecs:DescribeAccountAttributes",
+"ecs:DescribeActivations",
+"ecs:DescribeAutoProvisioningGroupHistory",
+"ecs:DescribeAutoProvisioningGroupInstances",
+"ecs:DescribeAutoProvisioningGroups",
+"ecs:DescribeAutoSnapshotPolicyAssociations",
+"ecs:DescribeAutoSnapshotPolicyEx",
+"ecs:DescribeAvailableResource",
+"ecs:DescribeBandwidthLimitation",
+"ecs:DescribeBandwidthPackages",
+"ecs:DescribeCapacityReservationInstances",
+"ecs:DescribeCapacityReservations",
+"ecs:DescribeClassicLinkInstances",
+"ecs:DescribeCloudAssistantSettings",
+"ecs:DescribeCloudAssistantStatus",
+"ecs:DescribeCommands",
+"ecs:DescribeDedicatedHostAutoRenew",
+"ecs:DescribeDedicatedHostClusters",
+"ecs:DescribeDedicatedHosts",
+"ecs:DescribeDedicatedHostTypes",
+"ecs:DescribeDeploymentSets",
+"ecs:DescribeDeploymentSetSupportedInstanceTypeFamily",
+"ecs:DescribeDiagnosticMetrics",
+"ecs:DescribeDiagnosticMetricSets",
+"ecs:DescribeDiagnosticReportAttributes",
+"ecs:DescribeDiagnosticReports",
+"ecs:DescribeDiskDefaultKMSKeyId",
+"ecs:DescribeDiskMonitorData",
+"ecs:DescribeDisks",
+"ecs:DescribeDisksFullStatus",
+"ecs:DescribeElasticityAssuranceAutoRenewAttribute",
+"ecs:DescribeElasticityAssuranceInstances",
+"ecs:DescribeElasticityAssurances",
+"ecs:DescribeEniMonitorData",
+"ecs:DescribeHpcClusters",
+"ecs:DescribeImageComponents",
+"ecs:DescribeImageFromFamily",
+"ecs:DescribeImagePipelineExecutions",
+"ecs:DescribeImagePipelines",
+"ecs:DescribeImages",
+"ecs:DescribeImageSharePermission",
+"ecs:DescribeImageSupportInstanceTypes",
+"ecs:DescribeInstanceAttachmentAttributes",
+"ecs:DescribeInstanceAttribute",
+"ecs:DescribeInstanceAutoRenewAttribute",
+"ecs:DescribeInstanceHistoryEvents",
+"ecs:DescribeInstanceMaintenanceAttributes",
+"ecs:DescribeInstanceModificationPrice",
+"ecs:DescribeInstanceMonitorData",
+"ecs:DescribeInstanceRamRole",
+"ecs:DescribeInstances",
+"ecs:DescribeInstancesFullStatus",
+"ecs:DescribeInstanceStatus",
+"ecs:DescribeInstanceTypeFamilies",
+"ecs:DescribeInstanceTypes",
+"ecs:DescribeInstanceVncUrl",
+"ecs:DescribeInvocationResults",
+"ecs:DescribeInvocations",
+"ecs:DescribeKeyPairs",
+"ecs:DescribeLaunchTemplates",
+"ecs:DescribeLaunchTemplateVersions",
+"ecs:DescribeLockedSnapshots",
+"ecs:DescribeManagedInstances",
+"ecs:DescribeNetworkInterfaceAttribute",
+"ecs:DescribeNetworkInterfacePermissions",
+"ecs:DescribeNetworkInterfaces",
+"ecs:DescribePlanMaintenanceWindows",
+"ecs:DescribePortRangeListAssociations",
+"ecs:DescribePortRangeListEntries",
+"ecs:DescribePortRangeLists",
+"ecs:DescribePrefixListAssociations",
+"ecs:DescribePrefixListAttributes",
+"ecs:DescribePrefixLists",
+"ecs:DescribePrice",
+"ecs:DescribeRecommendInstanceType",
+"ecs:DescribeRegions",
+"ecs:DescribeRenewalPrice",
+"ecs:DescribeReservedInstanceAutoRenewAttribute",
+"ecs:DescribeReservedInstances",
+"ecs:DescribeResourcesModification",
+"ecs:DescribeSecurityGroupAttribute",
+"ecs:DescribeSecurityGroupReferences",
+"ecs:DescribeSecurityGroups",
+"ecs:DescribeSendFileResults",
+"ecs:DescribeSnapshotGroups",
+"ecs:DescribeSnapshotLinks",
+"ecs:DescribeSnapshotMonitorData",
+"ecs:DescribeSnapshotPackage",
+"ecs:DescribeSnapshots",
+"ecs:DescribeSnapshotsUsage",
+"ecs:DescribeStorageCapacityUnits",
+"ecs:DescribeTaskAttribute",
+"ecs:DescribeTasks",
+"ecs:DescribeTerminalSessions",
+"ecs:DescribeUserData",
+"ecs:DescribeVscs",
+"ecs:DescribeZones",
+"ecs:GetInstanceConsoleOutput",
+"ecs:GetInstanceScreenshot",
+"ecs:ListPluginStatus",
+"ecs:ListTagResources",
+"ecs:ReportInstancesStatus"
+"Resource": "*"
+"Effect": "Allow",
+"Action": [
+"resourcecenter:ExecuteSQLQuery",
+"resourcecenter:GetResourceType"
+"Resource": "*"
+"Effect": "Allow",
+"Action": [
+"resourcemanager:ListResourceGroups"
+"Resource": "*"
+"Effect": "Allow",
+"Action": [
+"ecagent:DescribeAgentService",
+"ecagent:DescribeAgentCreditUsage"
+"Resource": "*"
+"Effect": "Allow",
+"Action": ["appflow:InvokeAction"],
+"Resource": "*"
+"Effect": "Allow",
+"Action": "ram:DeleteServiceLinkedRole",
+"Resource": "*",
+"Condition": {
+"StringEquals": { "ram:ServiceName": "ecagent.aliyuncs.com" }
+"Effect": "Allow",
+"Action": "ram:CreateServiceLinkedRole",
+"Resource": "*",
+"Condition": {
+"StringEquals": { "ram:ServiceName": "selfservice.ecs.aliyuncs.com" }
+说明
+末两条 Statement 授予了 ram:CreateServiceLinkedRole 和 ram:DeleteServiceLinkedRole 权限，用于 Agent 在定时任务执行时自动创建/清理下游依赖的服务关联角色（如 ECS 自服务角色 selfservice.ecs.aliyuncs.com）。
+创建服务关联角色
+首次在弹性计算 Agent 控制台创建定时任务时，系统会自动创建服务关联角色 AliyunServiceRoleForECAgent，无需手动创建。
+您可以通过以下方式验证角色是否已创建：
+登录 RAM 控制台。
+选择 身份管理 > 角色，搜索 AliyunServiceRoleForECAgent。
+如果搜索到该角色，说明服务关联角色已成功创建。
+删除服务关联角色
+如果您不再使用弹性计算 Agent 的定时任务功能，可以删除服务关联角色 AliyunServiceRoleForECAgent。注意：会话下的资源查询、异常诊断能力使用登录用户身份调用 API，不依赖此服务关联角色，删除后不受影响。
+警告
+删除前置校验：系统会自动检查当前账号下是否存在定时任务。如存在定时任务（无论是否正在运行），删除操作将被拒绝并返回错误提示。请先在弹性计算 Agent 控制台的定时任务页面删除所有任务后，再执行删除服务关联角色操作。
+删除成功后如需恢复，重新在控制台中创建定时任务即可，系统将自动重新创建该角色。
+删除步骤：
+登录 弹性计算 Agent 控制台，在左侧导航栏单击 定时任务，删除所有已配置的定时任务。
+登录 RAM 控制台。
+在 身份管理 > 角色 页面，搜索 AliyunServiceRoleForECAgent。
+在操作列单击 删除角色。系统将自动校验当前账号下是否仍有定时任务，若存在，删除操作将失败并提示需先清理定时任务。
+在删除对话框中，确认后单击 删除角色。
+常见问题
+RAM 用户为何无法自动创建服务关联角色？
+RAM 用户需要具备 ram:CreateServiceLinkedRole 权限。请联系主账号管理员为该 RAM 用户添加以下权限策略：
+"Version": "1",
+"Statement": [{
+"Effect": "Allow",
+"Action": ["ram:CreateServiceLinkedRole"],
+"Resource": "acs:ram:*:*:role/*",
+"Condition": {
+"StringEquals": { "ram:ServiceName": ["ecagent.aliyuncs.com"] }
+创建服务关联角色时为什么会提示权限不足？
+通常是缺少 ram:CreateServiceLinkedRole 权限。请联系主账号管理员添加，或由主账号用户直接在弹性计算 Agent 控制台首次使用定时任务功能，从而触发自动创建。
+存在定时任务时能否删除服务关联角色？
+不能。删除服务关联角色时，系统会自动检查当前账号下是否存在定时任务。如存在（无论是否正在运行），删除操作将被拒绝并返回错误提示。请先在弹性计算 Agent 控制台的定时任务页面清理所有任务，再执行删除服务关联角色操作。

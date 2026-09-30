@@ -1,0 +1,102 @@
+# IP地址
+> https://help.aliyun.com/zh/ecs/user-guide/overview-7
+
+在默认情况下，专有网络VPC使用IPv4寻址协议，您必须在创建VPC时指定IPv4网段，但是在与公网通信时您需要为ECS实例额外申请公网IP地址。您也可以按需选择开通IPv6寻址协议，从而为VPC分配IPv6网段，IPv6地址具有全局唯一性，分配给ECS实例的IPv6地址可以配置为私网IP或公网IP。
+私网IP
+私网IP一般指私网IPv4地址。私网IPv4地址是指无法通过互联网访问的IPv4地址。您可以通过私网IPv4地址实现ECS实例与内网资源通信，我们将使用动态主机配置协议DHCP（Dynamic Host Configuration Protocol）将私网IPv4地址分配给ECS实例。分配给实例的私网IPv4地址必须属于专有网络VPC的交换机私网IPv4网段内，且不同实例的弹性网卡所分配的私网IPv4地址数量由实例规格决定。更多信息，请参见实例规格族中的单网卡私有IPv4地址数指标。
+有关私网IPv4地址，您需要注意以下信息：
+在启动ECS实例时，该实例将获得一个在交换机网段范围内的主私网IPv4地址作为默认私网出口IP。如果您在创建ECS实例未指定，我们将自动分配一个交换机IPv4网段内的可用IP地址作为该实例主私网IPv4地址。实例的主私网IPv4地址将分配到实例的主网卡上，一个实例有且仅有一个主私网IPv4地址。一旦分配成功后，主私网IPv4地址无法在实例释放前进行回收。如果您希望修改实例的主私网IPv4地址，请参见修改私网IP地址。
+您可以自动或手动为实例分配更多的私网IPv4地址，即辅助私网IPv4地址。辅助私网IPv4地址允许在实例释放前进行回收并再次分配，但分配成功后不支持修改。在分配辅助私网IPv4地址成功后，您需要进行手动配置，请参见辅助私网IP。
+私网IPv4地址会在您停止和启动ECS实例时保留下来，并随实例释放而回收。
+公网IP
+公网IP一般指代公网IPv4地址。您可以使用公网IPv4地址实现ECS实例与公网通信。通过公网IPv4访问公网时，需要您为实例购买公网带宽。
+专有网络VPC类型的ECS实例支持分配的固定公网IP地址和弹性公网IP地址（EIP）。
+在启动ECS实例时，您可以手动配置公网带宽，阿里云将在公网IP地址池中选取一个公网IPv4地址分配给ECS实例。默认情况下，阿里云不会自动为实例分配公网IP地址。
+对于已创建成功且没有开通公网IP的实例，您可以通过资源变配，将流量带宽峰值提高到大于0 Mbit/s，使得实例自动生成一个公网IPv4地址。
+公网IP地址将在实例释放时回收，无法为您保留。在以下情况下，ECS实例的公网IP地址将被回收，或被重新分配：
+当您的实例在使用期间，带宽值被设置为0 Mbit/s时，公网IP地址将被回收。各付费模式实例修改带宽详情，请参见修改固定公网带宽和按量付费实例修改带宽。
+当您的按量付费实例选择节省停机模式并进行停机后，公网IP地址将被释放。当您再次启动ECS实例时，系统将为您的实例重新分配公网IP地址，此时阿里云无法保证能为您的ECS实例分配相同的公网IP地址。
+如果您希望长期使用某个公网IPv4地址并反复分配给不同ECS实例，您可以将公网IP地址转换为EIP，请参见固定公网IP转为弹性公网IP。
+EIP是可以独立购买和持有的公网IP地址资源。您可以单独申请EIP，也可以从公网IP地址进行转换。EIP支持与ECS实例绑定和解绑，一台ECS实例可以关联多个EIP，更多信息，请参见将EIP绑定至辅助弹性网卡。EIP不会随ECS实例的释放而回收，如果您希望回收EIP，请参见释放按量计费EIP实例。更多有关EIP的使用，请参见EIP实例概述。
+IPv6地址
+阿里云专有网络VPC支持IPv6地址。开通IPv6寻址协议后，阿里云将自动从IPv6地址池中为您的VPC分配IPv6网段，您无法自行选择网段范围。支持IPv6地址的VPC内创建的交换机同样支持IPv6网段，您可以在创建交换机时或指定已创建交换机开通IPv6网段，请参见创建和管理交换机。分配给实例的IPv6地址必须属于专有网络VPC的交换机IPv6网段内，且不同实例的弹性网卡所分配的IPv6地址数量由实例规格决定，请参见实例规格族中的单网卡IPv6地址数指标。
+IPv6地址具有全局唯一性，分配给ECS实例的IPv6地址默认仅支持私网访问，如果要通过IPv6地址访问公网或被公网访问，您必须开通IPv6公网带宽。
+您可以在创建ECS实例时分配多个IPv6地址，这些IPv6地址将分配至ECS实例的主网卡。
+您可以在ECS实例创建成功后，给ECS实例挂载的弹性网卡分配一个或多个IPv6地址。
+分配IPv6地址成功后，您需要登录实例内部配置IPv6地址使其生效。
+IPv6地址允许在实例释放前进行回收并再次分配。IPv6地址会在您停止和启动ECS实例时保留下来，并随网卡释放而回收。
+查看实例IP地址
+您可以在控制台上或实例内部查看实例的IP地址，并且保证二者信息一致。实例内部的IP地址和实际分配的不一致，可能会导致公、私网通信异常、安全组规则失效以及管理困难等问题。
+控制台查看
+登录ECS管理控制台。
+在左侧导航栏，选择实例与镜像 > 实例。
+在页面左侧顶部，选择目标资源所在的资源组和地域。
+在实例页面，找到目标实例，单击实例ID进入实例详情页面，查看所需的IP地址。
+配置信息区域：
+公网IP：47.98.XX.XX
+弹性公网IP：121.41.XX.XX
+主私网IP：192.168.XX.XX
+绑定资源区域：
+辅助私网IP：192.168.XX.XX,192.168.XX.XX
+IPv6地址：2408:XXXX:325:a216:95f1:3dd9:6640:8b9e
+说明
+如果您的实例未分配固定公网IP、辅助私网IP、IPv6或未绑定弹性公网IP，相关的信息字段将显示为空。
+API查看
+您可以通过DescribeInstanceAttribute查询指定实例的IP地址信息：
+PrivateIpAddress：表示实例的主私有IPv4地址信息
+PublicIpAddress：实例的固定公网IP地址信息
+EipAddress：实例绑定的弹性公网IP地址信息
+您也可以通过DescribeNetworkInterfaceAttribute查询弹性网卡的辅助私网IP地址、IPv6地址、弹性公网IP地址等信息。
+实例内部查看
+Linux实例：您可以在远程连接Linux实例后，通过ip a查看实例的私网IP地址。
+eth0 接口上配置的三个私网 IP 地址（192.168.1.201 为主地址，192.168.1.202 和 192.168.1.203 为辅助地址）在输出中以 inet 行呈现。
+[root@ixxx ~]# ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+inet 127.0.0.1/8 scope host lo
+valid_lft forever preferred_lft forever
+inet6 ::1/128 scope host
+valid_lft forever preferred_lft forever
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
+link/ether 00:16:3e:0e:3b:96 brd ff:ff:ff:ff:ff:ff
+altname enp0s5
+altname ens5
+inet 192.168.1.201/24 brd 192.168.1.255 scope global noprefixroute eth0
+valid_lft forever preferred_lft forever
+inet 192.168.1.202/24 brd 192.168.1.255 scope global secondary noprefixroute eth0
+valid_lft forever preferred_lft forever
+inet 192.168.1.203/24 brd 192.168.1.255 scope global secondary noprefixroute eth0
+valid_lft forever preferred_lft forever
+inet6 fe80::xxx scope link
+valid_lft forever preferred_lft forever
+您可以进一步通过sudo route -n命令查看网关IP地址：
+在Destination列为默认路由（0.0.0.0）的行所对应的Gateway列的IP地址即为eth0网络设备的内网网关IP地址。
+此示例中，默认路由对应的网关 IP 地址为 192.168.1.253。
+[root@ixxxxxxxxxxxxx ~]# sudo route -n
+Kernel IP routing table
+Destination Gateway Genmask Flags Metric Ref Use Iface
+0.0.0.0 192.168.1.253 0.0.0.0 UG 100 0 0 eth0
+192.168.1.0 0.0.0.0 255.255.255.0 U 100 0 0 eth0
+192.168.1.0 0.0.0.0 255.255.255.0 U 100 0 0 eth0
+192.168.1.0 0.0.0.0 255.255.255.0 U 100 0 0 eth0
+Windows实例：您可以在远程连接Windows实例后，通过ipconfig查看实例的私网IP地址、默认网关等信息。
+C:\Users\Administrator>ipconfig
+Windows IP 配置
+以太网适配器 以太网:
+连接特定的 DNS 后缀 . . . . . . :
+本地链接 IPv6 地址. . . . . . . : fe80::3f8a:c3:22da:3675%6
+IPv4 地址 . . . . . . . . . . . : 192.168.1.201
+子网掩码 . . . . . . . . . . . : 255.255.255.0
+IPv4 地址 . . . . . . . . . . . : 192.168.1.202
+子网掩码 . . . . . . . . . . . : 255.255.255.0
+IPv4 地址 . . . . . . . . . . . : 192.168.1.203
+子网掩码 . . . . . . . . . . . : 255.255.255.0
+默认网关. . . . . . . . . . . . : 192.168.1.253
+在专有网络中，公网IP存在于网关设备上，所以专有网络ECS实例操作系统内看不到公网IP，只能查看到内网IP。如果应用必须使用操作系统中可见的公网IP，可参考使用VPC附加网段实现EIP网卡可见实现。
+相关文档
+如果客户端无法ping通目标ECS实例的公网IP，您可以参考无法ping通ECS实例公网IP的排查方法进行排查及修复。
+IPv6地址可能存在内部配置异常或没有公网能力导致访问异常，您可以参考无法ping通ECS实例IPv6地址的排查方法进行排查及修复。
+多实例集群场景下，如果不能为每台ECS实例一一分配公网IP，您可以参考无公网IP的云服务器 ECS使用公网NAT网关SNAT功能访问互联网实现。
+创建VPC和交换机时，您需要指定VPC和交换机的网段。网段的大小决定了可部署云资源的多少，合理的网段规划需要避免网络冲突并保障网络的可扩展性，规划不当将会导致极高的重建成本。
+详细信息，请参见网段规划。
+同VPC内的ECS实例内网互通，您可以通过安全组实现访问控制，当您需要在不同VPC中的资源之间建立安全且高效的私网通信时，您可以通过云企业网、VPC对等连接或私网连接（PrivateLink）等跨VPC互联解决方案实现，详细信息，请参见ECS实现内网互通。

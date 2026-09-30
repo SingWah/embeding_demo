@@ -1,0 +1,154 @@
+# 使用Node.js SDK调用API管理ECS实例
+> https://help.aliyun.com/zh/ecs/developer-reference/example-on-how-to-use-ecs-sdk-for-node-js
+
+本文以调用查询一台或多台ECS实例的详细信息（DescribeInstances）接口为例，为您介绍Node.js V2.0 SDK的安装和使用。
+前提条件
+由于阿里云账号（主账号）拥有资源的所有权限，其AccessKey一旦泄露风险巨大，所以建议您使用满足最小化权限需求的RAM用户的AccessKey。具体操作方式请参见创建AccessKey。
+给RAM用户授予操作云服务器ECS相关资源的权限。本文提供的示例代码为查询示例，所以选择AliyunECSReadonlyAccess系统权限策略，您在使用的时候可以根据业务需求进行自定义授权。
+使用自定义权限策略。
+关于如何创建自定义权限策略，请参见创建自定义权限策略和授权信息。
+云服务器ECS依据最佳实践提供了一些自定义权限策略示例，您可以参考这些示例以快速创建符合自身业务需求的自定义权限策略，具体详情请参见自定义权限策略。
+使用系统权限策略。
+云服务器ECS支持的所有系统权限策略及其对应的权限描述，请参见云服务器 ECS系统权限策略参考。
+在环境变量中配置AccessKey，具体操作步骤请参见在Linux、macOS和Windows系统配置环境变量。
+安装SDK
+Node.js V2.0 SDK安装方式请参见SDK 中心。您可以直接复制下方提供的安装命令在Terminal中执行，以完成ECS SDK的安装：
+npm install --save @alicloud/ecs20140526@4.3.0
+使用SDK
+1. 初始化客户端
+阿里云SDK支持多种访问凭据用于初始化客户端，例如AccessKey和STS Token等，更多方式请参见管理访问凭证。本示例以通过AccessKey初始化客户端为例。
+TypeScript示例
+import Ecs20140526, * as $Ecs20140526 from '@alicloud/ecs20140526';
+import OpenApi, * as $OpenApi from '@alicloud/openapi-client';
+export class Client {
+static createClient() {
+let config = new $OpenApi.Config({
+// 必填，请确保代码运行环境设置了环境变量 ALIBABA_CLOUD_ACCESS_KEY_ID。
+accessKeyId: process.env['ALIBABA_CLOUD_ACCESS_KEY_ID'],
+// 必填，请确保代码运行环境设置了环境变量 ALIBABA_CLOUD_ACCESS_KEY_SECRET。
+accessKeySecret: process.env['ALIBABA_CLOUD_ACCESS_KEY_SECRET'],
+endpoint: `ecs.cn-hangzhou.aliyuncs.com`,
+return new Ecs20140526(config);
+JavaScript示例
+const Ecs20140526 = require('@alicloud/ecs20140526');
+const OpenApi = require('@alicloud/openapi-client');
+class Client {
+static createClient() {
+const config = new OpenApi.Config({
+// 必填，请确保代码运行环境设置了环境变量 ALIBABA_CLOUD_ACCESS_KEY_ID。
+accessKeyId: process.env['ALIBABA_CLOUD_ACCESS_KEY_ID'],
+// 必填，请确保代码运行环境设置了环境变量 ALIBABA_CLOUD_ACCESS_KEY_SECRET。
+accessKeySecret: process.env['ALIBABA_CLOUD_ACCESS_KEY_SECRET'],
+endpoint: `ecs.cn-hangzhou.aliyuncs.com`,
+return new Ecs20140526.default(config);
+2. 构建接口的请求对象
+在构建请求对象之前，请查看该接口的API文档获取参数信息。
+说明
+请求对象命名规则：{API名称}Request，例如DescribeInstances该接口的请求对象为DescribeInstancesRequest。
+TypeScript示例
+// 构造请求对象
+const describeInstancesRequest = new Ecs20140526.DescribeInstancesRequest({
+regionId: "cn-hangzhou",
+JavaScript示例
+// 构造请求对象
+const describeInstancesRequest = new Ecs20140526.DescribeInstancesRequest({
+regionId: "cn-hangzhou",
+3. 发起调用
+通过客户端调用OpenAPI时，支持设置运行时参数，例如超时配置、代理配置等，更多信息请查看进阶配置。
+说明
+接口返回对象命名规则：{API名称}Response，例如DescribeInstances该接口的返回对象为DescribeInstancesResponse。
+TypeScript示例
+// 创建运行时配置对象
+const runtime = new $Util.RuntimeOptions();
+// 发起请求
+const describeInstancesResponse = await client.describeInstancesWithOptions(describeInstancesRequest, runtime);
+JavaScript示例
+// 创建运行时配置对象
+const runtime = new Util.RuntimeOptions();
+// 发起请求
+const describeInstancesResponse = await client.describeInstancesWithOptions(describeInstancesRequest, runtime);
+4. 异常处理
+Node.js SDK采用Promise和async/await的方式处理异步操作，同时提供了一套错误处理机制，以帮助开发者捕获和处理API调用中可能出现的错误。当API调用失败时，阿里云SDK将抛出一个错误对象Error。SDK内部将异常分为UnretryableError和ResponseError。
+UnretryableError：主要是因为网络问题造成，一般是网络问题达到最大重试次数后抛出。
+ResponseError：主要以业务报错为主的异常。
+建议采取合理的措施来处理异常，比如合理地传播异常、记录日志、尝试恢复等，以确保系统的健壮性和稳定性。
+5. 完整示例
+TypeScript示例
+import * as $Util from '@alicloud/tea-util';
+import Ecs20140526, * as $Ecs20140526 from '@alicloud/ecs20140526';
+import * as $OpenApi from '@alicloud/openapi-client';
+export class Client {
+static createClient() {
+let config = new $OpenApi.Config({
+// 必填，请确保代码运行环境设置了环境变量 ALIBABA_CLOUD_ACCESS_KEY_ID。
+accessKeyId: process.env['ALIBABA_CLOUD_ACCESS_KEY_ID'],
+// 必填，请确保代码运行环境设置了环境变量 ALIBABA_CLOUD_ACCESS_KEY_SECRET。
+accessKeySecret: process.env['ALIBABA_CLOUD_ACCESS_KEY_SECRET'],
+endpoint: `ecs.cn-hangzhou.aliyuncs.com`,
+return new Ecs20140526(config);
+static async main(): Promise<void> {
+const client = Client.createClient();
+// 构造请求对象
+const describeInstancesRequest = new $Ecs20140526.DescribeInstancesRequest({
+regionId: "cn-hangzhou",
+// 创建运行时配置对象
+const runtime = new $Util.RuntimeOptions();
+try {
+// 发起请求并获取响应
+const response = await client.describeInstancesWithOptions(describeInstancesRequest, runtime);
+console.log('Describe Instances Response:', JSON.stringify(response.body));
+} catch (error) {
+// 此处仅做打印展示，请谨慎对待异常处理，在工程项目中切勿直接忽略异常。
+console.error('Error occurred:', error);
+Client.main();
+JavaScript示例
+const Ecs20140526 = require('@alicloud/ecs20140526');
+const OpenApi = require('@alicloud/openapi-client');
+const Util = require('@alicloud/tea-util');
+class Client {
+static createClient() {
+const config = new OpenApi.Config({
+// 必填，请确保代码运行环境设置了环境变量 ALIBABA_CLOUD_ACCESS_KEY_ID。
+accessKeyId: process.env['ALIBABA_CLOUD_ACCESS_KEY_ID'],
+// 必填，请确保代码运行环境设置了环境变量 ALIBABA_CLOUD_ACCESS_KEY_SECRET。
+accessKeySecret: process.env['ALIBABA_CLOUD_ACCESS_KEY_SECRET'],
+endpoint: `ecs.cn-hangzhou.aliyuncs.com`,
+return new Ecs20140526.default(config);
+static async main() {
+const client = Client.createClient();
+// 构造请求对象
+const describeInstancesRequest = new Ecs20140526.DescribeInstancesRequest({
+regionId: "cn-hangzhou",
+// 创建运行时配置对象
+const runtime = new Util.RuntimeOptions();
+try {
+// 发起请求并获取响应
+const response = await client.describeInstancesWithOptions(describeInstancesRequest, runtime);
+console.log('Describe Instances Response:', JSON.stringify(response.body));
+} catch (error) {
+// 此处仅做打印展示，请谨慎对待异常处理，在工程项目中切勿直接忽略异常。
+// 错误 message
+console.log('Error occurred:', error.message);
+Client.main();
+场景化示例
+批量创建ECS实例
+ECS实例列表查询
+续费ECS实例
+释放ECS实例
+查询可用的变配资源
+查询抢占式实例库存
+查询抢占式实例当前价格
+创建抢占式实例
+增加安全组规则
+新建安全组并将指定资源加入到安全组
+创建弹性网卡
+附加弹性网卡
+分离弹性网卡
+删除弹性网卡
+变更ECS实例规格
+调整实例的实例规格和公网带宽
+指定实例规格获取一个或多个备选的实例规格
+通过备选实例规格创建ECS实例最佳实践
+更多内容
+除了使用上述调用方式外，您还可以使用泛化调用方式调用ECS的OpenAPI，详细介绍请参见泛化调用。
+若您当前使用的是V1.0 SDK，并希望进一步了解V1.0 SDK的相关内容，请参见V1.0 Node.js SDK。

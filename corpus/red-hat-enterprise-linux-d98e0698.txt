@@ -1,0 +1,53 @@
+# Red Hat Enterprise Linux
+> https://help.aliyun.com/zh/ecs/red-hat-enterprise-linux
+
+阿里云提供的Red Hat Enterprise Linux公共镜像本质上来自阿里云官方店铺在云市场发布的镜像，为方便用户购买，在ECS控制台的公共镜像中配置了快捷方式。您可以访问以下不同版本的Red Hat Enterprise Linux云市场镜像的详情页，以获取镜像的发布信息（镜像的适用地域、价格和使用指南等信息）。
+说明
+您在购买ECS实例时，只有购买已通过Red Hat Enterprise Linux认证的实例规格，才能选择不同版本的Red Hat镜像。已通过Red Hat Enterprise Linux认证的规格信息，请参见Red Hat镜像支持哪些实例规格族？。
+在您选择不同的实例规格时，Red Hat Enterprise Linux的镜像价格不同。有关Red Hat Enterprise Linux镜像的价格信息，请参见镜像计费。
+2024年06月30日后，RHEL 7从维护阶段过渡到延长生命周期阶段，在此阶段不会提供程序漏洞修复、安全修复、硬件启用或根本原因分析，同时只对现有安装提供支持。建议您采取相应的措施以持续获得软件更新和安全补丁，以避免操作系统停止维护带来的影响。更多信息，请参见Red Hat Enterprise Linux操作系统。
+Red Hat Enterprise Linux 10.1 64位 x86
+Red Hat Enterprise Linux 10.1 64位 ARM版
+Red Hat Enterprise Linux 10.0 64位 x86
+Red Hat Enterprise Linux 10.0 64位 ARM版
+Red Hat Enterprise Linux 9.7 64位 x86
+Red Hat Enterprise Linux 9.7 64位 ARM版
+Red Hat Enterprise Linux 9.6 64位 x86
+Red Hat Enterprise Linux 9.6 64位 ARM版
+Red Hat Enterprise Linux 9.5 64位 x86
+Red Hat Enterprise Linux 9.5 64位 ARM版
+Red Hat Enterprise Linux 9.4 64位 x86
+Red Hat Enterprise Linux 9.4 64位 ARM版
+Red Hat Enterprise Linux 9.3 64位 x86
+Red Hat Enterprise Linux 9.3 64位 ARM版
+Red Hat Enterprise Linux 8.10 64位 x86
+Red Hat Enterprise Linux 8.10 64位 ARM版
+Red Hat Enterprise Linux 8.9 64位 x86
+Red Hat Enterprise Linux 8.9 64位 ARM版
+Red Hat Enterprise Linux 9.2 64位 x86 UEFI
+Red Hat Enterprise Linux 9.2 64位 ARM版
+Red Hat Enterprise Linux 9.2 64位 x86
+Red Hat Enterprise Linux 9.1 64位 ARM版
+Red Hat Enterprise Linux 9.1 64位 x86
+Red Hat Enterprise Linux 9.0 64位 x86
+Red Hat Enterprise Linux 8.8 64位 ARM版
+Red Hat Enterprise Linux 8.8 64位 x86 UEFI
+Red Hat Enterprise Linux 8.8 64位 x86
+Red Hat Enterprise Linux 8.7 64位 ARM版
+Red Hat Enterprise Linux 8.7 64位 x86
+Red Hat Enterprise Linux 8.6 64位 x86 UEFI
+Red Hat Enterprise Linux 8.6 64位 x86
+Red Hat Enterprise Linux 8.5 64位 x86
+Red Hat Enterprise Linux 8.4 64位 x86
+Red Hat Enterprise Linux 8.3 64位 x86
+Red Hat Enterprise Linux 8.2 64位 x86
+Red Hat Enterprise Linux 8.1 64位 x86
+Red Hat Enterprise Linux 8 64位 x86
+Red Hat Enterprise Linux 7.9 64位 x86
+Red Hat Enterprise Linux 7.9 64位 x86 UEFI
+Red Hat Enterprise Linux 7.8 64位 x86
+Red Hat Enterprise Linux 7.7 64位 x86
+Red Hat Enterprise Linux 7.5 64位 x86
+Red Hat Enterprise Linux 7.4 64位 x86
+Red Hat Enterprise Linux 6.10 64位 x86
+Red Hat Enterprise Linux 6.9 64位 x86

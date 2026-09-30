@@ -1,0 +1,37 @@
+# 版本说明
+> https://help.aliyun.com/zh/ecs/developer-reference/api-ebs-2021-07-30-changeset
+
+变更时间：2024-11-07
+变更集发布说明：
+OpenAPI 名称
+变更内容概要
+操作
+DescribeMetricData
+OpenAPI 错误码发生变更、OpenAPI 入参发生变更。
+查看变更详情
+查看API文档
+变更时间：2024-10-08
+变更集发布说明：
+OpenAPI 名称
+变更内容概要
+操作
+CreateEnterpriseSnapshotPolicy
+OpenAPI 错误码发生变更。
+查看变更详情
+查看API文档
+DeleteEnterpriseSnapshotPolicy
+OpenAPI 错误码发生变更。
+查看变更详情
+查看API文档
+DescribeEnterpriseSnapshotPolicy
+OpenAPI 错误码发生变更。
+查看变更详情
+查看API文档
+ModifyDedicatedBlockStorageClusterAttribute
+OpenAPI 错误码发生变更。
+查看变更详情
+查看API文档
+UpdateEnterpriseSnapshotPolicy
+OpenAPI 错误码发生变更。
+查看变更详情
+查看API文档

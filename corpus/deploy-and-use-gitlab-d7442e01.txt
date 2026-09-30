@@ -1,0 +1,416 @@
+# 部署 GitLab 代码托管平台
+> https://help.aliyun.com/zh/ecs/user-guide/deploy-and-use-gitlab
+
+在 ECS 实例上部署 GitLab，可获得自主可控的代码托管和 CI/CD 平台，支持私有化访问与数据本地化存储。本文介绍在 Linux 系统的 ECS 实例上通过安装包、Docker 镜像或 ECS 扩展程序部署 GitLab 的完整步骤。
+准备工作
+请确保 ECS 实例满足以下条件：
+实例规格：安装 GitLab 所需的实例规格与项目规模和团队规模有关，建议最小规格为 4 vCPU、8 GiB。更多信息，请参见 Installation system requirements 和 Running GitLab in a memory-constrained environment。
+重要
+低于 4 vCPU、8 GiB 会因规格过小，导致长时间处于 Installing 状态或安装失败。请升级规格以后再安装，升级规格操作，请参见升降配方式概述。
+操作系统：Linux 系统。具体支持的系统说明，请参见 Supported OSes。
+实例已分配固定公网IP地址或绑定弹性公网IP（EIP）。如您不清楚如何开通公网，请参见开通公网。
+安全组：入方向规则放行 80、443、22 端口。请参见添加安全组规则。
+安装 GitLab
+GitLab 版本包括企业版（EE）、社区版（CE）。其中极狐 GitLab 是在中国内地与中国香港、中国澳门发行的企业级 GitLab 版本，服务器位于中国境内，访问速度更快。版本对比详情参见 极狐 GitLab 安装与版本说明。
+安装包（推荐）
+在中国内地优先选择极狐 GitLab，下载和访问速度更快；当团队需要与海外环境协同，或要求保持与 GitLab 社区版完全一致的代码与文档体系时，再选择 GitLab 社区版。
+极狐 GitLab
+极狐 GitLab 支持的操作系统参见 supported_os。
+Alibaba Cloud Linux 3
+使用Workbench登录Linux实例。
+下载最新 RPM 安装包到本地临时目录。命令先从 repomd.xml 动态读取当前 primary.xml.gz 文件名（仓库每次 reindex 后该 hash 都会变化），再从中解析最新 RPM 的相对路径并下载。
+cd /tmp && \
+ARCH=$(uname -m) && \
+PRIMARY=$(curl -s https://packages.gitlab.cn/repository/el/8/repodata/repomd.xml \
+| grep -oE "[a-f0-9]{64}-primary\.xml\.gz" | head -1) && \
+URL=$(curl -s "https://packages.gitlab.cn/repository/el/8/repodata/${PRIMARY}" \
+| gunzip \
+| grep -oE "href=\"[^\"]*gitlab-jh[^\"]*${ARCH}\.rpm\"" \
+| sed 's/href="//;s/"$//' \
+| sort -V \
+| tail -1) && \
+wget -c "https://packages.gitlab.cn/repository/el/8/${URL}"
+安装上一步下载的 RPM 包。命令通过 glob 通配符匹配实际下载的版本，避免与上一步的最新版本脱节。末尾输出 Complete! 表示 RPM 安装成功。
+RPM=$(ls /tmp/gitlab-jh-*.x86_64.rpm | sort -V | tail -1) && \
+sudo yum localinstall -y --disablerepo=gitlab-jh "$RPM" && rm -f "$RPM"
+--disablerepo=gitlab-jh 参数表示安装本地 RPM 时，禁止 yum 去刷新 gitlab-jh 这个远程仓库的元数据，避免因解析仓库元数据异常触发 OOM 导致安装失败。
+配置外部访问地址并启动 GitLab。
+将 ECS_PUBLIC_IP 替换为 ECS 实例的公网 IP 地址。
+sudo EXTERNAL_URL="http://ECS_PUBLIC_IP" gitlab-ctl reconfigure
+首次执行约耗时 5～10 分钟。
+验证服务状态。
+sudo gitlab-ctl status
+输出 puma、sidekiq、nginx、postgresql、redis、prometheus 等进程均为 run 状态，表示 GitLab 已成功启动。
+Alibaba Cloud Linux 4
+使用Workbench登录Linux实例。
+创建仓库文件。
+sudo tee /etc/yum.repos.d/gitlab-jh.repo > /dev/null << 'EOF'
+[gitlab-jh]
+name=JiHu GitLab
+baseurl=https://packages.gitlab.cn/repository/el/9/
+gpgcheck=1
+gpgkey=https://packages.gitlab.cn/repository/raw/gpg/public.gpg.key
+priority=1
+enabled=1
+EOF
+安装 GitLab。末尾输出 Complete! 表示安装成功。
+sudo yum install -y gitlab-jh
+配置外部访问地址并启动 GitLab。
+将 ECS_PUBLIC_IP 替换为 ECS 实例的公网 IP 地址。
+sudo EXTERNAL_URL="http://ECS_PUBLIC_IP" gitlab-ctl reconfigure
+首次执行约耗时 5～10 分钟。
+验证服务状态。
+sudo gitlab-ctl status
+输出 puma、sidekiq、nginx、postgresql、redis、prometheus 等进程均为 run 状态，表示 GitLab 已成功启动。
+CentOS 7.x
+使用Workbench登录Linux实例。
+安装 GitLab 所需的依赖包。
+sudo yum install -y curl policycoreutils-python openssh-server
+添加 GitLab 软件包仓库。
+curl -fsSL https://get.gitlab.cn | sudo /bin/bash
+由于网络原因，可能会出现无法添加 GitLab 软件源镜像的问题，建议多次重试。
+当输出中包含关键字Successfully added gitlab-jh repo，表示 GitLab 软件包仓库已安装。
+安装并启动GitLab。
+将 ECS_PUBLIC_IP 替换成安装 GitLab 的实例公网 IP 地址后执行：
+sudo EXTERNAL_URL="http://ECS_PUBLIC_IP" yum install -y gitlab-jh
+首次执行约耗时 5～10 分钟。
+验证服务状态。
+sudo gitlab-ctl status
+输出 puma、sidekiq、nginx、postgresql、redis、prometheus 等进程均为 run 状态，表示 GitLab 已成功启动。
+Ubuntu
+使用Workbench登录Linux实例。
+安装 GitLab 所需的依赖包。
+sudo apt-get update
+sudo apt-get install -y curl openssh-server ca-certificates tzdata perl
+配置安装极狐 GitLab 的软件源镜像。
+curl -L get.gitlab.cn | bash
+当输出中包含关键字Successfully added gitlab-jh repo，表示 GitLab 软件包仓库已安装。
+安装并启动 GitLab。
+将 ECS_PUBLIC_IP 替换成安装 GitLab 的实例公网 IP 地址。
+sudo EXTERNAL_URL="http://ECS_PUBLIC_IP" apt-get install -y gitlab-jh
+验证服务状态。
+sudo gitlab-ctl status
+输出 puma、sidekiq、nginx、postgresql、redis 等进程均为 run 状态，表示 GitLab 已成功启动。
+GitLab 社区版
+Alibaba Cloud Linux 3 使用安装包方式安装时，仅支持安装极狐 GitLab。如果需要在 Alibaba Cloud Linux 3 安装 GitLab 社区版，请使用 Docker 镜像方式。
+CentOS 7.x
+使用Workbench登录Linux实例。
+添加 GitLab 包仓库。
+curl -sS https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/script.rpm.sh | sudo bash
+安装 GitLab 所需的依赖包。
+sudo yum install -y curl policycoreutils-python openssh-server
+安装 GitLab 社区版。末尾输出 Complete! 表示安装成功。
+sudo EXTERNAL_URL="http://ECS_PUBLIC_IP" yum install -y gitlab-ce
+将 <ECS_PUBLIC_IP> 替换成安装 GitLab 的 ECS 实例公网 IP 地址。必须保留 http:// 或 https:// 前缀，否则 gitlab-ctl reconfigure 会因 external_url 缺协议而报错。
+验证服务状态。
+sudo gitlab-ctl status
+输出 puma、sidekiq、nginx、postgresql、redis、prometheus 等进程均为 run 状态，表示 GitLab 已成功启动。
+Ubuntu
+使用Workbench登录Linux实例。
+安装 GitLab 所需的依赖包。
+sudo apt-get update
+sudo apt-get install -y curl openssh-server ca-certificates tzdata perl
+添加 GitLab 软件包仓库。当输出The repository is setup! You can now installpackages.，表示 GitLab 软件包仓库已安装。
+sudo curl https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/script.deb.sh | sudo bash
+由于网络原因，可能会出现无法添加 GitLab 软件源镜像的问题，建议多次重试。
+刷新软件包列表。
+sudo apt-get update
+安装 GitLab。末尾输出 Complete! 表示安装成功。
+sudo EXTERNAL_URL="http://ECS_PUBLIC_IP" apt-get install -y gitlab-ce
+将 <ECS_PUBLIC_IP> 替换成安装 GitLab 的 ECS 实例。必须保留 http:// 或 https:// 前缀，否则 gitlab-ctl reconfigure 会因 external_url 缺协议而报错。
+验证服务状态。
+sudo gitlab-ctl status
+输出 puma、sidekiq、nginx、postgresql、redis、prometheus 等进程均为 run 状态，表示 GitLab 已成功启动。
+ECS 扩展程序
+ECS 扩展程序是用于增强和扩展 ECS 实例功能的插件。Alibaba Cloud Linux 3 系统默认安装极狐 GitLab，其他系统默认安装 GitLab 社区版。
+登录 ECS 控制台，进入目标实例的扩展程序页签。
+在扩展程序列表中找到 GitLab 类扩展程序并完成安装，操作步骤参见OOS扩展程序，支持的操作系统版本以控制台界面为准。
+当前支持的操作系统版本包括 Ubuntu 24.04、Ubuntu 22.04、Ubuntu 20.04、CentOS 7.9、CentOS 7.8、CentOS 7.7 和 Aliyun 3.2（Aliyun 3.2 的 GitLab 版本使用极狐GitLab）。可在左侧导航栏选择服务器管理 > 扩展程序进入扩展程序列表，单击 GitLab 进入详情页后单击安装扩展程序完成安装。
+扩展程序状态显示为成功后，远程连接 ECS 实例，执行以下命令验证 GitLab 服务状态。
+sudo gitlab-ctl status
+输出 puma、sidekiq、nginx、postgresql、redis 等进程均为 run 状态，表示 GitLab 已成功启动。
+Docker 镜像
+使用Workbench登录Linux实例。
+安装Docker。
+无需安装Docker Compose。
+创建 Docker 容器的挂载数据目录，该目录会作为 GitLab 配置、日志和数据文件所在的目录。
+sudo mkdir -p /srv/gitlab
+设置环境变量$GITLAB_HOME。
+export GITLAB_HOME=/srv/gitlab
+执行如下命令，安装 GitLab 容器镜像。
+重要
+由于运营商网络原因，会导致您拉取Docker Hub镜像变慢，甚至下载失败。您可以使用阿里云容器镜像服务ACR提供的官方镜像加速器，加速官方镜像的下载。具体操作，请参见官方镜像加速。
+GitLab 社区版
+sudo docker run --detach \
+--hostname gitlab.example.com \
+--publish 443:443 --publish 80:80 --publish 2222:22 \
+--name gitlab \
+--restart always \
+--volume $GITLAB_HOME/config:/etc/gitlab \
+--volume $GITLAB_HOME/logs:/var/log/gitlab \
+--volume $GITLAB_HOME/data:/var/opt/gitlab \
+--shm-size 256m \
+gitlab/gitlab-ce:latest
+容器参数
+主机参数说明
+hostname
+指定的主机名，建议修改为当前 ECS 实例的公网 IP 地址。
+publish 443:443
+将主机的 443 端口映射到容器的 443 端口，使用 HTTPS 访问需要的端口。如果出现端口被主机端口已经被占用的报错时，请替换为非标准端口，如publish 8443:443。
+说明
+如替换成非标端口，需要为安全组添加放行对应端口的入方向规则，例如 8443，请参见使用安全组。
+publish 80:80
+将主机的 80 端口映射到容器的 80 端口，使用 HTTP 访问需要的端口。如果出现端口被主机端口已经被占用的报错时，请替换为非标准端口，例如publish 8080:80。
+说明
+如替换成非标端口，需要为安全组添加放行对应端口的入方向规则，例如 8080，请参见使用安全组。
+publish 2222:22
+将主机的 2222 端口映射到容器的 22 端口，Git 克隆、推送、拉取代码时通过 SSH 服务使用该端口。
+说明
+ECS 实例默认启动 SSH 服务，会占用 22 端口。
+替换成非标端口例如 2222 后，需要先为安全组添加放行对应端口的入方向规则，然后修改 gitlab.rb 文件中的 SSH 端口号。
+ECS 实例的路径和容器路径的对应关系如下：
+ECS 路径
+容器路径
+说明
+$GITLAB_HOME/data
+/var/opt/gitlab
+存储应用程序数据。
+$GITLAB_HOME/logs
+/var/log/gitlab
+存储 GitLab 日志文件。
+$GITLAB_HOME/config
+/etc/gitlab
+存储 GitLab 配置文件。
+极狐 GitLab
+sudo docker run --detach \
+--hostname gitlab.example.com \
+--publish 443:443 --publish 80:80 --publish 2222:22 \
+--name gitlab \
+--restart always \
+--volume $GITLAB_HOME/config:/etc/gitlab \
+--volume $GITLAB_HOME/logs:/var/log/gitlab \
+--volume $GITLAB_HOME/data:/var/opt/gitlab \
+--shm-size 256m \
+registry.gitlab.cn/omnibus/gitlab-jh:latest
+容器参数
+主机参数说明
+hostname
+指定的主机名，建议修改为当前 ECS 实例的公网 IP 地址。
+publish 443:443
+将主机的 443 端口映射到容器的 443 端口，使用 HTTPS 访问需要的端口。如果出现端口被主机端口已经被占用的报错时，请替换为非标准端口，如publish 8443:443。
+说明
+如替换成非标端口，需要为安全组添加放行对应端口的入方向规则，例如 8443，请参见使用安全组。
+publish 80:80
+将主机的 80 端口映射到容器的 80 端口，使用 HTTP 访问需要的端口。如果出现端口被主机端口已经被占用的报错时，请替换为非标准端口，例如publish 8080:80。
+说明
+如替换成非标端口，需要为安全组添加放行对应端口的入方向规则，例如 8080，请参见使用安全组。
+publish 2222:22
+将主机的 2222 端口映射到容器的 22 端口，Git 克隆、推送、拉取代码时通过 SSH 服务使用该端口。
+说明
+ECS 实例默认启动 SSH 服务，会占用 22 端口。
+替换成非标端口例如 2222 后，需要先为安全组添加放行对应端口的入方向规则，然后修改 gitlab.rb 文件中的 SSH 端口号。
+ECS 实例的路径和容器路径的对应关系如下：
+ECS 路径
+容器路径
+说明
+$GITLAB_HOME/data
+/var/opt/gitlab
+存储应用程序数据。
+$GITLAB_HOME/logs
+/var/log/gitlab
+存储 GitLab 日志文件。
+$GITLAB_HOME/config
+/etc/gitlab
+存储 GitLab 配置文件。
+查看容器状态。
+sudo docker ps -a
+STATUS 列显示 (healthy) 时，说明 GitLab 容器已正常启动。
+[ecs-user@iZ2zeee22a96g ~]$ sudo docker ps -a
+CONTAINER ID IMAGE COMMAND CREATED STATUS PORTS NAMES
+75b3bc5de483 gitlab/gitlab-ce:latest "/assets/wrapper" 2 hours ago Up 2 hours (healthy) 0.0.0.0:443->443/tcp, :::443->443/tcp, 0.0.0.0:5000->22/tcp, :::5000->22/tcp, 0.0.0.0:8080->80/tcp, :::8080->80/tcp gitlab
+进入容器进一步检查 GitLab 各内部进程：
+sudo docker exec gitlab gitlab-ctl status
+期望 puma、sidekiq、nginx、postgresql、redis 等进程均为 run 状态，表示容器内 GitLab 服务已成功启动。
+进入 GitLab 管理页面
+在浏览器输入网址。访问网址：http://${ECS的公网IP}。
+重要
+如果使用 Docker 镜像方式安装，并将 HTTP 的默认端口 80 映射成非标准端口，请在访问链接后添加该端口号。
+首次登录使用用户名root，通过如下方式获取密码。
+获取 GitLab 的登录密码。在 ECS 实例执行以下命令：
+Linux 安装包方式：sudo cat /etc/gitlab/initial_root_password
+Docker 安装方式：sudo docker exec -it gitlab grep 'Password:' /etc/gitlab/initial_root_password
+回显信息类似如下，在 Password 字段后即为 GitLab 的初始登录密码。
+[test@iZuf63zs0dn0cxxx ~]$ sudo cat /etc/gitlab/initial_root_password
+# WARNING: This value is valid only in the following conditions
+# 1. If provided manually (either via `GITLAB_ROOT_PASSWORD` environment variable or via `gitlab_rails['initial_root_password']` setting in `gitlab.rb`), it was provided before database was seeded for the first time
+(usually, the first reconfigure run).
+# 2. Password hasn't been changed manually, either via UI or via command line.
+# If the password shown here doesn't work, you must reset the admin password following https://docs.gitlab.com/ee/security/reset_user_password.html#reset-your-root-password.
+Password: nB9P+4UUY2yx8Gp3BYgwQpKSfdo4wh11DpQH_
+# NOTE: This file will be automatically deleted in the first reconfigure run after 24 hours.
+重要
+出于安全原因，24 小时后该文件会被自动删除。建议安装成功首次登录后立即修改 GitLab 的初始密码，操作步骤参见 reset_user_password。
+进入 Admin 页面。
+单击页面顶部的 Menu 按钮，在下拉菜单中选择 Admin。
+在 Users>Pending approval 页面审批新用户的申请。其他操作例如管理项目、管理用户等，请参见 admin_area。
+说明
+本示例介绍将文件上传到 GitLab 仓库的步骤。如需了解更多 GitLab 操作（例如常用命令、数据备份、配置选项、用户管理、与其他服务集成、故障排除等），请参见 极狐 GitLab 和 GitLab 社区版。
+注册用户并设置免密访问
+访问GitLab页面。单击Sign in按钮下的Register now，创建一个新用户。等待GitLab管理员通过申请后，使用新创建的用户登录GitLab。
+在本地生成密钥对文件。
+ssh-keygen
+生成密钥对的过程中，系统会提示输入密钥对存放目录（默认为当前用户目录下的 .ssh/id_rsa，例如 /home/test/.ssh/id_rsa）和密钥对密码，可以手动输入，也可以按 Enter 保持默认。
+回显信息类似如下所示。
+[test@iZuf63zs0dn0qxxx : ~]$ ssh-keygen
+Generating public/private rsa key pair.
+Enter file in which to save the key (/home/test/.ssh/id_rsa):
+Created directory '/home/test/.ssh'.
+Enter passphrase (empty for no passphrase):
+Enter same passphrase again:
+Your identification has been saved in /home/test/.ssh/id_rsa.
+Your public key has been saved in /home/test/.ssh/id_rsa.pub.
+The key fingerprint is:
+SHA256:c8wCYK16ByqC8jEWaL9G/2gkWVe3lQUaens xxx test@iZuf63zs0dn0xxx
+The key's randomart image is:
++---[RSA 2048]----+
+| o. .+o.|
+| . .. ...0+.. |
+| . . ...oo.+ .|
+|... o. o o..oE.o |
+|o .+o.. S +..oo |
+|= *=... + .+ |
+|o+.+=. . |
+| .o o. |
+| .... |
++----[SHA256]-----+
+查看并复制公钥文件id_rsa.pub中的内容，便于后续步骤使用。
+cat ~/.ssh/id_rsa.pub
+回显信息类似如下所示。
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDQVwWjF3KXmI549jDI0fuCgl+syJjjn55iMUDRRiCd/B+9TwUda3l9WXH5i7RU53QGRCsDVFZxixLOlmXr9E3VSqkf8xXBnHs/5E2z5PIOCN0nxfB9xeA1db/QxPwK4gkHisep+eNHRn9x+DpCYDoSoYQN0nBg+H3uqfOqL42mJ+tqSfkyqbhjBf1kjtDTlBfVCWtI0siu7owm+c65+8KNyPlj5/0AyJ4Aqk1OX2jv+YE4nTipucn7rHwWuowasPU86l+uBsLNwOSb+H7loJvQyhEINX2FS1KnpRU+ld20t07n+N3ErfX5xBAGfxXpoN9BKKSP+RT7rvTeXTVE**** test@iZuf63zs0dn0qccsisy****
+添加 SSH key。将获取的公钥添加到 GitLab 账户中，以便实现免密身份验证。
+单击页面右上角的头像，然后单击 Profile。
+GitLab 旧版本菜单条目为 Edit profile。
+在左侧导航栏，单击 SSH Keys。将公钥文件 id_rsa.pub 中的内容粘贴到 Key 所在的文本框中，然后单击 Add key。
+SSH Key 添加完成后，页面将显示 SSH Key 详情，包括密钥内容、指纹信息（MD5 和 SHA256）以及创建时间、过期时间等元数据。
+创建项目并托管代码
+创建新项目
+在 GitLab 主页，单击页面右侧的 New Project 按钮，然后单击 Create blank project。
+单击 Create blank project，设置 Project name 和 Project URL，然后单击页面底部的 Create project。本文以 mywork 项目为例说明。
+回到项目页面，复制 SSH 克隆地址，该地址在克隆时使用。
+重要
+项目页面显示的 SSH 克隆 URL 默认使用 gitlab.example.com 作为 host（GitLab 内置默认 hostname），直接克隆会因 DNS 解析失败而报错。请在克隆前手动将 host 替换为 ECS 实例的公网 IP 或自定义域名。
+如需让项目页面直接显示正确的 host，可在 /etc/gitlab/gitlab.rb 中配置 gitlab_rails['gitlab_shell_ssh_host']，然后执行 sudo gitlab-ctl reconfigure，详情参见 Configuring the external URL for GitLab。
+克隆远程仓库
+在本地安装 Git。
+sudo yum install git
+在本地配置使用 Git 仓库的人员信息。
+配置使用 Git 仓库的用户名。
+git config --global user.name "testname"
+配置使用 Git 仓库的人员邮箱。
+git config --global user.email "abc@example.com"
+克隆已创建的项目到本地。
+输入git clone并粘贴 SSH 克隆地址，Git 会自动创建一个以仓库名称命名的文件夹并下载文件。
+git clone ${SSH URL}
+如果使用 Docker 镜像安装，需要为链接添加ssh://前缀并指定 docker run 命令中映射的端口，例如：
+重要
+如果不想修改 SSH 链接，需要修改gitlab_rails['gitlab_shell_ssh_port'] 参数，以便 GitLab 页面正确显示，请参见使用 Docker 方式启动时，提示 22 端口被占用。
+git clone ssh://git@{IP域名}:{SSH端口}/root/mywork
+[ecs-user@iZ2zefuyca xxx ~]$ git clone git@59.xxx.xxx.xxx:root/mywork.git
+Cloning into 'mywork'...
+The authenticity of host '59.xxx.xxx.xxx (59.xxx.xxx.xxx)' can't be established.
+ECDSA key fingerprint is SHA256:I4eX9gjdR2dwOBmI5xerO+dTnJOZ/xxx.
+ECDSA key fingerprint is MD5:18:54:b5:be:b2:6d:e9:25:c1:4d:84:89:2f:b5:13:d1.
+Are you sure you want to continue connecting (yes/no)? yes
+Warning: Permanently added '59.xxx.xxx.xxx' (ECDSA) to the list of known hosts.
+remote: Enumerating objects: 3, done.
+remote: Counting objects: 100% (3/3), done.
+remote: Compressing objects: 100% (2/2), done.
+remote: Total 3 (delta 0), reused 0 (delta 0), pack-reused 0
+Receiving objects: 100% (3/3), done.
+进入到项目目录。
+cd mywork/
+查看当前分支的名称，默认为主分支main。
+git branch
+新建分支并修改文件
+在本地创建新的分支，便于更改文件。
+新建一个分支example。
+git checkout -b example
+新建需要上传到 GitLab 中的目标文件test.txt，并写入内容Hello World!。
+echo "Hello world!" > test.txt
+提交并推送更改
+将新分支 example 推送到远程仓库保存。
+将test.txt文件添加到暂存区。
+git add test.txt
+确认变更的文件。
+git status
+获得以下输出：
+On branch example
+Changes to be committed:
+(use "git restore --staged <file>..." to unstage)
+new file: test.txt
+提交暂存文件test.txt。
+git commit -m "测试用"
+example分支目前只在本地可用。将分支推送到 GitLab 仓库，便于其他人访问。
+git push origin example
+推送到 GitLab 仓库后，其他用户也可以查看新建的分支。
+在代码仓库页面，单击左上角的分支选择器，可以在 Branches 列表中看到已推送的 example 分支。
+合并更改
+将本地example 分支的更改合并到主分支 main，然后将合并后的主分支 main推送到远程仓库。
+切换到主分支main。
+git checkout main
+将新建分支example 合并到主分支main。
+git merge example
+将合并后的主分支推送到 GitLab 仓库。
+git push
+变更已同步到 GitLab 仓库的主分支main中。
+在 main 分支中，test.txt 文件内容显示为 Hello world!。
+后续步骤
+配置邮件通知
+GitLab需要一个邮件传输代理来发送电子邮件通知，例如项目更新、密码重置等。SMTP服务通常使用服务器的25端口发送邮件，但基于安全考虑，ECS实例25端口默认受限，建议您使用SSL加密端口（通常是465端口）来对外发送邮件，常用端口的说明请参见常用端口。配置SMTP的步骤：
+配置外部 SMTP 服务器。
+验证 SMTP 配置效果。
+执行gitlab-rails console命令进入 Rails 控制台。
+输入以下命令，发送测试电子邮件：
+Notify.test_email('destination_email@address.com', 'Message Subject', 'Message Body').deliver_now
+登录目标邮箱查看测试邮件，或者在 ECS 实例上执行sudo tail -f /var/log/mail.log查看邮件日志。
+备份 GitLab 仓库的数据
+在 ECS 上安装 GitLab 后，GitLab 仓库的数据通常存储于服务器的 /var/opt/gitlab/git-data 路径下，仓库位于名为 repositories 的子文件夹下。
+备份方式：
+如果您只想保存仓库数据，可以为当前ECS实例的云盘创建快照，操作步骤参见手动创建单个快照和通过ECS快照备份恢复数据。
+如果您想备份仓库数据、GitLab配置、已安装的其他软件等全量数据，可以为ECS实例创建镜像，操作步骤参见使用实例创建自定义镜像和通过ECS镜像备份恢复数据。
+如果您需要使用多台ECS来部署GitLab服务器：
+创建NAS文件系统：用于存储GitLab的数据。
+多台ECS实例批量挂载同一NFS协议文件系统：将NAS系统同时挂载到所有ECS实例，以便这些实例可以共享GitLab的数据。
+配置GitLab数据路径：将Git仓库的数据存储路径配置到已经挂载的NAS路径，具体的操作步骤参见将 Git 数据存储在备用目录中。
+解析 GitLab 网站域名
+通过实例公网 IP 地址直接访问 GitLab 网站会降低服务端的安全性。如已有域名或需为 GitLab 网站注册一个域名，可参考以下步骤。
+域名注册。
+解析域名。设置域名解析后，外部用户可通过域名访问 GitLab 网站。
+域名解析是使用域名访问您的网站的必备环节。具体操作，请参见新手引导。
+开启 HTTPS 加密访问。使用免费服务例如使用 Let’s Encrypt 免费的自动 HTTPS，或者付费服务使用正式证书为Web站点开启HTTPS访问。
+添加安全组规则：在 ECS 的安全组内，添加一条入方向规则，为了安全起见，建议只对授权的 IP 地址开放端口。
+安装包或扩展程序方式：443（HTTPS）端口。
+Docker Engine 方式：对应于 docker run 命令中设置的主机 HTTPS 端口。
+修改 gitlab.rb 中的 external_url 参数，配置完成后如下图所示。
+安装包方式：配置 GitLab 的外部 URL。
+Docker 镜像方式：编辑配置文件。
+配置完成后，gitlab.rb 中的 external_url 参数示例为 external_url 'https://yf.xxx.com'，其中 yf.xxx.com 为您的 GitLab 网站域名。
+常见问题
+Alibaba Cloud Linux 3 上安装极狐 GitLab 报 Out of memory allocating 18446744071562068992 bytes!
+现象：执行 curl -fsSL https://get.gitlab.cn | sudo /bin/bash 添加仓库后，运行 sudo yum install -y gitlab-jh 或 sudo yum makecache 时进程被中止，报错为 Out of memory allocating 18446744071562068992 bytes!。free -h 显示内存仍有大量空闲。
+原因：Alibaba Cloud Linux 3 自带的 librepo 1.14.x 系列（可执行 rpm -q librepo 查询本机版本）解析极狐 GitLab 仓库元数据时，遇到超过 INT32_MAX 的 <open-size> 字段会发生整数溢出，被 glib 误判为不可能的内存分配请求并中止。报错数字 18446744... 量级即整数符号溢出特征，并非真实物理内存不足。
+解决方案：改用手工 RPM 方式安装，绕开 yum 对 gitlab-jh 仓库元数据的解析。具体步骤参见安装 GitLab，选择安装包方式进行安装。
+服务器卡顿、无法远程连接怎么办？
+低于 4 vCPU、8 GiB 会因规格过小，导致长时间处于 Installing 状态或安装失败。请升级规格以后再安装，升级规格操作，请参见升降配方式概述。
+如果无法远程连接服务器，可以通过VNC连接实例，然后配置 SWAP、优化 Sidekiq，具体步骤参见 memory_constrained_envs。
+监控ECS实例的vCPU使用率、网络流量和磁盘I/O的操作步骤，请参见查看实例监控信息。
+使用 Docker 方式启动时，提示 22 端口被占用
+ECS 实例默认启动 SSH 服务，会占用 22（SSH）端口。使用 Docker 镜像方式安装时，需要将主机的 22 端口映射成其他端口，并修改gitlab_rails['gitlab_shell_ssh_port'] 参数：
+在启动 Docker 时指定非标端口，例如publish 2222:22。
+编辑 GitLab 配置文件。
+执行sudo docker exec -it gitlab /bin/bash，进入会话。
+编辑文件/etc/gitlab/gitlab.rb。
+设置gitlab_rails['gitlab_shell_ssh_port'] = 2222。
+执行gitlab-ctl reconfigure，重新配置 GitLab。
+打开项目页面，验证配置效果。
+单击 Clone 按钮，在展开的下拉面板中查看 Clone with SSH 区域，确认 SSH 克隆地址使用端口 2222（格式如 ssh://git@域名:2222/项目路径），表明自定义 SSH 端口配置已生效。

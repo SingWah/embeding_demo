@@ -1,0 +1,40 @@
+# Agentic DiskPool（邀测）
+> https://help.aliyun.com/zh/ecs/user-guide/agentic-diskpool-invited-test/
+
+针对 AI Agent 海量小容量云盘的存储与突发性能诉求，Agentic DiskPool 通过池化的方式统一管理容量与性能，池内云盘共享 IOPS/吞吐、突发性能免费开启。面向 Agent 场景，提供安全隔离、小容量云盘高性能的存储能力。
+产品优势
+性能共享，小盘获得高性能：池内所有云盘自由竞争 DiskPool 的 IOPS 和吞吐。DiskPool 中 1 GiB 小盘即可获得 350 MB/s 峰值吞吐和最高 2 万 IOPS，突破单盘容量对性能的限制。
+突发性能免费：池内 Agentic Disk 的 BurstIO 始终开启、无法关闭、无需额外付费。突发场景无需为峰值性能支付额外成本。
+自动扩容：当容量使用率达到触发阈值，自动扩容，无需人工干预。避免了传统存储中因容量耗尽导致的写中断风险，同时消除了频繁手动扩容的运维开销。
+统一管理，运维简化：仅需统一管理 Agentic DiskPool。容量规划、性能规划在 Pool 层完成，可降低海量云盘的管理复杂度。
+应用场景
+AI Agent 大规模启动与亚秒级唤醒：Agent 在启动或唤醒瞬间产生集中高吞吐读取需求（如加载镜像、加载 CheckPoint）。Agentic DiskPool 通过多盘性能共享，使小容量 Agent 盘同时获得高吞吐，避免启动风暴导致的 IO 瓶颈。
+产品规格
+Agentic DiskPool：存储池，是容量与性能的管理单元，按总容量计费。
+Agentic Disk：池内云盘，共享所属 DiskPool 的性能，不单独计费。
+Agentic Disk
+Agentic Disk 依附于 Agentic DiskPool，无法独立创建，属于 ESSD 系列的本地冗余云盘。仅支持按量付费，无额外计费项，只能单独购买、作为数据盘挂载至实例使用。
+规格属性
+说明
+单盘容量范围
+1 ～ 65,536 GiB
+最大 IOPS
+20,000
+最大吞吐
+350 MB/s
+性能突发（免费）
+始终开启。
+重要
+池内所有 Agentic Disk 自由竞争 DiskPool 的 IOPS 和吞吐。DiskPool 中 1 GiB 小盘即可获得 350 MB/s 峰值吞吐和最高 2 万 IOPS，突破单盘容量对性能的限制。但是 DiskPool 无空闲性能时，无法保证所有云盘分配到所需性能。业务若有性能保障需求，建议使用其他 ESSD 系列云盘。
+使用限制
+Agentic DiskPool当前邀测发布。
+功能限制：Agentic Disk 不支持云盘变配、按量付费转包年包月、云盘克隆及异步复制。
+若有云盘变配需求可以先创建快照，再利用快照创建所需类型云盘。
+实例规格限制：不支持第 5 代实例规格族，其余支持挂载的实例规格族与 ESSD 云盘一致。
+计费说明
+Agentic DiskPool：采用按量付费，按 Agentic DiskPool 的总容量和使用时长计费，计费单价与 ESSD PL1一致。
+Agentic Disk：不单独计费。池内云盘的容量与性能费用均已包含在 Agentic DiskPool 的容量费用中，无需额外支付。
+相关文档
+创建 Agentic DiskPool（邀测）
+在 Agentic DiskPool 中创建云盘
+管理 Agentic DiskPool 容量

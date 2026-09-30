@@ -1,0 +1,99 @@
+# 通过 Workbench CLI 连接实例
+> https://help.aliyun.com/zh/ecs/user-guide/connect-to-an-instance-through-workbench-cli/
+
+从本机命令行免密访问无公网 IP 的 Linux ECS 实例，完成交互式登录、远程命令执行与文件传输；同时原生适配 AI Agent，通过结构化 JSON 输出让 Agent 直接解析结果并据命令退出码判断成败。
+什么是 Workbench CLI
+重要
+Workbench CLI 当前仅支持连接 Linux 实例（SSH 协议），不支持连接 Windows 实例。如需连接 Windows 实例，请使用 通过 Workbench 连接实例。
+Workbench CLI（命令为 workbench）是阿里云 ECS 提供的命令行连接工具，适用于以下用户：
+人类用户：在没有为实例分配公网 IP 的情况下，通过命令行完成交互式登录、远程命令执行、文件上传下载等操作，替代 SSH 直连。
+AI Agent：通过结构化 JSON 输出（--output json）与退出码透传，AI 编程工具（如悟空、opencode）可直接调用 workbench 命令管理 ECS 实例，无需额外适配。
+Workbench CLI 的核心能力如下：
+交互式登录：workbench connect 打开 PTY 会话，支持无密码、密码、密钥三种认证方式。
+远程命令执行：workbench exec 在实例上执行一条命令并返回结果，支持文本或 JSON 格式。
+文件传输：workbench upload 和 workbench download 通过 OSS 中转，在本机与实例之间传输文件。
+会话与守护进程管理：workbench session 和 workbench daemon 用于诊断和手动清理，日常使用无需干预。
+会话内 AI Agent 助手：在 connect 交互式会话中按 Tab 键或 Ctrl+A 唤起 AI 助手，用自然语言让 AI 在实例上执行命令。
+与其他 ECS 连接方式的对比
+阿里云 ECS 提供了三种基于 Workbench/会话管理的免公网连接方式，选型对比如下：
+能力维度
+Workbench 网页版
+Workbench CLI
+会话管理 CLI（ali-instance-cli）
+交互形式
+浏览器 GUI
+本机命令行
+本机命令行
+是否需要公网 IP
+不需要
+不需要
+不需要
+支持的实例操作系统
+Linux、Windows
+仅 Linux（SSH 协议）
+Linux、Windows
+远程命令与文件传输
+在网页终端内手动操作
+原生命令：exec、upload、download
+仅终端会话，需要额外脚本封装
+是否面向 AI Agent
+否
+是（结构化 JSON 输出 + 退出码透传）
+否
+典型场景
+临时排查、Windows 桌面接入
+日常运维脚本、AI 编程助手
+已存量脚本仅需终端会话
+选型建议：
+需要 图形界面 或 连接 Windows 实例，请使用 通过 Workbench 连接实例。
+需要在 命令行 或 AI 编程工具 中操作 Linux 实例，请使用 Workbench CLI。
+已有 ali-instance-cli 的存量脚本且仅需终端会话，可继续沿用，参见 通过会话管理 CLI(ali-instance-cli) 连接实例。
+使用限制
+实例操作系统：仅支持连接 Linux 实例（通过 SSH 协议）。不支持连接 Windows 实例。
+云助手 Agent：目标实例必须已安装并正常运行云助手 Agent。2017 年 12 月 1 日之后使用官方公共镜像创建的 ECS 实例默认预装云助手 Agent；否则需手动安装。
+安全组规则：首次连接时 CLI 会自动为实例添加内网安全组规则（TCP 22 端口，授权 100.104.0.0/16）。如账号无安全组权限，需在 ECS 控制台手动添加。
+网络连通性：本机需能访问 *.aliyuncs.com 及 Workbench 后端 WebSocket 端点；upload / download 命令需实例能访问对应地域的 OSS 内网端点。
+重要
+Windows 实例目前不在 Workbench CLI 支持范围内，请勿将 workbench connect 用于 Windows 实例。
+快速开始
+通过以下 3 步在 5 分钟内完成第一次连接。详细的安装、凭证与命令说明请参见 安装并配置 Workbench CLI 凭证 与 使用 Workbench CLI 管理 ECS 实例。
+步骤一：安装 Workbench CLI
+根据本机操作系统选择安装命令，安装脚本会自动检测架构（amd64/arm64）并安装到系统默认路径。
+Linux 或 macOS
+curl -fsSL https://workbench-cli.oss-cn-hangzhou.aliyuncs.com/install.sh | bash
+Windows
+irm https://workbench-cli.oss-cn-hangzhou.aliyuncs.com/install.ps1 | iex
+步骤二：配置 AccessKey
+执行以下命令，按提示输入 AccessKey ID 与 AccessKey Secret。
+workbench config
+配置完成后，凭证保存在 ~/.workbench/config.json，文件权限自动设置为 0600（仅当前用户可读写）。生产环境建议使用 RAM 角色凭证代替静态 AccessKey，配置方式请参见 安装并配置 Workbench CLI 凭证。
+步骤三：连接实例
+执行以下命令连接到目标实例（将 i-bp1a2b3c4d5e6f 替换为您的实例 ID）。
+workbench connect -i i-bp1a2b3c4d5e6f
+地域会从实例 ID 前缀自动推断，通常无需通过 -r 手动指定。进入交互式 shell 后，可按 Tab 键唤出斜杠命令面板（/upload、/download、/agent 等），按 Ctrl+D 退出会话。
+命令总览
+命令
+说明
+workbench list ecs
+按地域、状态、标签查询 ECS 实例列表。
+workbench connect
+打开交互式 PTY 会话连接到实例，支持无密码、密码、密钥认证。
+workbench exec
+在实例上执行一条命令并返回结果，支持 text/json 输出。
+workbench upload / workbench download
+通过 OSS 中转，在本机与实例之间上传或下载文件。
+workbench session
+查询与手动关闭会话，日常使用无需干预。
+workbench daemon
+查看或停止后台守护进程，首次调用时自动启动，空闲 60 秒后自动退出。
+workbench config
+配置凭证，支持 AK / StsToken / RamRoleArn / CredentialsCmd / CredentialsURI 五种模式，并支持多 Profile 管理。
+workbench upgrade
+升级到最新版本或指定版本。
+workbench version
+打印当前版本号、commit、构建日期。
+上述命令均支持 --output json、--region、--profile 全局参数。每条命令的完整参数、示例与 JSON 输出结构，请参见 使用 Workbench CLI 管理 ECS 实例。
+相关文档
+安装并配置 Workbench CLI 凭证：在 Linux、macOS、Windows 上安装 CLI，并配置 AK / StsToken / RamRoleArn / CredentialsCmd / CredentialsURI 五种凭证模式与最小 RAM 权限策略。
+使用 Workbench CLI 管理 ECS 实例：list / connect / exec / upload / download / session / daemon 各命令的参数、示例、典型场景与故障排查。
+在 AI Agent 中使用 Workbench CLI 操作 ECS 实例：在悟空、opencode 等 AI 编程工具中加载 Workbench CLI Skill，以及典型对话场景与安全建议。

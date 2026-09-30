@@ -1,0 +1,163 @@
+# 如何使用Nginx+uWSGI部署Django项目
+> https://help.aliyun.com/zh/ecs/user-guide/use-nginx-and-uwsgi-to-deploy-a-django-project
+
+在ECS实例上部署Django项目，可通过Nginx分发静态文件，结合uWSGI管理应用进程，从而实现动静分离，提升服务性能。
+工作原理
+浏览器向服务器发送HTTP或HTTPS请求。
+Nginx作为前端服务器，接收传入的请求。
+静态资源（如CSS、JavaScript、图片）的请求，Nginx直接从本地提供文件。可提升响应速度，并减轻Django应用的负载。
+动态请求则转发至uWSGI服务器。
+uWSGI接收到Nginx转发的请求，将其传递给Django应用进行处理，实现负载均衡。
+Django应用处理请求，执行业务逻辑（如数据库查询、模板渲染），返回响应数据。
+快速部署
+Terraform可一键运行此方案至已有实例，或自动创建新实例。
+部署至已有实例：设置ecs_instance_id参数为实例ID，然后单击发起调试 > 预览并执行。
+新建实例：参数ecs_instance_id不设置任何值，依次单击发起调试 > 预览并执行。
+操作步骤
+步骤一：准备资源
+创建专有网络与交换机。
+创建ECS实例。
+前往实例购买页。选择自定义购买页签。
+实例规格：推荐使用至少2 vCPU和4 GiB内存。
+镜像：Alibaba Cloud Linux 3。
+网络和安全组：
+网络：选择已创建的专有网络 VPC。
+公网IP：勾选分配公网 IPv4 地址。
+安全组：选择新建安全组并勾选HTTP (TCP：80)。
+配置运行时环境。
+使用Workbench登录Linux实例。
+安装Nginx与Python开发工具包（编译uWSGI）。
+默认源的Nginx版本过旧，有安全风险。添加Nginx官方源以安装最新的稳定版本。
+#添加Nginx官方源到系统中
+sudo tee /etc/yum.repos.d/nginx.repo <<-'EOF'
+[nginx-stable]
+name=nginx stable repo
+baseurl=http://nginx.org/packages/centos/8/$basearch/
+gpgcheck=1
+enabled=1
+gpgkey=https://nginx.org/keys/nginx_signing.key
+module_hotfixes=true
+EOF
+sudo yum install -y python3.8 python38-devel pcre-devel gcc make nginx
+#安装Django和uWSGI
+sudo python3.8 -m pip install --upgrade pip wheel -i https://mirrors.aliyun.com/pypi/simple
+sudo python3.8 -m pip install "Django>=4.2,<5.0" "uwsgi>=2.0.23" -i https://mirrors.aliyun.com/pypi/simple
+创建logs,static,media目录分别用于存储日志，静态文件和媒体文件，创建/run/uwsgi目录用于存放socket文件。
+sudo mkdir -p /srv/django-app/{logs,static,media}
+sudo mkdir -p /run/uwsgi
+步骤二：部署Django应用
+创建一个Django示例项目。
+推荐为项目创建Python虚拟环境，可以隔离项目依赖，避免不同项目间的包版本冲突。
+sudo /usr/local/bin/django-admin startproject myproject /srv/django-app/
+修改项目配置文件/srv/django-app/myproject/settings.py，以满足生产环境的安全和性能要求。
+设置DEBUG属性为False。此操作可防止应用出错时泄露敏感配置与代码细节。
+设置ALLOWED_HOSTS属性为实例的公网IP地址。如果此列表为空，应用将无法启动。这是Django的一项内置安全机制。
+IP地址须作为字符串包含在列表中，例如['xxx.xxx.xxx.xxx']
+在文件末尾添加STATIC_ROOT = BASE_DIR / 'static'，用于指定静态文件目录。
+同步示例项目的静态文件至指定目录（STATIC_ROOT），以供Nginx直接访问。
+sudo python3.8 /srv/django-app/manage.py collectstatic --noinput
+执行数据库迁移，在数据库中创建存储用户等应用数据所需的表结构。
+Django项目默认使用SQLite3数据库，该配置不适用于生产环境。修改myproject/settings.py文件中的DATABASES设置，可将其替换为其他数据库。
+sudo python3.8 /srv/django-app/manage.py migrate
+创建项目的管理员账户，用于后续登录Django管理后台。
+sudo python3.8 /srv/django-app/manage.py createsuperuser
+步骤三：配置uWSGI服务
+创建uWSGI配置文件/etc/django-app.ini。指定项目路径、进程模型、socket文件位置和日志文件。
+processes参数可根据实例CPU核心数进行调整，建议设置为核心数 * 2
+建议使用非特权用户运行服务，即使应用被攻破，攻击者也无法获得服务器的最高权限。
+[uwsgi]
+# 项目配置
+chdir = /srv/django-app
+module = myproject.wsgi:application
+# 进程配置
+master = true
+processes = 4
+threads = 2
+# 网络与权限配置
+socket = /run/uwsgi/django-app.sock
+chmod-socket = 666
+chown-socket = root:root
+vacuum = true
+# 安全与运行配置
+uid = root
+gid = root
+die-on-term = true
+# 日志配置
+logto = /srv/django-app/logs/uwsgi.log
+在后台启动 uWSGI 服务，使其在终端关闭后也能持续运行。
+可使用ps aux | grep uwsgi命令检查uWSGI进程状态。
+nohup /usr/local/bin/uwsgi --ini /etc/django-app.ini &
+（可选）使用systemd管理uWSGI服务，可以实现开机自启和更可靠的服务管理。
+创建启动配置文件/etc/systemd/system/uwsgi-django-app.service。
+[Unit]
+Description=uWSGI service for Django App
+After=network.target
+[Service]
+User=root
+Group=root
+RuntimeDirectory=uwsgi
+ExecStart=/usr/local/bin/uwsgi --ini /etc/django-app.ini
+Restart=always
+KillSignal=SIGQUIT
+Type=notify
+NotifyAccess=all
+[Install]
+WantedBy=multi-user.target
+启动uWSGI服务并设置开机自启。
+sudo systemctl daemon-reload
+sudo systemctl start uwsgi-django-app
+sudo systemctl enable uwsgi-django-app
+检查服务状态。
+sudo systemctl status uwsgi-django-app
+步骤四：配置Nginx作为前端服务器
+将下方配置中的<server_ip>替换为实例公网IP，并将内容保存为Nginx配置文件/etc/nginx/conf.d/django-app.conf。
+# 定义一个 upstream，指向 uWSGI 的 socket 文件
+upstream django_backend {
+server unix:/run/uwsgi/django-app.sock;
+server {
+listen 80;
+server_name <server_ip>; # 替换为公网IP
+charset utf-8;
+client_max_body_size 20M;
+# 静态文件服务
+location /static/ {
+alias /srv/django-app/static/;
+# 媒体文件服务
+location /media/ {
+alias /srv/django-app/media/;
+# 代理所有其他请求到 Django 应用
+location / {
+include /etc/nginx/uwsgi_params;
+uwsgi_pass django_backend;
+运行nginx -t命令验证Nginx配置文件语法是否正确。
+若输出包含syntax is ok和test is successful，则表示配置正确。
+重启Nginx应用新配置并设置开机自启。
+sudo systemctl restart nginx
+sudo systemctl enable nginx
+访问示例项目登录页面：http://<ECS的公网IP地址>/admin。
+生产应用建议
+使用非特权用户运行服务：创建一个无登录权限的系统用户来运行应用，可以有效隔离权限，提升服务器安全性。即使应用代码存在漏洞被利用，攻击者也无法获得服务器的root权限。
+#创建一个无登录权限的系统用户 (django-app)
+sudo useradd --system --shell /bin/false --home /srv/django-app django-app
+#应用目录的所有权更改为django-app用户。
+sudo chown -R django-app:django-app /srv/django-app
+使用 Python 虚拟环境：为每个项目创建独立的Python虚拟环境，可以隔离项目依赖，避免不同项目间的包版本冲突。这使得部署环境更加纯净、可预测，并且易于复现。
+# 创建虚拟环境
+python3.8 -m venv venv
+# 激活虚拟环境
+source venv/bin/activate
+常见问题
+访问页面显示502 Bad Gateway
+此错误通常表示Nginx无法与uWSGI正常通信。
+检查uWSGI服务状态：systemctl status uwsgi-django-app。
+查看uWSGI日志：tail -f /srv/django-app/logs/uwsgi.log。
+检查socket文件是否存在及其权限：ls -l /run/uwsgi/django-app.sock。
+访问静态文件显示403 Forbidden
+此问题是由于 Nginx 进程没有足够的权限读取静态文件目录。
+确认Nginx的运行用户（在Alibaba Cloud Linux上通常是nginx）对/srv/django-app/static/目录及其所有子文件和子目录具有读取（r）和执行（x）权限。
+访问页面显示500 Internal Server Error
+此错误表示 Django 应用在处理请求时内部发生错误。
+开启调试模式定位问题：临时将项目配置文件settings.py中的DEBUG设置为True，然后重启uWSGI服务并刷新页面。浏览器将显示详细的错误堆栈信息，有助于快速定位问题。
+重要
+此操作仅限调试使用，问题解决后须将DEBUG改回False，以防敏感信息泄露。
+检查uWSGI日志：错误信息同样会被记录在uWSGI的日志文件中，通过查看日志可以获取Django抛出的具体错误。

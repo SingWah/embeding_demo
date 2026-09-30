@@ -1,0 +1,114 @@
+# Nginx服务配置多站点
+> https://help.aliyun.com/zh/ecs/user-guide/build-multiple-websites-on-a-linux-instance
+
+在一台ECS实例中配置多个Web站点，可以有效节约运营成本，便捷管理多个网站（包括更新软件、配置安全设置、备份数据等），根据各个网站的需求变化，可以灵活调整资源分配等。本文介绍如何在Linux系统的ECS实例上使用Nginx搭建多个Web站点。
+前提条件
+已创建分配公网IP的ECS实例，并部署了LNMP环境，具体操作，请参见部署LNMP环境或部署LNMP环境（Ubuntu）。
+说明
+本教程Nginx服务配置多站点支持一键运行完成环境安装，您可以直接运行代码部署。 一键运行
+创建测试站点
+远程连接已部署LNMP环境的ECS实例。
+远程连接方式请参见使用Workbench登录Linux实例。
+运行以下命令，进入已配置好的网站根目录。
+cd /usr/share/nginx/html
+运行以下命令，创建两个测试文件夹。
+文件夹中用于存放测试网站信息，即存放项目代码。
+sudo mkdir Testpage-1
+sudo mkdir Testpage-2
+配置测试站点Testpage-1的信息。
+运行以下命令，进入Testpage-1。
+cd /usr/share/nginx/html/Testpage-1/
+运行以下命令，创建并编辑index.html文件。
+sudo vim index.html
+按i进入编辑模式，输入以下测试内容。
+Test page 1
+编辑完成后，按Esc键，输入:wq后按下回车键，保存并退出。
+配置测试站点Testpage-2的信息。
+运行以下命令，进入Testpage-2。
+cd /usr/share/nginx/html/Testpage-2/
+运行以下命令，创建并编辑index.html文件。
+sudo vim index.html
+按i进入编辑模式，输入以下测试内容。
+Test page 2
+编辑完成后，按Esc键，输入:wq后按下回车键，保存并退出。
+配置Nginx
+运行以下命令，查看nginx.conf配置文件。
+cat /etc/nginx/nginx.conf
+在http{}模块内，查看include配置信息。
+本示例中配置如下所示，include /etc/nginx/conf.d/*.conf;表示Nginx将会从该路径下的所有.conf文件获取站点信息。其中 include /etc/nginx/conf.d/*.conf; 即为需要关注的 include 配置行，用于从 /etc/nginx/conf.d 目录加载模块化配置文件。
+http {
+log_format main '$remote_addr - $remote_user [$time_local] "$request" '
+'$status $body_bytes_sent "$http_referer" '
+'"$http_user_agent" "$http_x_forwarded_for"';
+access_log /var/log/nginx/access.log main;
+sendfile on;
+tcp_nopush on;
+tcp_nodelay on;
+keepalive_timeout 65;
+types_hash_max_size 2048;
+include /etc/nginx/mime.types;
+default_type application/octet-stream;
+# Load modular configuration files from the /etc/nginx/conf.d directory.
+# See http://nginx.org/en/docs/ngx_core_module.html#include
+# for more information.
+include /etc/nginx/conf.d/*.conf;
+server {
+listen 80 default_server;
+listen [::]:80 default_server;
+server_name _;
+root /usr/share/nginx/html;
+运行以下命令，进入/etc/nginx/conf.d路径下。
+cd /etc/nginx/conf.d
+为测试站点Testpage-1创建并配置Nginx配置文件。
+运行以下命令，创建并编辑配置文件。
+sudo vim Testpage1.conf
+按i进入编辑模式，输入以下内容。
+在注释内容处，替换服务器域名参数信息与项目路径参数信息。
+server {
+listen 80;
+server_name testpage1.com; #此处使用测试域名。实际配置中使用您的服务器域名。
+#charset koi8-r;
+access_log /var/log/nginx/b.access.log main;
+location / {
+root /usr/share/nginx/html; #测试站点路径。即您的项目代码路径。
+index index.html index.htm;
+#error_page 404 /404.html;
+error_page 500 502 503 504 /50x.html;
+location = /50x.html {
+root /usr/share/nginx/html;
+编辑完成后，按Esc键，输入:wq后按下回车键，保存并退出。
+为测试站点Testpage-2创建并配置Nginx配置文件。
+运行以下命令，创建并编辑配置文件。
+sudo vim Testpage2.conf
+按i进入编辑模式，输入以下内容。
+在注释内容处，替换服务器域名参数信息与项目路径参数信息。
+server {
+listen 80;
+server_name testpage2.com; #此处使用测试域名。实际配置中使用您的服务器域名。
+#charset koi8-r;
+access_log /var/log/nginx/b.access.log main;
+location / {
+root /usr/share/nginx/html; #测试站点路径。即您的项目代码路径。
+index index.html index.htm;
+#error_page 404 /404.html;
+error_page 500 502 503 504 /50x.html;
+location = /50x.html {
+root /usr/share/nginx/html;
+编辑完成后，按Esc键，输入:wq后按下回车键，保存并退出。
+运行以下命令，重启Nginx服务。
+sudo systemctl restart nginx
+结果验证
+在本地主机打开浏览器，成功访问到两个测试站点。
+访问http://<ECS实例公网IP>/Testpage-1，查看Testpage-1站点内容
+页面正常显示加粗标题 Test page 1，表示 Testpage-1 站点已成功部署并可访问。
+访问http://<ECS实例公网IP>/Testpage-2，查看Testpage-2站点内容
+页面成功显示 Test page 2 标题，表明 Testpage-2 站点已正确部署并可正常访问。
+至此多个Web站点已搭建成功。在实际搭建站点场景中，您只需要将配置文件中的项目路径配置正确，即可实现多站点的访问。
+后续操作
+若希望您的网站具备对外访问能力，建议采用域名访问的形式，以便用户能够更加便捷且安全地访问您的网站。如果您已有域名或者想为您的站点注册一个域名，可以参考以下步骤。
+注册域名。
+具体操作，请参见域名注册。
+解析域名。
+域名解析是使用域名访问您的网站的必备环节。有关将域名指向实例公网IP的具体操作流程，请参见添加网站解析。
+相关文档
+如果您想在一台Windows实例中部署多个Web站点，请参见IIS服务配置多站点。

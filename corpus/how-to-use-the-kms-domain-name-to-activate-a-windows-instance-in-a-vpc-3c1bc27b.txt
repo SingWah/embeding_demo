@@ -1,0 +1,52 @@
+# 如何使用KMS域名激活VPC网络中的Windows实例
+> https://help.aliyun.com/zh/ecs/user-guide/how-to-use-the-kms-domain-name-to-activate-a-windows-instance-in-a-vpc
+
+本文介绍如何使用微软授权给阿里云的KMS域名激活VPC网络下ECS实例的正版Windows Server系统。
+背景信息
+如果您在阿里云上购买了Windows Server许可证，阿里云会自动为您激活正版Windows Server系统。
+在阿里云上购买Windows Server许可证的场景，例如：
+创建ECS实例时使用了阿里云公共镜像中的Windows Server镜像。
+创建ECS实例时使用了许可证类型为阿里云官方许可证导入的自定义镜像。
+如果因为某些原因激活失败，您可以参考该篇手动激活。
+不同地域的KMS域名如下所示。
+重要
+当您需要在防火墙或安全组中放行微软授权的KMS域名对应的IP时，可通过ping KMS域名查看。例如查看中国内地KMS域名对应的IP时，请执行ping kms.cloud.aliyuncs.com。
+地域名称
+KMS域名
+中国内地
+kms.cloud.aliyuncs.com
+中国香港
+kms.cloud.aliyuncs.com
+新加坡
+sg.kms.cloud.aliyuncs.com
+美国（硅谷）
+us1.kms.cloud.aliyuncs.com
+美国（弗吉尼亚）
+us2.kms.cloud.aliyuncs.com
+日本（东京）
+jp.kms.cloud.aliyuncs.com
+德国（法兰克福）
+de.kms.cloud.aliyuncs.com
+阿联酋（迪拜）
+db.kms.cloud.aliyuncs.com
+马来西亚（吉隆坡）
+my.kms.cloud.aliyuncs.com
+印度尼西亚（雅加达）
+id.kms.cloud.aliyuncs.com
+英国（伦敦）
+eu.kms.cloud.aliyuncs.com
+操作步骤
+本文以激活中国内地VPC网络下Windows Server操作系统的ECS实例为例。如果您需要激活其他地域的ECS实例，请替换对应地域的KMS域名。
+远程连接ECS实例。
+具体操作，请参见使用Workbench登录Windows实例。
+单击开始>运行，输入cmd，然后按Enter键后进入命令行窗口。
+执行以下命令，更换KMS域名。
+slmgr -skms kms.cloud.aliyuncs.com
+重要
+如果执行失败，请检查您使用的DNS服务器是否为阿里的DNS服务器，若使用了非阿里DNS，可能会导致kms.cloud.aliyuncs.com解析失败，建议从VPC创建的ECS实例将默认DNS服务器设置为100.100.2.136或100.100.2.138。
+当系统显示类似如下，表示更换KMS域名成功，然后单击确定。
+执行以下命令，激活KMS服务（该KMS服务与阿里云密钥管理服务无关）。
+slmgr -ato
+系统显示如下，表示激活成功。
+相关文档
+当Windows系统激活失败时，可能是由于网络异常、服务器时钟不同步、激活码错误等原因导致。更多信息，请参见Windows系统ECS实例激活失败如何解决。

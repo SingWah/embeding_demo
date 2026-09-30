@@ -1,0 +1,207 @@
+# 在Linux实例中搭建FTP服务器
+> https://help.aliyun.com/zh/ecs/user-guide/manually-build-an-ftp-site-on-a-linux-instance
+
+vsftpd（very secure FTP daemon）是一个广泛使用的、开源的FTP服务器软件，以其高性能、高安全性和稳定性著称，支持多种FTP相关协议，包括FTP、SFTP（通过SSH）、TLS/SSL加密的FTP等。本文介绍如何在Linux系统的ECS实例上安装并配置vsftpd。
+快速部署
+您可以单击一键运行进入Terraform Explorer查看并执行Terraform代码，从而实现自动化地在ECS实例中搭建FTP站点。
+准备资源
+已创建一台基础ECS实例，并满足以下配置。如果您还未创建，请参见自定义购买实例。
+操作系统：Alibaba Cloud Linux 3 / 2、CentOS 7.x 64位、Ubuntu、Debian。
+IP地址：实例已分配固定公网IP地址或绑定弹性公网IP（EIP）。具体操作，请参见弹性公网IP。
+VSFTP简介
+vsftpd（Very Secure FTP Daemon）是一个开源的FTP服务器软件，专为UNIX和Linux系统设计。其主要特点包括：
+安全性高：vsftpd经过严格的安全审计，采用多种安全机制，能有效防止常见的攻击和漏洞。
+性能优越：具备高性能的文件传输能力，支持大并发用户同时连接。
+配置简单：提供灵活且易于理解的配置选项，适合各种用户需求。
+支持IPv6：对新一代网络协议提供友好的支持。
+搭建VSFTP服务
+Alibaba Cloud Linux 3、2/CentOS 7.x
+步骤一：安装vsftpd
+运行以下命令，更新系统组件并安装vsftpd服务。
+sudo yum update -y
+sudo yum install vsftpd -y
+运行以下命令，启动 FTP 服务并设置开机自启动。
+sudo systemctl start vsftpd
+sudo systemctl enable vsftpd
+运行以下命令，确认服务是否启动。
+netstat -antup | grep ftp
+显示结果如下，则说明 FTP 服务已成功启动。
+[root@xxx ~]# systemctl start vsftpd
+[root@xxx ~]# netstat -antup | grep ftp
+tcp6 0 0 :::21 :::* LISTEN 16387/vsftpd
+此时，vsftpd 已默认开启匿名用户模式，无需通过用户名和密码即可登录 FTP 服务器。使用此方式登录 FTP 服务器的用户没有修改或上传文件的权限。
+步骤二：配置 vsftpd
+运行以下命令，创建FTP服务专用用户并配置密码，本文中以 ftpuser 为例。
+sudo useradd -d /data/ftp -s /sbin/nologin ftpuser # 指定家目录并禁用Shell
+sudo passwd ftpuser
+运行以下命令，创建ftp服务文件夹，并配置目录权限。
+sudo mkdir -p /data/ftp # 创建自定义存储目录
+sudo chown ftpuser:ftpuser /data/ftp
+sudo chmod 750 /data/ftp # 权限需满足755或750
+编辑vsftp配置文件。
+说明
+FTP 可通过主动模式和被动模式与客户端机器进行连接并传输数据。由于大多数客户端机器的防火墙设置及无法获取真实 IP 等原因，建议您选择被动模式搭建 FTP 服务。如下修改以设置被动模式为例。
+运行以下命令，备份vsftp配置文件。
+sudo cp /etc/vsftpd/vsftpd.conf /etc/vsftpd/vsftpd.conf.bak
+运行以下命令，修改配置文件。
+sudo vim /etc/vsftpd/vsftpd.conf
+修改FTP服务基础安全配置。
+listen=YES # 开启ipv4监听
+anonymous_enable=NO # 禁止匿名访问
+local_enable=YES # 启用本地用户登录
+write_enable=YES # 允许文件上传
+chroot_local_user=YES # 锁定用户到主目录
+allow_writeable_chroot=YES # 解决chroot写入错误
+在配置文件末尾添加被动模式相关配置。
+pasv_enable=YES # 启用被动模式
+pasv_min_port=40000 # 被动端口范围下限
+pasv_max_port=40100 # 被动端口范围上限
+pasv_address=公网IP地址 # 必须设置为服务器公网IP
+运行以下命令，重启vsftpd服务。
+sudo systemctl restart vsftpd
+步骤三：设置安全组
+完成FTP服务搭建后，您需要根据实际使用的 FTP 模式给 Linux 云服务器放通入站规则，详情请参见添加安全组规则。
+大多数客户端机器在局域网中，其 IP 地址经过了转换。如果您选择使用 FTP 主动模式，请确保客户端机器获得了其真实的 IP 地址，否则可能会导致客户端无法成功登录 FTP 服务器。确保正确配置有助于避免连接问题，从而提高 FTP 服务的稳定性和可用性。
+主动模式：放通端口21。
+被动模式：放通端口21，及配置文件 /etc/vsftpd/vsftpd.conf 中设置的 pasv_min_port 到 pasv_max_port 之间的所有端口，本文放通端口为40000-40100。FTP服务被动模式放通范围端口的原因及配置建议请参见FTP被动模式端口配置建议。
+步骤四：验证FTP服务
+您可通过 FTP 客户端软件、浏览器或文件资源管理器等工具验证 FTP 服务，本文以客户端的文件资源管理器为例。
+本地连接测试。
+运行以下命令，进行本机连接测试。
+ftp ftpuser@localhost
+控制台得到 Login successful则表示连接成功。
+# ftp ftpuser@localhost
+Connected to localhost.
+220 (vsFTPd 3.0.5)
+331 Please specify the password.
+Password:
+230 Login successful.
+Remote system type is UNIX.
+Using binary mode to transfer files.
+客户端连接测试。
+打开客户端的计算机，在路径栏中访问以下地址。
+地址格式为 ftp://<FTP服务器公网IP地址>:21。连接成功后，文件资源管理器中将显示 FTP 服务器目录下的文件。
+在弹出的登录身份窗口中输入FTP用户与密码。成功登录后，即可上传及下载文件。
+Ubuntu/Debian
+步骤一：安装VSFTP
+运行以下命令，更新系统组件并安装vsftpd服务。
+sudo apt update && sudo apt upgrade -y
+sudo apt install vsftpd -y
+运行以下命令，启动vsftpd服务并设置开机自启。
+sudo systemctl start vsftpd
+sudo systemctl enable vsftpd
+步骤二：配置VSFTP
+运行以下命令，创建专用FTP用户。
+sudo useradd -m -s /bin/bash ftpuser # 创建用户并自动生成主目录
+sudo passwd ftpuser # 设置用户密码（建议使用强密码）
+运行以下命令，创建文件存储目录并配置权限。
+sudo mkdir /home/ftpuser/ftp-files
+sudo chown ftpuser:ftpuser /home/ftpuser/ftp-files
+sudo chmod 755 /home/ftpuser/ftp-files
+运行以下命令，备份原始配置文件。
+sudo cp /etc/vsftpd.conf /etc/vsftpd.conf.bak
+运行以下命令，编辑配置文件。
+sudo nano /etc/vsftpd.conf
+修改以下配置内容：
+# 基础配置
+listen=YES
+anonymous_enable=NO # 禁止匿名访问
+local_enable=YES # 允许本地用户登录
+write_enable=YES # 启用写入权限
+chroot_local_user=YES # 锁定用户在主目录
+在配置末尾添加以下配置：
+allow_writeable_chroot=YES # 允许chroot目录写入
+local_root=/home/ftpuser/ftp-files # 指定ftp用户根目录
+# 被动模式配置（解决外网连接问题）
+pasv_enable=YES
+pasv_address=xx.xx.xx.xx # 替换为您的公网IP
+pasv_min_port=40000
+pasv_max_port=40100
+运行以下命令，重启FTP服务。
+sudo systemctl restart vsftpd
+在FTP安装完成后，会默认创建用户名为ftp的用户，默认无密码。运行以下命令修改ftp密码。
+sudo passwd ftp
+设置一个强密码并跳过所有其他提示。
+将用户添加到允许的FTP用户列表中。
+echo "ftp" | sudo tee -a /etc/vsftpd.userlist
+创建FTP文件目录并授予用户权限。
+创建FTP文件夹。
+sudo mkdir /home/ftp
+设置文件夹所有权。
+本例中赋予文件夹读、写、完全控制权限。可以根据需求修改相应权限。
+sudo chmod 777 /home/ftp
+步骤三：设置安全组
+完成FTP服务搭建后，您需要根据实际使用的 FTP 模式给 Linux 云服务器放通入站规则，详情请参见添加安全组规则。
+大多数客户端机器在局域网中，其 IP 地址经过了转换。如果您选择使用 FTP 主动模式，请确保客户端机器获得了其真实的 IP 地址，否则可能会导致客户端无法成功登录 FTP 服务器。确保正确配置有助于避免连接问题，从而提高 FTP 服务的稳定性和可用性。
+主动模式：放通端口21。
+被动模式：放通端口21，及配置文件 /etc/vsftpd/vsftpd.conf 中设置的 pasv_min_port 到 pasv_max_port 之间的所有端口。FTP服务被动模式放通范围端口的原因及配置建议请参见搭建FTP站点（Windows）。
+步骤四：验证FTP服务
+您可通过 FTP 客户端软件、浏览器或文件资源管理器等工具验证 FTP 服务，本文以客户端的文件资源管理器为例。
+本地连接测试。
+运行以下命令，进行本机连接测试。
+ftp ftpuser@localhost
+控制台得到 Login successful则表示连接成功。
+# ftp ftpuser@localhost
+Connected to localhost.
+220 (vsFTPd 3.0.5)
+331 Please specify the password.
+Password:
+230 Login successful.
+Remote system type is UNIX.
+Using binary mode to transfer files.
+客户端连接测试。
+打开客户端的计算机，在路径栏中访问以下地址。
+地址格式为 ftp://<FTP服务器公网IP地址>:21。连接成功后，文件资源管理器中将显示 FTP 服务器目录下的文件。
+在弹出的登录身份窗口中输入FTP用户与密码。成功登录后，即可上传及下载文件。
+典型错误对照表
+现象
+解决方案
+227 Entering Passive Mode后超时
+检查公网IP绑定+防火墙双端放行
+550 Permission denied
+修正目录权限为755
+仅能列出空目录
+检查chroot_local_user配置
+500 OOPS: vsftpd: refusing to run with writable root
+执行chmod a-w /data/ftp
+被动模式连接超时
+检查防火墙规则和pasv_address设置
+无法上传文件
+验证目录权限是否为755/750
+附录
+vsftp配置文件及参数说明
+/etc/vsftpd目录下文件说明如下：
+/etc/vsftpd/vsftpd.conf是vsftpd的核心配置文件。
+/etc/vsftpd/ftpusers是黑名单文件，此文件中的用户不允许访问FTP服务器。
+/etc/vsftpd/user_list是白名单文件，此文件中的用户允许访问FTP服务器。
+vsftpd.conf配置文件参数说明如下：
+用户登录控制参数说明如下表所示。
+参数
+说明
+anonymous_enable=YES
+接受匿名用户
+no_anon_password=YES
+匿名用户login时不询问口令
+anon_root=（none）
+匿名用户主目录
+local_enable=YES
+接受本地用户
+local_root=（none）
+本地用户主目录
+用户权限控制参数说明如下表所示。
+参数
+说明
+write_enable=YES
+可以上传文件（全局控制）
+local_umask=022
+本地用户上传的文件权限
+file_open_mode=0666
+上传文件的权限配合umask使用
+anon_upload_enable=NO
+匿名用户可以上传文件
+anon_mkdir_write_enable=NO
+匿名用户可以建目录
+anon_other_write_enable=NO
+匿名用户修改删除
+chown_username=lightwiter
+匿名上传文件所属用户名

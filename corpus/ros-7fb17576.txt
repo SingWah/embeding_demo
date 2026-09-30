@@ -1,0 +1,786 @@
+# 通过ROS模板示例自动化创建ECS实例
+> https://help.aliyun.com/zh/ecs/developer-reference/ros
+
+开发者和管理员可以编写模板，在模板中定义所需的阿里云资源（例如ECS实例、安全组等）、资源间的依赖关系等。资源编排 ROS（Resource Orchestration Service）的编排引擎将根据模板自动完成所有资源的创建和配置，实现自动化部署及运维。本文为您介绍如何通过一个资源编排模板，自动化创建云服务器 ECS实例。
+资源编排是阿里云提供的一项简化云计算资源管理的服务。更多详情请参见什么是资源编排服务。
+支持的ECS资源列表
+目前支持编排的资源包括普通资源和数据源资源。更多详情请参见资源编排支持ECS资源类型清单。
+普通资源
+ALIYUN::ECS::AutoProvisioningGroup：创建弹性供应组
+ALIYUN::ECS::AutoSnapshotPolicy：自动快照策略
+ALIYUN::ECS::AssignIpv6Addresses：为弹性网卡分配一个或多个IPv6地址
+ALIYUN::ECS::AssignPrivateIpAddresses：为一块弹性网卡分配一个或多个辅助私有IP地址
+ALIYUN::ECS::Command：新建云助手命令
+ALIYUN::ECS::CopyImage：复制一个自定义镜像到其他地域
+ALIYUN::ECS::CustomImage：创建自定义镜像
+ALIYUN::ECS::DedicatedHost：创建专有宿主机
+ALIYUN::ECS::DeploymentSet：创建部署集
+ALIYUN::ECS::Disk：创建数据盘
+ALIYUN::ECS::DiskAttachment：将数据盘关联到相应的ECS
+ALIYUN::ECS::ForwardEntry：配置NAT网关中的转发表
+ALIYUN::ECS::HpcCluster：创建一个HPC集群
+ALIYUN::ECS::Instance：创建单个ECS实例
+ALIYUN::ECS::InstanceClone：基于某个ECS克隆单个新的ECS实例
+ALIYUN::ECS::InstanceGroup：创建一个或多个ECS实例
+ALIYUN::ECS::InstanceGroupClone：基于某个ECS实例克隆一个或多个新的ECS实例
+ALIYUN::ECS::Invocation：为ECS实例触发一条云助手命令
+ALIYUN::ECS::JoinSecurityGroup：添加ECS到安全组
+ALIYUN::ECS::LaunchTemplate：创建ECS实例启动模板
+ALIYUN::ECS::NetworkInterface：创建弹性网卡
+ALIYUN::ECS::NetworkInterfaceAttachment：附加弹性网卡到专有网络
+ALIYUN::ECS::NetworkInterfacePermission：授权弹性网卡
+ALIYUN::ECS::PrefixList：创建前缀列表
+ALIYUN::ECS::Route：创建自定义路由表条目
+ALIYUN::ECS::RunCommand：在一台或多台ECS实例中执行一段Shell、PowerShell或者Bat类型的脚本
+ALIYUN::ECS::SNatEntry：配置NAT网关中的SNAT表
+ALIYUN::ECS::SecurityGroup：创建安全组
+ALIYUN::ECS::SecurityGroupClone：克隆安全组
+ALIYUN::ECS::SecurityGroupEgress：配置安全组流量出规则
+ALIYUN::ECS::SecurityGroupIngress：配置安全组流量入规则
+ALIYUN::ECS::Snapshot：创建磁盘快照
+ALIYUN::ECS::SSHKeyPair：创建SSH密钥对
+ALIYUN::ECS::SSHKeyPairAttachment：绑定SSH密钥和ECS实例
+ALIYUN::ECS::VPC：创建专有网络
+ALIYUN::ECS::VSwitch：创建专有网络中的虚拟交换机
+ALIYUN::ECS::RamRoleAttachment：用于为一台或多台ECS实例授予实例RAM角色
+ALIYUN::ECS::Activation：创建一个激活码
+ALIYUN::ECS::ImageSharePermission：管理镜像共享权限
+ALIYUN::ECS::CapacityReservation：创建容量预定服务
+ALIYUN::ECS::ElasticityAssurance：创建弹性保障服务
+ALIYUN::ECS::ImagePipeline：创建一个镜像模板
+ALIYUN::ECS::ImageComponent：创建一个镜像组件
+ALIYUN::ECS::SecurityGroupEgresses：给安全组批量绑定多条出方向的访问规则
+ALIYUN::ECS::SecurityGroupIngresses：给安全组批量绑定多条入方向的访问规则
+ALIYUN::ECS::SnapshotGroup：为指定ECS实例中的云盘创建快照一致性组，快照一致性组包含一个或多个云盘对应的快照
+数据源资源
+DATASOURCE::ECS::AutoSnapshotPolicies：查询自动快照策略
+DATASOURCE::ECS::DedicatedHosts：查询专有宿主机的详细信息
+DATASOURCE::ECS::DeploymentSets：查询一个或多个部署集的属性列表
+DATASOURCE::ECS::Disks：查询您已经创建的块存储（包括云盘以及本地盘）
+DATASOURCE::ECS::DiskCategories：查询磁盘类型
+DATASOURCE::ECS::HpcClusters：查询可用的HPC集群
+DATASOURCE::ECS::Images：查询可用的镜像资源
+DATASOURCE::ECS::Instances：查询ECS实例的详细信息
+DATASOURCE::ECS::KeyPairs：查询一个或多个密钥对
+DATASOURCE::ECS::NetworkInterfaces：查询弹性网卡（ENI）的详细信息
+DATASOURCE::ECS::RecommendInstanceTypes：查询ECS实例规格
+DATASOURCE::ECS::SecurityGroups：查询安全组的基本信息
+DATASOURCE::ECS::Snapshots：查询一台ECS实例或一块云盘所有的快照列表
+DATASOURCE::ECS::Zones：查询可用区
+DATASOURCE::ECS::ManagedInstances：查询托管实例列表
+DATASOURCE::ECS::Commands：查询手动创建的所有可用命令
+DATASOURCE::ECS::DedicatedHostClusters：查询专有宿主机集群的列表信息
+DATASOURCE::ECS::Activations：查询激活码
+DATASOURCE::ECS::Activation：查询单个激活码详情
+DATASOURCE::ECS::AutoSnapshotPolicy：查询单个自动快照策略
+DATASOURCE::ECS::Command：查询您手动创建的单一可用的命令详情
+DATASOURCE::ECS::DedicatedHostCluster：查询一个专有宿主机集群的详细信息
+DATASOURCE::ECS::DeploymentSet：查询一个部署集的属性详情
+DATASOURCE::ECS::Disk：查询单个云盘详情
+DATASOURCE::ECS::HpcCluster：查询单个HPC集群
+DATASOURCE::ECS::Instance：查询一台ECS实例的详细信息
+DATASOURCE::ECS::KeyPair：查询一个密钥对详情
+DATASOURCE::ECS::LaunchTemplate：查询一个实例启动模板详情
+DATASOURCE::ECS::SecurityGroup：查询单个安全组详情
+DATASOURCE::ECS::Snapshot：查询单个快照详情
+DATASOURCE::ECS::LaunchTemplates：查询多个可用的实例启动模板
+调用示例
+接下来我们将以资源编排官方提供的创建ECS的模板为您演示完整使用流程。
+权限说明
+默认情况下资源编排直接使用当前登录控制台的用户凭证，若您使用的是阿里云账号，可跳过以下授权内容。若您本案例使用的是RAM用户，需要给RAM用户授予以下权限：
+云产品
+授予权限
+专有网络 VPC
+AliyunVPCFullAccess： 查询VPC列表和交换机列表以及创建EIP。
+云服务器 ECS
+AliyunECSFullAccess：创建ECS实例。
+资源编排
+AliyunROSFullAccess：创建资源栈等操作。
+弹性公网 IP
+AliyunEIPFullAccess：创建弹性公网IP等操作。
+所需资源清单
+云服务器 ECS实例的资源架构如下图所示：
+地域：选择ECS实例所在地域。无需指定，默认使用您控制台指定的地域。
+网络及可用区：每个阿里云地域都有一个默认专有网络VPC，并且每个默认专有网络VPC在每个可用区中都有一个默认子网。
+实例规格：实例规格，例如2vCPU 4GiB。
+镜像：为实例确定操作系统。例如Alibaba Cloud Linux、Windows Server等。
+存储：块存储EBS，包括系统盘和数据盘，可按需进行选择。
+弹性公网IP：为实例创建一个公网IP，可以通过该IP访问该ECS实例。
+安全组：一种虚拟防火墙，能够控制ECS实例的出入站流量。
+密钥对：一种安全便捷的登录认证方式，用于证明个人身份的安全凭证。创建密钥对后，公有密钥在您的ECS实例上，而私有密钥在您的本地计算机上。
+对应资源编排中的资源如下：
+地域：无需指定，默认使用您控制台指定的地域。
+网络及可用区：ALIYUN::ECS::VPC
+实例规格：DATASOURCE::ECS::Instance
+镜像：DATASOURCE::ECS::Images
+存储：ALIYUN::ECS::Disk
+弹性公网IP：ALIYUN::VPC::EIP
+安全组：ALIYUN::ECS::SecurityGroup
+密钥对：DATASOURCE::ECS::KeyPair
+创建并执行资源栈
+说明
+您可以通过一键部署快速完成以下操作。
+登录资源编排ROS控制台，单击顶部导航栏地域下拉框，选择您需要的地域。
+在左侧菜单栏选择资源栈，然后单击创建资源栈。本案例直接使用资源编排官方提供的公共模板。
+确认模板内容，然后单击下一步。
+该示例中，使用已有专有网络VPC、交换机、安全组，创建两个ECS实例，绑定EIP。YAML和JSON语法内容如下：
+YAML模板
+ROSTemplateFormatVersion: '2015-09-01'
+Description:
+en: Use Count to create a VPC type ECS, and then bind EIP (existing VPC).
+zh-cn: 使用Count创建VPC类型ECS，并依次绑定EIP(已有VPC)。
+Parameters:
+VPC:
+Type: String
+Label:
+en: VPC ID
+zh-cn: 专有网络VPC实例ID
+Description:
+en: Please search the ID starting with (vpc-xxx)from console-Virtual Private Cloud
+zh-cn: 现有虚拟专有网络的实例ID,控制台-VPC-专有网络下查询
+AssociationProperty: ALIYUN::ECS::VPC::VPCId
+VSwitch:
+Type: String
+Label:
+en: VSwitch ID
+zh-cn: 交换机实例ID
+Description:
+en: Existing VSwitch ID, query under console-VPC-VSwitch, <font color='red'>VSwitch must be under VPC. ECS will be created under this VSwitch</font>
+zh-cn: 现有交换机ID,控制台-VPC-交换机下查询，<font color='red'>交换机必须在VPC下。ECS将创建在此交换机下</font>
+AssociationProperty: ALIYUN::ECS::VSwitch::VSwitchId
+AssociationPropertyMetadata:
+VpcId: ${VPC}
+ZoneId: ${ECSZoneId}
+SecurityGroup:
+Type: String
+Label:
+en: Business Security Group ID
+zh-cn: 业务安全组ID
+Description:
+en: Please search the business security group ID starting with(sg-xxx)from console-ECS-Network & Security
+zh-cn: 现有业务安全组的实例ID,控制台-ECS-网络与安全-安全组下查询。<br><font color='red'>安全组必须归属在VPC下。</font>
+AssociationProperty: ALIYUN::ECS::SecurityGroup::SecurityGroupId
+AssociationPropertyMetadata:
+VpcId: ${VPC}
+EIPBandwidth:
+Type: Number
+Label:
+en: EIP Bandwidth
+zh-cn: 弹性公网带宽
+Description:
+en: 'EIP Bandwidth, Value range: [1,200], unit: Mbps.'
+zh-cn: 弹性公网地址带宽。取值范围：1~200， 单位：Mbps。
+Default: 2
+MinValue: 1
+MaxValue: 200
+EIPInternetChargeType:
+Type: String
+Label:
+en: EIP Charge Type
+zh-cn: 弹性公网地址的收费类型
+AssociationPropertyMetadata:
+LocaleKey: InternetChargeType
+Default: PayByTraffic
+AllowedValues:
+- PayByBandwidth
+- PayByTraffic
+Count:
+Type: Number
+Label:
+en: Count
+zh-cn: 数量
+Description:
+en: 'The number of ecs and eip to be created, value range: [1,140]'
+zh-cn: 需要创建的ecs和eip的数量，取值范围：[1,140]
+Default: 1
+MinValue: 1
+MaxValue: 140
+ECSZoneId:
+Type: String
+Label:
+en: VSwitch Availability Zone
+zh-cn: 交换机可用区
+Description:
+en: 'Availability zone ID.<br><b>Note: <font color=''blue''>Before selecting, please confirm whether the availability zone supports the specification of creating ECS resources. It is recommended to be different from other switch availability zones</font></b ><br><font color=''red''>The switch availability zone and the selected switch instance ID must be in the same availability zone.</font>'
+zh-cn: 可用区ID。<br><b>注： <font color='blue'>选择前请确认该可用区是否支持创建ECS资源的规格，建议与其他交换机可用区不同</font></b><br><font color='red'>交换机可用区和已选择的交换机实例ID必须在同一个可用区。</font>
+AssociationProperty: ALIYUN::ECS::Instance:ZoneId
+ECSImageId:
+Type: String
+Label:
+en: Image
+zh-cn: 镜像
+Description:
+en: Image ID，Please use Centos7, see detail：<b><a href='https://www.alibabacloud.com/help/en/doc-detail/112977.html' target='_blank'><font color='blue'>Find the mirror</font></a></b>
+zh-cn: 镜像ID, 请使用Centos7, 详见：<b><a href='https://help.aliyun.com/document_detail/112977.html' target='_blank'><font color='blue'>查找镜像</font></a></b>
+AssociationProperty: ALIYUN::ECS::Image::ImageId
+AssociationPropertyMetadata:
+InstanceType: ${ECSInstanceType}
+SupportedImageOwnerAlias:
+- system
+- self
+- others
+Default: centos_7_04_64_20G_alibase_201701015.vhd
+ECSInstanceType:
+Type: String
+Label:
+en: Instance Type
+zh-cn: 实例规格
+Description:
+en: <font color='blue'><b>1.Before selecting the model please confirm that the current available zone under the model is in stock, some models need to be reported in advance</b></font><br><font color='blue'><b>2.List of optional models</font><br></b></font>[ecs.c5.large <font color='green'>2vCPU 4GiB Intranet bandwidth1Gbps In-grid sending and receiving packages30MillionPPS</font>]<br></b>[ecs.c5.xlarge <font color='green'>4vCPU 8GiB Intranet bandwidth1.5Gbps In-grid sending and receiving packages50MillionPPS</font>]<br></b>[ecs.c5.2xlarge <font color='green'>8vCPU 16GiB Intranet bandwidth2.5Gbps In-grid sending and receiving packages80MillionPPS</font>]
+zh-cn: <font color='blue'><b>1.选择机型前请先确认当前可用区下该机型是否有货，部分机型需要提前报备</b></font><br><font color='blue'><b>2.可选机型列表</font><br></b></font>[ecs.c5.large <font color='green'>2vCPU 4GiB 内网带宽1Gbps 内网收发包30万PPS</font>]<br></b>[ecs.c5.xlarge <font color='green'>4vCPU 8GiB 内网带宽1.5Gbps 内网收发包50万PPS</font>]<br></b>[ecs.c5.2xlarge <font color='green'>8vCPU 16GiB 内网带宽2.5Gbps 内网收发包80万PPS</font>]
+AssociationProperty: ALIYUN::ECS::Instance::InstanceType
+AssociationPropertyMetadata:
+ZoneId: ECSZoneId
+ECSDiskCategory:
+Type: String
+Label:
+en: System Disk Type
+zh-cn: 系统盘类型
+Description:
+en: '<font color=''blue''><b>Optional values:</b></font><br>[cloud_efficiency: <font color=''green''>Efficient Cloud Disk</font>]<br>[cloud_ssd: <font color=''green''>SSD Cloud Disk</font>]<br>[cloud_essd: <font color=''green''>ESSD Cloud Disk</font>]<br>[cloud: <font color=''green''>Cloud Disk</font>]<br>[ephemeral_ssd: <font color=''green''>Local SSD Cloud Disk</font>]'
+zh-cn: '<font color=''blue''><b>可选值：</b></font><br>[cloud_efficiency: <font color=''green''>高效云盘</font>]<br>[cloud_ssd: <font color=''green''>SSD云盘</font>]<br>[cloud_essd: <font color=''green''>ESSD云盘</font>]<br>[cloud: <font color=''green''>普通云盘</font>]<br>[ephemeral_ssd: <font color=''green''>本地SSD盘</font>]'
+AssociationProperty: ALIYUN::ECS::Disk::SystemDiskCategory
+AssociationPropertyMetadata:
+LocaleKey: DiskCategory
+InstanceType: ${ECSInstanceType}
+ECSSysDiskSize:
+Type: Number
+Label:
+en: System Disk Space
+zh-cn: 系统盘空间
+Description:
+en: 'System disk size, range of values: 40-500, units: GB.'
+zh-cn: 系统盘大小, 取值范围：[40, 500], 单位：GB。
+Default: 40
+MinValue: 40
+MaxValue: 500
+ECSPassword:
+Type: String
+Label:
+en: Instance Password
+zh-cn: 实例密码
+Description:
+en: Server login password, Length 8-30, must contain three(Capital letters, lowercase letters, numbers, ()`~!@#$%^&*_-+=|{}[]:;'<>,.?/ Special symbol in).
+zh-cn: 服务器登录密码,长度8-30，必须包含三项（大写字母、小写字母、数字、 ()`~!@#$%^&*_-+=|{}[]:;'<>,.?/ 中的特殊符号）。
+ConstraintDescription:
+en: Length 8-30, must contain three(Capital letters, lowercase letters, numbers, ()`~!@#$%^&*_-+=|{}[]:;'<>,.?/ Special symbol in).
+zh-cn: 长度8-30，必须包含三项（大写字母、小写字母、数字、 ()`~!@#$%^&*_-+=|{}[]:;'<>,.?/ 中的特殊符号）。
+Default: Null
+AllowedPattern: '[0-9A-Za-z\_\-\&:;''<>,=%`~!@#\(\)\$\^\*\+\|\{\}\[\]\.\?\/]+$'
+MinLength: 8
+MaxLength: 30
+NoEcho: true
+KeyPairName:
+Type: String
+Label:
+en: Key Pair Name
+zh-cn: 密钥对名称
+Description:
+en: If it is a Windows ECS instance, ignore this parameter. The default is blank.<br>If you have filled in <font color='green'>key pair name</font>, <font color='green'>instance password< The content of /font> will still be set in the instance, but the password login method in the Linux system will be forbidden.<br><font color='red'>Please enter the name of the existing key pair. If you use the instance password Login, the key pair name does not need to be filled in</font>
+zh-cn: 如果是Windows ECS实例，则忽略该参数。默认为空。<br>如果已填写<font color='green'>密钥对名称</font>，<font color='green'>实例密码</font>的内容仍会被设置到实例中，但是Linux系统中的密码登录方式会被禁止。<br><font color='red'>请输入已有密钥对的名称。如使用实例密码登录，密钥对名称不需要填写</font>
+AssociationProperty: ALIYUN::ECS::KeyPair::KeyPairName
+Default: Null
+PayType:
+Type: String
+Label:
+en: ECS Instance Charge Type
+zh-cn: ECS付费类型
+AssociationProperty: ChargeType
+AssociationPropertyMetadata:
+LocaleKey: InstanceChargeType
+Default: PostPaid
+AllowedValues:
+- PostPaid
+- PrePaid
+PayPeriodUnit:
+Type: String
+Label:
+en: Pay Period Unit
+zh-cn: 购买资源时长周期
+AssociationProperty: PayPeriodUnit
+AssociationPropertyMetadata:
+Visible:
+Condition:
+Fn::Not:
+Fn::Equals:
+- ${PayType}
+- PostPaid
+Default: Month
+AllowedValues:
+- Month
+- Year
+PayPeriod:
+Type: Number
+Label:
+en: Period
+zh-cn: 购买资源时长
+AssociationProperty: PayPeriod
+AssociationPropertyMetadata:
+Visible:
+Condition:
+Fn::Not:
+Fn::Equals:
+- ${PayType}
+- PostPaid
+Default: 1
+AllowedValues:
+- 1
+- 2
+- 3
+- 4
+- 5
+- 6
+- 7
+- 8
+- 9
+Resources:
+ECSInstanceGroup:
+Type: ALIYUN::ECS::InstanceGroup
+Properties:
+ZoneId:
+Ref: ECSZoneId
+VpcId:
+Ref: VPC
+VSwitchId:
+Ref: VSwitch
+SecurityGroupId:
+Ref: SecurityGroup
+ImageId:
+Ref: ECSImageId
+AllocatePublicIP: 'false'
+InstanceChargeType:
+Ref: PayType
+Period:
+Ref: PayPeriod
+PeriodUnit:
+Ref: PayPeriodUnit
+InstanceType:
+Ref: ECSInstanceType
+IoOptimized: optimized
+KeyPairName:
+Ref: KeyPairName
+MaxAmount:
+Ref: Count
+Password:
+Ref: ECSPassword
+SystemDiskCategory:
+Ref: ECSDiskCategory
+SystemDiskSize:
+Ref: ECSSysDiskSize
+ElasticIp:
+Type: ALIYUN::VPC::EIP
+Properties:
+Bandwidth:
+Ref: EIPBandwidth
+InternetChargeType:
+Ref: EIPInternetChargeType
+Count:
+Ref: Count
+ElasticIpAssociation:
+Type: ALIYUN::VPC::EIPAssociation
+Properties:
+InstanceId:
+Fn::Select:
+- Ref: ALIYUN::Index
+- Fn::GetAtt:
+- ECSInstanceGroup
+- InstanceIds
+AllocationId:
+Fn::Select:
+- Ref: ALIYUN::Index
+- Ref: ElasticIp
+Count:
+Ref: Count
+Outputs:
+EipAddress:
+Description: IP address of created EIP.
+Value:
+Fn::GetAtt:
+- ElasticIp
+- EipAddress
+SecurityGroupId:
+Description: generated security group id for security group.
+Value:
+Ref: SecurityGroup
+VSwitchId:
+Description: generated security vswitch id for VPC.
+Value:
+Ref: VSwitch
+VpcId:
+Description: generated security vpc id for VPC.
+Value:
+Ref: VPC
+Metadata:
+ALIYUN::ROS::Interface:
+ParameterGroups:
+- Parameters:
+- VPC
+- ECSZoneId
+- VSwitch
+- SecurityGroup
+Label:
+default: 'VPC '
+- Parameters:
+- EIPBandwidth
+- EIPInternetChargeType
+Label:
+default: EIP
+- Parameters:
+- PayType
+- PayPeriodUnit
+- PayPeriod
+Label:
+default:
+en: ECS PayType Configuration
+zh-cn: ECS付费类型配置
+- Parameters:
+- ECSInstanceType
+- ECSImageId
+- ECSDiskCategory
+- ECSSysDiskSize
+- Count
+- ECSPassword
+- KeyPairName
+Label:
+default: ECS
+TemplateTags:
+- acs:example:弹性计算:使用Count创建VPC类型ECS，并依次绑定EIP(已有VPC)
+JSON模板
+"ROSTemplateFormatVersion": "2015-09-01",
+"Description": {
+"en": "Use Count to create a VPC type ECS, and then bind EIP (existing VPC).",
+"zh-cn": "使用Count创建VPC类型ECS，并依次绑定EIP(已有VPC)。"
+"Parameters": {
+"VPC": {
+"Type": "String",
+"Label": {
+"en": "VPC ID",
+"zh-cn": "专有网络VPC实例ID"
+"Description": {
+"en": "Please search the ID starting with (vpc-xxx)from console-Virtual Private Cloud",
+"zh-cn": "现有虚拟专有网络的实例ID,控制台-VPC-专有网络下查询"
+"AssociationProperty": "ALIYUN::ECS::VPC::VPCId"
+"VSwitch": {
+"Type": "String",
+"Label": {
+"en": "VSwitch ID",
+"zh-cn": "交换机实例ID"
+"Description": {
+"en": "Existing VSwitch ID, query under console-VPC-VSwitch, <font color='red'>VSwitch must be under VPC. ECS will be created under this VSwitch</font>",
+"zh-cn": "现有交换机ID,控制台-VPC-交换机下查询，<font color='red'>交换机必须在VPC下。ECS将创建在此交换机下</font>"
+"AssociationProperty": "ALIYUN::ECS::VSwitch::VSwitchId",
+"AssociationPropertyMetadata": {
+"VpcId": "${VPC}",
+"ZoneId": "${ECSZoneId}"
+"SecurityGroup": {
+"Type": "String",
+"Label": {
+"en": "Business Security Group ID",
+"zh-cn": "业务安全组ID"
+"Description": {
+"en": "Please search the business security group ID starting with(sg-xxx)from console-ECS-Network & Security",
+"zh-cn": "现有业务安全组的实例ID,控制台-ECS-网络与安全-安全组下查询。<br><font color='red'>安全组必须归属在VPC下。</font>"
+"AssociationProperty": "ALIYUN::ECS::SecurityGroup::SecurityGroupId",
+"AssociationPropertyMetadata": {
+"VpcId": "${VPC}"
+"EIPBandwidth": {
+"Type": "Number",
+"Label": {
+"en": "EIP Bandwidth",
+"zh-cn": "弹性公网带宽"
+"Description": {
+"en": "EIP Bandwidth, Value range: [1,200], unit: Mbps.",
+"zh-cn": "弹性公网地址带宽。取值范围：1~200， 单位：Mbps。"
+"Default": 1,
+"MinValue": 1,
+"MaxValue": 200
+"EIPInternetChargeType": {
+"Type": "String",
+"Label": {
+"en": "EIP Charge Type",
+"zh-cn": "弹性公网地址的收费类型"
+"AssociationPropertyMetadata": {
+"LocaleKey": "InternetChargeType"
+"Default": "PayByTraffic",
+"AllowedValues": [
+"PayByBandwidth",
+"PayByTraffic"
+"Count": {
+"Type": "Number",
+"Label": {
+"en": "Count",
+"zh-cn": "数量"
+"Description": {
+"en": "The number of ecs and eip to be created, value range: [1,140]",
+"zh-cn": "需要创建的ecs和eip的数量，取值范围：[1,140]"
+"Default": 2,
+"MinValue": 1,
+"MaxValue": 140
+"ECSZoneId": {
+"Type": "String",
+"Label": {
+"en": "VSwitch Availability Zone",
+"zh-cn": "交换机可用区"
+"Description": {
+"en": "Availability zone ID.<br><b>Note: <font color='blue'>Before selecting, please confirm whether the availability zone supports the specification of creating ECS resources. It is recommended to be different from other switch availability zones</font></b ><br><font color='red'>The switch availability zone and the selected switch instance ID must be in the same availability zone.</font>",
+"zh-cn": "可用区ID。<br><b>注： <font color='blue'>选择前请确认该可用区是否支持创建ECS资源的规格，建议与其他交换机可用区不同</font></b><br><font color='red'>交换机可用区和已选择的交换机实例ID必须在同一个可用区。</font>"
+"AssociationProperty": "ALIYUN::ECS::Instance:ZoneId"
+"ECSImageId": {
+"Type": "String",
+"Label": {
+"en": "Image",
+"zh-cn": "镜像"
+"Description": {
+"en": "Image ID，Please use Centos7, see detail：<b><a href='https://www.alibabacloud.com/help/en/doc-detail/112977.html' target='_blank'><font color='blue'>Find the mirror</font></a></b>",
+"zh-cn": "镜像ID, 请使用Centos7, 详见：<b><a href='https://help.aliyun.com/document_detail/112977.html' target='_blank'><font color='blue'>查找镜像</font></a></b>"
+"AssociationProperty": "ALIYUN::ECS::Image::ImageId",
+"AssociationPropertyMetadata": {
+"InstanceType": "${ECSInstanceType}",
+"SupportedImageOwnerAlias": [
+"system",
+"self",
+"others"
+"Default": "centos_7_04_64_20G_alibase_201701015.vhd"
+"ECSInstanceType": {
+"Type": "String",
+"Label": {
+"en": "Instance Type",
+"zh-cn": "实例规格"
+"Description": {
+"en": "<font color='blue'><b>1.Before selecting the model please confirm that the current available zone under the model is in stock, some models need to be reported in advance</b></font><br><font color='blue'><b>2.List of optional models</font><br></b></font>[ecs.c5.large <font color='green'>2vCPU 4GiB Intranet bandwidth1Gbps In-grid sending and receiving packages30MillionPPS</font>]<br></b>[ecs.c5.xlarge <font color='green'>4vCPU 8GiB Intranet bandwidth1.5Gbps In-grid sending and receiving packages50MillionPPS</font>]<br></b>[ecs.c5.2xlarge <font color='green'>8vCPU 16GiB Intranet bandwidth2.5Gbps In-grid sending and receiving packages80MillionPPS</font>]",
+"zh-cn": "<font color='blue'><b>1.选择机型前请先确认当前可用区下该机型是否有货，部分机型需要提前报备</b></font><br><font color='blue'><b>2.可选机型列表</font><br></b></font>[ecs.c5.large <font color='green'>2vCPU 4GiB 内网带宽1Gbps 内网收发包30万PPS</font>]<br></b>[ecs.c5.xlarge <font color='green'>4vCPU 8GiB 内网带宽1.5Gbps 内网收发包50万PPS</font>]<br></b>[ecs.c5.2xlarge <font color='green'>8vCPU 16GiB 内网带宽2.5Gbps 内网收发包80万PPS</font>]"
+"AssociationProperty": "ALIYUN::ECS::Instance::InstanceType",
+"AssociationPropertyMetadata": {
+"ZoneId": "ECSZoneId"
+"ECSDiskCategory": {
+"Type": "String",
+"Label": {
+"en": "System Disk Type",
+"zh-cn": "系统盘类型"
+"Description": {
+"en": "<font color='blue'><b>Optional values:</b></font><br>[cloud_efficiency: <font color='green'>Efficient Cloud Disk</font>]<br>[cloud_ssd: <font color='green'>SSD Cloud Disk</font>]<br>[cloud_essd: <font color='green'>ESSD Cloud Disk</font>]<br>[cloud: <font color='green'>Cloud Disk</font>]<br>[ephemeral_ssd: <font color='green'>Local SSD Cloud Disk</font>]",
+"zh-cn": "<font color='blue'><b>可选值：</b></font><br>[cloud_efficiency: <font color='green'>高效云盘</font>]<br>[cloud_ssd: <font color='green'>SSD云盘</font>]<br>[cloud_essd: <font color='green'>ESSD云盘</font>]<br>[cloud: <font color='green'>普通云盘</font>]<br>[ephemeral_ssd: <font color='green'>本地SSD盘</font>]"
+"AssociationProperty": "ALIYUN::ECS::Disk::SystemDiskCategory",
+"AssociationPropertyMetadata": {
+"LocaleKey": "DiskCategory",
+"InstanceType": "${ECSInstanceType}"
+"ECSSysDiskSize": {
+"Type": "Number",
+"Label": {
+"en": "System Disk Space",
+"zh-cn": "系统盘空间"
+"Description": {
+"en": "System disk size, range of values: 40-500, units: GB.",
+"zh-cn": "系统盘大小, 取值范围：[40, 500], 单位：GB。"
+"Default": 40,
+"MinValue": 40,
+"MaxValue": 500
+"ECSPassword": {
+"Type": "String",
+"Label": {
+"en": "Instance Password",
+"zh-cn": "实例密码"
+"Description": {
+"en": "Server login password, Length 8-30, must contain three(Capital letters, lowercase letters, numbers, ()`~!@#$%^&*_-+=|{}[]:;'<>,.?/ Special symbol in).",
+"zh-cn": "服务器登录密码,长度8-30，必须包含三项（大写字母、小写字母、数字、 ()`~!@#$%^&*_-+=|{}[]:;'<>,.?/ 中的特殊符号）。"
+"ConstraintDescription": {
+"en": "Length 8-30, must contain three(Capital letters, lowercase letters, numbers, ()`~!@#$%^&*_-+=|{}[]:;'<>,.?/ Special symbol in).",
+"zh-cn": "长度8-30，必须包含三项（大写字母、小写字母、数字、 ()`~!@#$%^&*_-+=|{}[]:;'<>,.?/ 中的特殊符号）。"
+"Default": null,
+"AllowedPattern": "[0-9A-Za-z\\_\\-\\&:;'<>,=%`~!@#\\(\\)\\$\\^\\*\\+\\|\\{\\}\\[\\]\\.\\?\\/]+$",
+"MinLength": 8,
+"MaxLength": 30,
+"NoEcho": true
+"KeyPairName": {
+"Type": "String",
+"Label": {
+"en": "Key Pair Name",
+"zh-cn": "密钥对名称"
+"Description": {
+"en": "If it is a Windows ECS instance, ignore this parameter. The default is blank.<br>If you have filled in <font color='green'>key pair name</font>, <font color='green'>instance password< The content of /font> will still be set in the instance, but the password login method in the Linux system will be forbidden.<br><font color='red'>Please enter the name of the existing key pair. If you use the instance password Login, the key pair name does not need to be filled in</font>",
+"zh-cn": "如果是Windows ECS实例，则忽略该参数。默认为空。<br>如果已填写<font color='green'>密钥对名称</font>，<font color='green'>实例密码</font>的内容仍会被设置到实例中，但是Linux系统中的密码登录方式会被禁止。<br><font color='red'>请输入已有密钥对的名称。如使用实例密码登录，密钥对名称不需要填写</font>"
+"AssociationProperty": "ALIYUN::ECS::KeyPair::KeyPairName",
+"Default": null
+"PayType": {
+"Type": "String",
+"Label": {
+"en": "ECS Instance Charge Type",
+"zh-cn": "ECS付费类型"
+"AssociationProperty": "ChargeType",
+"AssociationPropertyMetadata": {
+"LocaleKey": "InstanceChargeType"
+"Default": "PostPaid",
+"AllowedValues": [
+"PostPaid",
+"PrePaid"
+"PayPeriodUnit": {
+"Type": "String",
+"Label": {
+"en": "Pay Period Unit",
+"zh-cn": "购买资源时长周期"
+"AssociationProperty": "PayPeriodUnit",
+"AssociationPropertyMetadata": {
+"Visible": {
+"Condition": {
+"Fn::Not": {
+"Fn::Equals": [
+"${PayType}",
+"PostPaid"
+"Default": "Month",
+"AllowedValues": [
+"Month",
+"Year"
+"PayPeriod": {
+"Type": "Number",
+"Label": {
+"en": "Period",
+"zh-cn": "购买资源时长"
+"AssociationProperty": "PayPeriod",
+"AssociationPropertyMetadata": {
+"Visible": {
+"Condition": {
+"Fn::Not": {
+"Fn::Equals": [
+"${PayType}",
+"PostPaid"
+"Default": 1,
+"AllowedValues": [
+1,
+2,
+3,
+4,
+5,
+6,
+7,
+8,
+9
+"Resources": {
+"ECSInstanceGroup": {
+"Type": "ALIYUN::ECS::InstanceGroup",
+"Properties": {
+"ZoneId": {
+"Ref": "ECSZoneId"
+"VpcId": {
+"Ref": "VPC"
+"VSwitchId": {
+"Ref": "VSwitch"
+"SecurityGroupId": {
+"Ref": "SecurityGroup"
+"ImageId": {
+"Ref": "ECSImageId"
+"AllocatePublicIP": "false",
+"InstanceChargeType": {
+"Ref": "PayType"
+"Period": {
+"Ref": "PayPeriod"
+"PeriodUnit": {
+"Ref": "PayPeriodUnit"
+"InstanceType": {
+"Ref": "ECSInstanceType"
+"IoOptimized": "optimized",
+"KeyPairName": {
+"Ref": "KeyPairName"
+"MaxAmount": {
+"Ref": "Count"
+"Password": {
+"Ref": "ECSPassword"
+"SystemDiskCategory": {
+"Ref": "ECSDiskCategory"
+"SystemDiskSize": {
+"Ref": "ECSSysDiskSize"
+"ElasticIp": {
+"Type": "ALIYUN::VPC::EIP",
+"Properties": {
+"Bandwidth": {
+"Ref": "EIPBandwidth"
+"InternetChargeType": {
+"Ref": "EIPInternetChargeType"
+"Count": {
+"Ref": "Count"
+"ElasticIpAssociation": {
+"Type": "ALIYUN::VPC::EIPAssociation",
+"Properties": {
+"InstanceId": {
+"Fn::Select": [
+"Ref": "ALIYUN::Index"
+"Fn::GetAtt": [
+"ECSInstanceGroup",
+"InstanceIds"
+"AllocationId": {
+"Fn::Select": [
+"Ref": "ALIYUN::Index"
+"Ref": "ElasticIp"
+"Count": {
+"Ref": "Count"
+"Outputs": {
+"EipAddress": {
+"Description": "IP address of created EIP.",
+"Value": {
+"Fn::GetAtt": [
+"ElasticIp",
+"EipAddress"
+"SecurityGroupId": {
+"Description": "generated security group id for security group.",
+"Value": {
+"Ref": "SecurityGroup"
+"VSwitchId": {
+"Description": "generated security vswitch id for VPC.",
+"Value": {
+"Ref": "VSwitch"
+"VpcId": {
+"Description": "generated security vpc id for VPC.",
+"Value": {
+"Ref": "VPC"
+"Metadata": {
+"ALIYUN::ROS::Interface": {
+"ParameterGroups": [
+"Parameters": [
+"VPC",
+"ECSZoneId",
+"VSwitch",
+"SecurityGroup"
+"Label": {
+"default": "VPC "
+"Parameters": [
+"EIPBandwidth",
+"EIPInternetChargeType"
+"Label": {
+"default": "EIP"
+"Parameters": [
+"PayType",
+"PayPeriodUnit",
+"PayPeriod"
+"Label": {
+"default": {
+"en": "ECS PayType Configuration",
+"zh-cn": "ECS付费类型配置"
+"Parameters": [
+"ECSInstanceType",
+"ECSImageId",
+"ECSDiskCategory",
+"ECSSysDiskSize",
+"Count",
+"ECSPassword",
+"KeyPairName"
+"Label": {
+"default": "ECS"
+"TemplateTags": [
+"acs:example:弹性计算:使用Count创建VPC类型ECS，并依次绑定EIP(已有VPC)"
+根据界面，选择专有网络VPC、交换机、可用区、安全组等，然后单击创建，执行资源栈。
+输出结果。
+创建完成后，您可以通过OpenAPI、SDK或者控制台查看状态为运行中的ECS实例。
+参考文档
+资源编排提供搭建环境、搭建网站、搭建应用和AIGC实践等场景的资源一键部署，更多使用案例可参考：
+使用ROS为ECS实例配置IPv6地址
+使用ROS一键部署Docker环境（Linux）
+使用ROS一键部署MySQL数据库（Linux）
+使用ROS一键部署LNMP环境
+使用ROS搭建WordPress
+使用ROS部署宝塔Linux面板
+使用ROS搭建FTP站点（Linux）
+使用ROS搭建Hadoop环境
+使用ROS部署Java Web环境（Alibaba Cloud Linux 3/2、CentOS 7.x）
+使用ROS部署SVN
+使用ROS一键部署RDS MySQL On ECS
+使用ROS一键部署基于EBS的高性能MySQL服务
+使用ROS搭建AI对话机器人

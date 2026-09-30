@@ -1,0 +1,10 @@
+# 部署Java环境
+> https://help.aliyun.com/zh/ecs/user-guide/deploy-a-java-environment/
+
+Java是一种跨平台、面向对象的编程语言，以其“一次编写，到处运行”的特性而闻名。它在企业级应用、Web开发、移动应用和大数据处理等领域有着广泛的应用。本文介绍了部署Java环境的不同方法，包括自动化部署和手动部署。
+OpenJDK
+OpenJDK是一个开源的Java软件开发工具包，提供了Java运行时环境（JRE）和Java开发工具（JDK）。
+扩展程序安装OpenJDK：使用扩展程序在您的Linux系统上快速部署OpenJDK环境，以节省时间。
+手动部署OpenJDK：指导您如何手动安装OpenJDK的多个版本，支持Linux和Windows操作系统。
+Alibaba Dragonwell JDK
+Alibaba Dragonwell JDK是OpenJDK的下游版本，是阿里巴巴内部的OpenJDK实现。它针对在100,000多台服务器上运行的在线电子商务、金融和物流应用程序进行了优化。Alibaba Dragonwell是运行这些分布式Java 应用程序的引擎，可实现极高的扩展性。详细信息，请参见部署Alibaba Dragonwell JDK。

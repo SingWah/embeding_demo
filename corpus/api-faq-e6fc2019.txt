@@ -1,0 +1,45 @@
+# 调用ECS API的高频问题汇总
+> https://help.aliyun.com/zh/ecs/developer-reference/api-faq
+
+本文汇总了调用云服务器ECS API接口时的常见问题。
+创建多台ECS实例时如何设置有序的实例名称或者主机名称？
+如何通过API为ECS实例分配公网IP地址？
+通过API或SDK查询安全组规则，为什么无法显示所有的规则？
+为什么API、SDK和阿里云CLI只返回十条信息？
+API错误码ErrorCode排查思路
+创建多台ECS实例时如何设置有序的实例名称或者主机名称？
+在创建多台ECS实例时，建议使用RunInstances设置有序的实例名称或主机名称。该接口提供了InstanceName和HostName两个参数，您可以根据命名规则设置这些参数的值。更多信息，请参见批量设置有序的实例名称或主机名称。
+如何通过API为ECS实例分配公网IP地址？
+方法一：创建时自动分配固定公网IP地址
+调用RunInstances，并将带宽参数InternetMaxBandwidthOut设置为大于0的取值，系统自动为ECS实例分配固定公网IP。
+方法二：创建后再分配固定公网IP地址
+创建ECS实例后，若ECS实例没有固定公网IP地址，调用ModifyInstanceNetworkSpec接口将带宽参数InternetMaxBandwidthOut设置为大于0的取值，系统分配固定公网IP地址。对于按量付费（PostPaid）ECS实例，您还需要指定参数AllocatePublicIp为true才会分配固定公网IP地址。
+方法三：创建弹性公网IP（EIP）并绑定到ECS实例
+调用AssociateEipAddress将EIP绑定到云产品实例，即可获得公网IP地址。
+更多开通公网方案，请参见为ECS实例开通公网。
+通过API或SDK查询安全组规则，为什么无法显示所有的规则？
+安全组规则区分网卡类型NicType，包括公网（internet）和内网（intranet）。
+您在使用DescribeSecurityGroupAttribute查询安全组规则时，NicType不是必选参数，但其默认值为internet。因此查询结果只显示公网相关的安全组规则，不会返回所有安全组规则。
+aliyun ecs DescribeSecurityGroupAttribute --SecurityGroupId <TheSecurityGroupId> --RegionId <TheRegionId>
+若您需要查看内网类型的安全组规则，如内网互相打通、金融云VPN防火墙的规则等内网网卡安全组规则时，需要您指定NicType参数为intranet。
+aliyun ecs DescribeSecurityGroupAttribute --SecurityGroupId <TheSecurityGroupId> --RegionId <TheRegionId> --NicType intranet
+为什么API、SDK和阿里云CLI只返回十条信息？
+部分查询接口支持分页查询，当不设置分页信息时，默认查询十条记录。您可以通过设置PageNumber和PageSize自定义分页查询的信息。
+名称
+类型
+是否必需
+描述
+PageNumber
+Integer
+否
+查询接口返回资源信息列表的页码。ECS API均以Describe作为查询接口前缀，更多详情，请参阅API概览。
+起始值：1。
+默认值：1。
+PageSize
+Integer
+否
+分页展示响应信息时设置的每页行数，单位：行。
+最大值：100。
+默认值：10。
+说明
+PageSize的最大值为100，若查询的结果大于100，您需要借助PageNumber 获取后几页响应信息，即多次提交请求。每次设置PageNumber为1、2 和 3 等，以获取所有的响应信息。如果您使用的是Java SDK，可以在请求中通过setPageNumber()方法指定需要返回的页数。

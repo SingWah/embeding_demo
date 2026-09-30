@@ -1,0 +1,940 @@
+# 操作系统运维
+> https://help.aliyun.com/zh/ecs/operating-system-operation-and-maintenance-faqs
+
+更换操作系统问题
+如何更换操作系统（系统盘）?
+账号A的服务器制作镜像后，能给账号B更换操作系统使用吗？
+更换操作系统时，如果镜像中包含数据盘，可以通过该镜像更换操作系统吗？
+更换操作系统与重新初始化系统盘有什么差异？
+通过更换操作系统扩容系统盘失败，如何处理？
+更换操作系统时，如果选不到目标镜像并且提示“该实例为非IO优化实例”怎么办？
+Linux系统使用问题
+Linux实例中如何禁用或启用包管理器进行内核升级
+Linux系统常用内核网络参数介绍与常见问题处理
+执行yum命令失败，提示“HTTP Error 404 -Not Found Trying other mirror”错误？
+在Linux实例中执行yum命令失败，提示“error: unpacking of archive failed on file /usr/bin/xxxx: cpio: open Failed”错误怎么办？
+在Linux实例中，执行yum相关命令提示“File "/usr/bin/yum", line 30”错误怎么办？
+Linux实例使用su命令切换用户时，提示“su: failed to execute /bin/bash: Permission denied”错误怎么办？
+在Linux实例中执行systemctl命令报错怎么办？
+在CentOS 6.5系统的ECS实例中，执行ethtool -g eth0命令，提示“Cannot get device ring settings: Operation not supported”错误怎么办？
+在CentOS 6系统的ECS实例中，执行df命令，回执存在重复或不存在的挂载路径
+Linux实例中使用Apache Bench进行压力测试时报错“apr_pollset_poll: The timeout specified has expired”的解决方案
+Linux实例中访问/tmp目录提示“bash: cd: /tmp: 权限不够“错误怎么办？
+Debian 8系统的ECS实例中，执行“apt-get update”命令提示“404 Not Found”错误怎么办？
+Ubuntu系统的ECS实例中，执行apt-get update命令时提示“NO_PUBKEY”错误怎么办
+为什么Linux系统的ECS实例中出现大量“TCP: time wait bucket table overflow”错误？
+Linux系统的ECS实例中，普通用户使用su命令切换root用户时提示“su: Authentication failure”错误怎么办？
+初始化云盘时，在CentOS 7系统mount本地盘时出现命令卡住现象，如何处理？
+Linux实例的自定义数据（user-data）未生效，系统日志提示"Failed to run module scripts-user(scripts in /var/lib/cloud/instance/scripts)"错误怎么办？
+Linux系统的ECS实例的系统、内存或进程出现异常，查看系统日志提示"page allocation failure"错误怎么办？
+Linux实例在修改文件时遇到“Read-only file system ***”错误怎么处理？
+如何修复Linux系统中已知的系统软件缺陷？
+在Linux系统内启动某个服务时提示task: Cannot allocate memory该如何处理？
+Linux实例开启TCP SACK的方法
+如何修复Linux实例中缺失的关键系统目录或文件？
+为什么Linux实例设置内核参数kernel.unknown_nmi_panic后，实例异常重启？
+调整Linux实例的nofile参数后，远程连接失败或提示“Too many open files”错误怎么办？
+message及journalctl -u 无法打印最新日志
+Linux系统使用Audit工具配置操作审计
+在Linux系统的ECS实例中，执行wget命令时提示“command not found”错误怎么办？
+在Linux实例系统的ECS实例中，使用wget命令下载时提示“Permission denied”错误怎么办？
+如何重制系统时区为本地时区？
+Windows系统使用问题
+Windows许可证
+微软许可证与软件保障
+申请许可移动性
+Windows安装补丁报错必须更新Windows模块安装程序才能安装此程序包
+Windows实例中安装驱动程序失败如何处理?
+Windows系统提示找不到“Server Manager.lnk”如何处理？
+修改Windows实例远程桌面连接端口
+Windows Update补丁更新失败如何处理？
+实例之间无法互相访问AD域或同时加入AD域怎么办？
+Windows Server 2008连接VPN出现812错误怎么办？
+Windows系统挂载NAS共享目录时报错“发生系统错误 58”如何处理？
+远程登录Windows系统后界面显示异常如何处理？
+Windows NTFS文件系统中大量小文件导致空间统计异常如何处理？
+Windows系统的IP地址被异常修改如何处理？
+Windows实例网络接口配置的IP地址丢失如何处理？
+Windows实例的终端服务器配置异常导致无法远程登录如何处理？
+slmgr.vbs文件类型变化导致无法激活Windows系统如何处理？
+Windows 2008实例更新补丁出现“8000FFFF Windows Update 遇到未知的错误”报错如何处理？
+Windows实例更新或安装角色时出现“0x80073712（组件存储已损坏）”错误，如何处理？
+Windows Server配置环境变量不生效如何处理？
+如何解决Windows实例添加角色和功能时提示“服务器管理器正在收集清单数据”问题？
+更新Windows系统时提示错误，如何处理？
+如何解决Windows Server 2012 R2及以上实例无法安装.NET Framework 3.5或语言包的问题？
+Windows实例服务列表中无法手动启动服务，如何处理？
+Windows系统组件损坏导致系统激活失败如何处理？
+Windows系统组策略文件配置异常导致组策略打开报错，如何处理？
+使用自建账号登录Windows实例后提示“Windows资源管理器已停止工作”，如何处理？
+Windows系统的ECS实例更新系统时，一直卡在0%该如何处理？
+Windows Server 2008 R2因驱动签名无法验证导致启动失败
+Windows实例系统更新失败，提示“0x80070422（服务无法启动或运行）”错误怎么办？
+Windows实例配置IE代理服务器后Windows更新失败，提示“0x80d02002”错误怎么办？
+如何卸载Windows实例中的系统补丁？
+Windows系统实例内修改主机名并重启后，主机名（HostName）又恢复到之前的名称怎么办？
+ECS实例使用的Windows系统激活失败如何解决？
+远程登录Windows实例出现黑屏，无法进入桌面怎么办？
+Windows实例为硬件保留内存过多导致实例卡顿如何处理？
+Windows实例中Vminit日志异常如何解决？
+Windows实例中Vminit关键操作执行失败如何解决？
+Windows实例事件日志异常检查
+如何在Windows系统内定位服务器关机原因
+Windows2012提示“本次操作由于这台计算机的限制而被取消”如何处理？
+Windows系统信息中存在有问题的设备，设备ID类似ACPI\QEMU*****该如何处理？
+Windows系统使用第三方杀毒防护软件可能出现的问题以及使用建议
+如何检查Windows实例注册表中的磁盘驱动残留项？
+Windows系统的ECS实例内安装MySQL数据库时，提示“无法启动此程序，因为计算机中丢失MSVCR100.dll”错误怎么办？
+Windows Server with Container镜像中包含的容器运行时是什么类型？
+为什么Windows系统在执行userdata时写入数据失败？
+Windows Server 2025镜像有哪些限制？
+Windows实例离线安装virtio驱动
+如何手动更新Windows实例的virtio驱动？
+Windows Server半年渠道镜像与实例管理
+UEFI镜像的Windows实例VNC连接后无法修改分辨率
+使用特定KMS域名激活VPC网络中的Windows Server系统？
+实例的操作系统为Windows Server，现在提示Windows副本不是正版怎么办？
+频繁调用Windows系统API:timeBeginPeriod导致系统时间异常，如何解决？
+Windows云服务器使用IE浏览器打开网站提示“增强安全配置正在阻止来自下列网站内容”如何处理？
+更换Windows实例的系统盘或者重新初始化系统盘，为什么userdata不会自动执行？
+Windows系统是否有设置可以让一个进程的线程均匀分布在各个 CPU 上？
+Windows线程调度是否会考虑CPU缓存命中率？
+Windows线程在什么调度场景下会重新计算并迁移到其他 CPU 运行？
+Red Hat镜像使用问题
+Red Hat镜像支持哪些实例规格族？
+使用Red Hat Enterprise Linux操作系统过程中遇到问题，如何获取技术支持？
+阿里云提供的Red Hat Enterprise Linux镜像包含哪些Red Hat官方订阅？
+购买阿里云上的Red hat操作系统显示未订阅（Unknown），是什么原因？
+如何解决RedHat 8.1/8.2镜像在弹性裸金属服务器实例规格族的ECS实例下启动慢的问题？
+CentOS/RedHat 7.x升级Systemd重启进入救援模式如何处理？
+SUSE镜像问题
+SUSE操作系统提供哪些服务支持？
+SLES for SAP常见问题
+CentOS镜像问题
+如何处理CentOS DNS解析超时？
+如何检查与修复CentOS 7实例和Windows实例IP地址缺失问题？
+CentOS 7.9 ARM系统无法生成dump文件如何处理？
+CentOS/RedHat 7.x升级Systemd重启进入救援模式如何处理？
+Ubuntu镜像问题
+为什么Ubuntu某些版本的ECS实例中启动安骑士进程后系统负载较高？
+Ubuntu系统服务为何会被自动重启？
+FreeBSD镜像问题
+FreeBSD系统如何打补丁编译内核？
+FreeBSD系统在KVM环境无法找到系统盘，如何处理？
+Fedora镜像问题
+为什么我无法使用ssh-rsa签名算法的SSH密钥对远程连接Fedora 33 64位系统的实例？
+为什么使用Fedora CoreOS镜像创建部分实例后，CPU信息只有实例规格的一半？
+Alibaba Cloud Linux系统问题
+Alibaba Cloud Linux 通用问题
+开启内核选项CONFIG_PARAVIRT_SPINLOCK可能导致性能问题
+Alibaba Cloud Linux系统出现printk死锁导致系统宕机
+Alibaba Cloud Linux系统关闭CPU漏洞修复的方法
+NFS v4.x版本中可能存在的已知问题
+SysAK 2.2.0版本导致运行DNF命令发生段错误，如何处理？
+如何避免因cgroup引起的应用性能抖动？
+Alibaba Cloud Linux系统的Overlayfs文件系统缺乏读权限导致操作失败，如何处理？
+出现OOM Killer的原因及解决方案
+如何排查slab_unreclaimable内存占用高的原因？
+Linux内存碎片化的应对措施
+如何在Alibaba Cloud Linux实例中通过“/etc/resolv.conf”文件自定义配置DNS
+ECS实例中的应用偶尔出现丢包现象并且内核日志（dmesg）存在kernel: nf_conntrack: table full, dropping packet的报错信息
+在阿里云ECS中运行Alibaba Cloud Linux是否收费？
+Alibaba Cloud Linux支持哪些阿里云ECS实例类型？
+Alibaba Cloud Linux是否支持32位应用程序和库？
+Alibaba Cloud Linux是否支持图形化界面（GUI）？
+Alibaba Cloud Linux 3
+Alibaba Cloud Linux 3系统缺失sch_netem模块
+Alibaba Cloud Linux 3系统配置XPS的方法及影响说明
+Alibaba Cloud Linux 3.8版本镜像升级内核报错的修复方案
+Alibaba Cloud Linux系统关闭CPU漏洞修复的方法
+Alibaba Cloud Linux 3系统空载下load大于1的解决方案
+Alibaba Cloud Linux 3系统的NFS文件系统读取文件性能不符合预期，如何处理？
+Alibaba Cloud Linux 2
+Alibaba Cloud Linux2系统中与透明大页THP相关的性能调优方法
+如何解决Alibaba Cloud Linux 2中polkit内存泄漏问题？
+Alibaba Cloud Linux 2系统中systemd服务异常问题说明
+Alibaba Cloud Linux 2开启或关闭IPv6
+Alibaba Cloud Linux 2如何安装并启用高版本的curl？
+Alibaba Cloud Linux 2系统的ECS实例无法查询和配置路由信息，如何处理？
+Alibaba Cloud Linux 2系统的ECS实例创建大量进程失败，如何处理？
+Alibaba Cloud Linux 2系统中TCP拥塞控制算法BBR对网络性能有影响，如何处理？
+使用Alibaba Cloud Linux 2镜像的ECS实例中ext4文件系统Buffer I/O写性能不符合预期解决方案
+Alibaba Cloud Linux 2系统的ECS实例执行ss命令时返回的Send-Q字段值为0的解决方案
+Alibaba Cloud Linux系统中与透明大页THP相关的性能调优方法
+Alibaba Cloud Linux 2系统的ECS实例挂载Overlayfs时共用挂载目录导致挂载失败
+Alibaba Cloud Linux 2系统的ECS实例内核日志存在“integrity: Unable to open file”信息，如何处理？
+是否可以查看Alibaba Cloud Linux 2组件的源代码？
+Alibaba Cloud Linux 2是否与历史版本的Aliyun Linux向后兼容？
+Alibaba Cloud Linux 2上支持运行哪些第三方应用程序？
+Alibaba Cloud Linux 2怎样保证数据安全？
+Alibaba Cloud Linux 2是否支持数据加密？
+怎样设置Alibaba Cloud Linux 2的有关权限？
+GuestOS常见问题
+Linux操作系统（GuestOS）常见问题与解决方案
+无法正常启动
+检查fstab文件中的块设备信息是否存在?
+检查fstab文件中块设备是否正确挂载?
+检查fstab文件内容格式是否正确?
+使用fsck命令检查系统文件
+无法正常登录
+检查limits设置是否正确
+检查关键系统用户（即root账号）的密码是否存在
+检查系统关键文件格式
+检查SSH的访问权限配置是否正确
+检查SSH访问所需要的关键文件或目录是否存在
+检查大页内存设置是否过大
+检查操作系统是否OOM
+检查系统防火墙是否打开
+检查TCP SACK是否开启
+检查UDP缓存是否溢出
+检查SELinux是否开启
+无法通过SSH或VNC登录实例
+连接实例时报错
+无法访问实例
+检查NAT环境内核参数是否正确
+检查进程是否启动以及常见业务端口是否处于监听状态
+网络不通
+检查DHCP配置是否正确
+检查网络相关进程是否存在
+检查网卡多队列是否开启
+性能问题
+检查TCP backlog是否溢出
+CPU使用率是否过高
+磁盘无法写入文件
+Windows操作系统（GuestOS）常见问题与解决方案
+无法正常登录
+检查Windows网卡是否打开
+Windows实例中系统网卡不可用，会导致无法登录实例。具体操作，请参见Windows实例中系统网卡处于不可用状态。
+检查Windows系统的3389端口是否开放
+使用远程桌面连接RDP服务，可以方便地管理和操作Windows实例。如果您未开启远程桌面连接RDP服务，则无法进行远程桌面连接。具体操作，请参见Windows实例如何启动远程桌面连接RDP服务。
+检查virtio驱动的版本是否过低
+如果virtio驱动版本过低，可能导致无法登录实例。具体操作，请参见更新Windows实例的virtio驱动。
+检查防火墙是否设置正确
+防火墙设置不当，可能导致无法登录实例。具体操作，请参见Windows系统防火墙策略配置指南。
+性能问题
+CPU使用率是否过高
+如果CPU持续保持高使用率，则会对系统稳定性和业务运行造成影响。具体操作，请参见Windows实例CPU使用率较高问题的排查与处理。
+检查Windows操作系统的版本
+微软已经于2020年01月14日停止对Windows Server 2008和Windows Server 2008 R2操作系统提供支持。因此阿里云不再对使用上述操作系统的ECS实例提供技术支持。如果您有使用上述操作系统的ECS实例，请尽快更新至Windows Server 2012或以上版本。当前支持的镜像请参见公共镜像，您也可以在售卖页查看。
+检查磁盘容量
+Windows系统有时会出现C盘的磁盘空间不断减小的情况，导致系统不能正常操作。具体操作，请参见Windows实例中C盘可用空间减少的排查思路。
+安装AD域控制器失败问题
+安装AD域控制器失败，提示“安装Active Directory域服务二进制文件失败”错误怎么办？
+安装AD域控制器时，提示“此计算机具有动态分配的IP地址”怎么办？
+安装AD域控制器时，提示“0x0000232B RC0DE_NAME_ERROR”错误代码怎么办？
+安装AD域控制器时，提示“找不到网络路径”错误怎么办？
+其他问题
+Linux时间和时区说明
+如何为已有自定义镜像安装NVMe驱动？
+如何解决实例迁移后的宕机问题？
+如何为Linux服务器安装GRUB？
+如何收集操作系统宕机后的内核转储信息?
+如何解决查看/proc/cpuinfo文件中CPU频率与实例规格说明不一致的问题
+使用RSA密钥无法登录ECS实例问题
+基于弹性裸金属实例规格的ECS实例，系统生成crash dump文件失败如何解决？
+Linux操作系统内核回写时出现softlockup异常如何解决？
+在ECS实例内删除cgroup出现softlockup异常如何解决？
+ECS实例宕机相关解决方案
+公共镜像自带FTP上传吗？
+为什么ECS默认没有启用虚拟内存或Swap说明？
+如何在公共镜像中开启kdump？
+如何设置Linux系统的ECS实例的静态IP地址？
+如何在Linux实例中自定义配置DNS？
+Linux操作系统配置IPv6地址后，安装了NTP服务的服务器时间无法同步，如何处理？
+为什么使用自定义镜像创建的实例，热插拔云盘/网卡会失败？
+操作系统内核错误后可能出现实例关机，如何处理？
+附录
+如何更换操作系统（系统盘）?
+您可以通过更换ECS实例的镜像来更换操作系统（更换系统盘）。
+警告
+更换操作系统（系统盘）后，原来的旧系统盘会被释放，系统盘上的所有数据会被清除。建议您在操作之前为系统盘手动创建单个快照备份数据。
+账号A的服务器制作镜像后，能给账号B更换操作系统使用吗？
+可以。账号A需要先共享自定义镜像给账号B，然后账号B再使用镜像更换操作系统（更换系统盘）。
+更换操作系统时，如果镜像中包含数据盘，可以通过该镜像更换操作系统吗？
+您可以使用包含数据盘的镜像更换操作系统，仅更换原实例的系统盘，不影响原实例的数据盘。
+重要
+如果更换操作系统使用的是包含数据盘的自定义镜像，请确保业务中系统盘和数据盘之间没有依赖关系，或变更后的系统盘对数据盘的操作不影响您的业务流程。例如，如果您的业务中存在系统盘向数据盘的读写数据操作，更换操作系统后，由于系统盘变动，可能导致业务出现读写数据盘异常等问题。
+更换操作系统与重新初始化系统盘有什么差异？
+主要差异如下表所示：
+差异项
+重新初始化系统盘
+更换系统盘（操作系统）
+功能差异
+初始化会还原云服务器的初始化状态，初始化前后操作系统不变。
+将现有的操作系统类型切换为其他类型的操作系统。
+对系统盘的影响
+旧系统盘不会被释放。
+系统盘数据会恢复到刚创建时的状态，创建实例后安装的应用程序和产生的数据都会被清除，建议您做好数据备份。
+系统盘ID、云盘类型、ECS实例的IP地址等均保持不变。
+更换操作系统后，原来旧的系统盘会被释放。
+会清除系统盘上的所有数据，建议您做好数据备份。
+系统盘ID会变，但是云盘类型、ECS实例IP地址以及弹性网卡MAC地址保持不变。
+对数据盘的影响
+不会影响数据盘。
+不会影响数据盘。
+对快照的影响
+基于系统盘创建的快照可以用于回滚云盘。
+基于系统盘创建的手动快照和自动快照均会保留。
+自动快照策略设置仍然有效，不需要重新设置。
+旧系统盘快照不能用于回滚新系统盘，但可以用于创建自定义镜像。
+基于旧盘手动创建的快照，不会被释放。
+自动创建的快照，如果旧系统盘开启自动快照随云盘释放，则自动快照会被自动删除；如果未开启自动快照随云盘释放，则到期后自动释放。
+旧系统盘的自动快照策略将失效，需要重新设置。
+计费情况
+初始化系统盘不收费。初始化前后操作系统不变，计费项不发生改变。
+更换操作系统本身免费，以下情况会收取费用：
+如果更换的新镜像是收费镜像，则会收取镜像费用。更多信息，请参见镜像计费。
+如果更换时扩容了系统盘的云盘容量，则会收取新增容量的费用。更多信息，请参见块存储计费。
+通过更换操作系统扩容系统盘失败，如何处理？
+通过更换操作系统（系统盘）对系统盘进行扩容时，可能会因为超时导致分区扩容不生效。针对未扩容成功的系统，请参考扩容分区与文件系统（Linux）手动扩展分区。该方式只是扩展系统盘分区，不会影响系统的版本。
+更换操作系统时，如果选不到目标镜像并且提示“该实例为非IO优化实例”怎么办？
+问题原因
+实例和镜像的I/O优化属性需要匹配，即I/O优化实例只能使用IO优化镜像，非I/O优化实例只能使用非I/O优化镜像。因此，当实例与镜像的I/O优化属性不匹配时，在更换操作系统的过程中，将无法选择目标镜像，并会提示“该实例为非I/O优化实例，在更换操作系统时只能选择支持非I/O优化的镜像”。
+解决方案
+现售的实例类型均为I/O优化实例，建议您更换为新的实例类型。
+选择支持I/O优化实例的镜像来更换操作系统（更换系统盘）。
+说明
+您可以通过DescribeInstances接口的IoOptimized参数查询实例的I/O属性。
+您可以通过DescribeImages接口的IsSupportIoOptimized参数查询镜像的I/O属性。
+如何重置系统时区为本地时区
+单台实例可以通过timedatectl set-timezone 本地时区xxx/xxx在系统内直接修改为本地时区。
+多台实例可以用云助手功能批量修改的功能。
+Windows Server with Container镜像中包含的容器运行时是什么类型？
+由于微软对容器运行时支持策略变更（详细信息请参考Supported Container Runtime on Windows Server），阿里云ECS自2024年开始更新的Windows Server with Container镜像不再预装MCR运行时库，替换为开源的containerd容器运行时库。如果用户对MCR有需求，请自行从Mirantis购买和安装Mirantis Container Runtime。
+自2024年03月01日开始，阿里云ECS产品提供的Windows Server with Container镜像中包含以下容器运行相关组件：
+Windows Server容器功能组件，不支持Hyper-V隔离。详细信息请参考 Windows and containers。
+Containerd运行时库，组件版本为1.7.13。更多信息，请参考containerd。
+管理容器的命令行界面nerdctl.exe，组件版本为1.7.13。更多信息，请参考nerdctl。
+Windows容器网络CNI插件nat.exe，组件版本为1.0.0。更多信息，请参考windows-container-networking。
+为什么Windows系统在执行userdata时写入数据失败？
+问题描述
+执行userdata写入数据到 C:\Users\Administrator\Desktop\userData_test.txt路径失败，提示未能找到路径。
+问题原因
+在Windows系统中，C:\Users及其子目录是用户配置文件和数据的默认存储位置，需要登录系统后才可以访问，而在系统初始化执行userdata阶段实际还未登录系统，所以写入数据到C:\Users目录会失败。
+解决方案
+修改userdata中写入数据的路径为其他路径，例如：
+[bat]
+echo "userData" > C:\userData_test.txt
+具体操作，请参见自定义实例初始化配置。
+Windows Server 2025镜像有哪些限制？
+vCPU：1 ~ 640
+内存：2 GiB ~ 48 TiB
+ECS实例规格
+由于兼容性问题，目前以下ECS实例规格暂不支持该镜像：
+所有弹性裸金属服务器规格族群
+6代AMD实例规格（通用型实例规格族g6a、计算型实例规格族c6a和内存型实例规格族r6a）
+使用特定KMS域名激活VPC网络中的Windows Server系统？
+VPC网络中，您需要使用特定的KMS域名来激活Windows系统实例。具体操作，请参见使用KMS域名激活ECS实例的正版Windows Server系统。
+实例的操作系统为Windows Server，现在提示Windows副本不是正版怎么办？
+需要激活Windows。具体操作，请参见使用KMS域名激活ECS实例的正版Windows Server系统。
+频繁调用Windows系统API:timeBeginPeriod导致系统时间异常，如何解决？
+在Windows Server 2008上频繁调用系统API:timeBeginPeriod，导致Windows系统时间变慢或变快。您可以参考如下操作进行解决：
+说明
+可能会造成系统时间精度变化的系统函数，请参见微软官方文档。
+远程登录ECS实例。
+具体操作，请参见使用Workbench登录Windows实例。
+下载工具。
+解压CheckTimeBeginPeriod.zip。
+解压bin.zip并进入bin目录，然后双击.exe文件。
+64位操作系统，双击InjectDllx64.exe。
+32位操作系统，双击InjectDllx86.exe。
+打印的进程就是调用timeBeginPeriod的进程。
+根据业务实际情况，停止或更新调用timeBeginPeriod的程序。
+Windows云服务器使用IE浏览器打开网站提示“增强安全配置正在阻止来自下列网站内容”如何处理？
+在Windows操作系统的云服务器ECS或者轻量应用服务器中，使用IE浏览器打开网站时，提示“增强安全配置正在阻止来自下列网站内容”报错，解决方法请参见Windows云服务器使用IE浏览器打开网站提示“增强安全配置正在阻止来自下列网站内容”如何处理？。
+更换Windows实例的系统盘或者重新初始化系统盘，为什么userdata不会自动执行？
+问题原因
+Windows系统的ECS实例正常启动后，会在C:\ProgramData\aliyun\vminit\INSTANCE_实例ID}\METASERVER路径下创建缓存文件，该文件用于标记实例是否已经初始化。如果您通过该ECS实例创建了自定义镜像，并用这个自定义镜像重新初始化系统盘或更换系统盘，在C:\ProgramData\aliyun\vminit\INSTANCE_ID\METASERVER路径下会找到与当前重置实例ID一致的缓存文件。由于Vminit组件会根据缓存文件的存在与否来判断ECS实例是否是初次启动。如果找到与当前重置实例ID一致的缓存文件，Vminit组件会判断ECS实例不是初次启动，将不会自动执行userdata脚本。
+说明
+Vminit在创建Windows实例时会自动安装，为Windows实例在启动阶段提供了初始化配置的能力，类似于Linux系统的cloud-init。关于Vminit组件的更多信息，请参见初始化工具介绍。
+解决方案
+建议您在通过该ECS实例创建自定义镜像前，检查并删除C:\ProgramData\aliyun\vminit\INSTANCE_{实例ID}\METASERVER路径下的缓存文件。
+Windows系统是否有设置可以让一个进程的线程均匀分布在各个 CPU 上？
+没有。
+Windows操作系统层面没有直接的设置来强行让特定进程的线程均匀分布。调度器是基于系统所有线程的整体行为工作的。如果需要控制特定进程的线程分布，通常需要借助第三方工具，或者在程序代码中手动设置线程的亲和性（Affinity）。
+Windows线程调度是否会考虑CPU缓存命中率？
+会考虑，为了最大化CPU缓存命中率（Cache Hit），Windows在调度时会重点参考以下两个因素：
+理想处理器（Ideal processor）：线程创建时由系统分配的处理器，通常通过轮询方式让新线程分布在不同CPU上。
+上次处理器（Last processor）：线程上一次运行所在的处理器。
+Windows线程在什么调度场景下会重新计算并迁移到其他 CPU 运行？
+在线程运行过程中，主要涉及以下三种调度场景：
+时间片轮转：当分配的时间片用完后，线程会被放回同一CPU的就绪（ready）队列等待，默认仍在原CPU上运行，不会重新计算下次运行的CPU。
+抢占式调度：当高优先级线程抢占执行时，低优先级线程会被强制放回原CPU队列，下次运行通常仍在原CPU，不需要重新计算。
+自愿等待：线程因等待资源（如 I/O、锁）而主动挂起，当资源就绪恢复运行时，系统会重新计算 CPU进行分配，优先寻找理想处理器或上次运行的处理器。
+使用Red Hat Enterprise Linux操作系统过程中遇到问题，如何获取技术支持？
+与传统的登录Red Hat系统提交售后请求不同的是，您可以直接提交工单寻求技术支持，阿里云售后工程师会协助解决您遇到的问题。如果涉及阿里云无法解决的Red Hat Enterprise Linux操作系统问题，阿里云会将问题提交至Red Hat，由Red Hat负责提供最终的技术支持。
+阿里云提供的Red Hat Enterprise Linux镜像包含哪些Red Hat官方订阅？
+阿里云提供的Red Hat镜像包含Red Hat Enterprise Linux（RHEL）产品订阅。相关软件仓库源如下：
+RHEL 7
+Red Hat Enterprise Linux 7 Server - Extras from RHUI (RPMs)
+Red Hat Enterprise Linux 7 Server - Optional from RHUI (RPMs)
+Red Hat Enterprise Linux 7 Server from RHUI (RPMs)
+RHEL 8&RHEL 9
+BaseOS
+AppStream
+最新的RHEL 8&RHEL 9镜像中，还将默认预置CodeReady Linux Builder和Supplementary两个仓库。如果您购买的RHEL 8&9实例中需要使用这两个软件仓库，请联系阿里云售后获取。
+更多关于RHEL 8&RHEL 9的软件仓库源及软件包列表详情，请参考RHEL 8软件包清单和RHEL 9软件包清单。
+阿里云Red Hat镜像仅提供RHEL产品软件包，如果您需要安装RHEL以外产品的软件包（例如Red Hat Satellite、Red Hat Ceph Storage），需要您自行购买红帽订阅，并注册主机，订阅相关产品。
+购买阿里云上的Red hat操作系统显示未订阅（Unknown），是什么原因？
+这是正常现象。您在购买Red Hat Enterprise Linux镜像时，可以从阿里云提供的更新源中获取Red Hat的更新。该方式与传统模式的区别在于，您将不会获得单独的Red Hat账号，用于从Red Hat提供的更新源获取更新。因此，您在实例内部执行subscription-manager命令查看订阅状态时，如下回显信息所示，系统将是未订阅状态。
++-------------------------------------------+
+System Status Details
++-------------------------------------------+
+Overall Status: Unknown
+System Purpose Status: Unknown
+SUSE操作系统提供哪些服务支持？
+阿里云线上售卖的SLES（SUSE Linux Enterprise Server）操作系统会与SUSE更新源保持定时同步。使用SLES公共镜像创建的实例，其操作系统支持服务包含在阿里云的企业级支持服务中。如果您购买了企业级支持服务，可以提交工单获取技术支持，阿里云工程师团队会协助您解决SLES操作系统上发生的问题。
+SLES for SAP常见问题
+SUSE Linux Enterprise Server for SAP Applications（SLES for SAP）是专为SAP系统定制的商业Linux操作系统。以下是使用过程中常见的问题：
+配置SUSE linux实例的NTP/Chrony时钟同步服务
+SLES/SLES for SAP升级操作系统
+如何判断ECS使用的镜像是否是SLES for SAP CSP镜像？
+是否可以查看Alibaba Cloud Linux 2组件的源代码？
+Alibaba Cloud Linux 2遵循开源协议。您可以通过yumdownloader工具或者在阿里云开源站点下载源代码包，也可以从GitHub站点下载Alibaba Cloud Linux 2内核源代码树，详情请参见GitHub。
+Alibaba Cloud Linux 2是否与历史版本的Aliyun Linux向后兼容？
+Alibaba Cloud Linux 2完全兼容Aliyun Linux 17.01。
+说明
+如果您使用了自行编译的内核模块，可能需要在Alibaba Cloud Linux 2上重新编译才能正常使用。
+Alibaba Cloud Linux 2上支持运行哪些第三方应用程序？
+Alibaba Cloud Linux 2与CentOS 7.6.1810发行版保持二进制兼容，在此基础上提供差异化的操作系统功能。
+与CentOS及RHEL相比，Alibaba Cloud Linux 2的优势体现在：
+满足您的操作系统新特性诉求，更快的发布节奏，以及更新的Linux内核、用户态软件及工具包。
+开箱即用，最简用户配置，最短时间服务就绪。
+最大化用户性能收益，与云基础设施联动优化。
+与RHEL相比没有运行时计费，与CentOS相比有商业支持。
+Alibaba Cloud Linux 2怎样保证数据安全？
+Alibaba Cloud Linux 2二进制兼容CentOS 7.6.1810/RHEL 7.6，遵从RHEL的安全规范。具体体现在以下几个方面：
+使用业内标准的漏洞扫描及安全测试工具，定期做安全扫描。
+定期评估CentOS 7的CVE补丁，修补操作系统的安全漏洞。
+与安全团队合作，支持阿里云现有的OS安全加固方案。
+使用CentOS 7相同的机制，发布用户安全警告及补丁更新。
+Alibaba Cloud Linux 2是否支持数据加密？
+Alibaba Cloud Linux 2保留CentOS 7的数据加密工具包，并确保CentOS 7与KMS协同工作的加密方案可以在Alibaba Cloud Linux 2得到支持。
+怎样设置Alibaba Cloud Linux 2的有关权限？
+Alibaba Cloud Linux 2属于与CentOS 7同源的操作系统。CentOS 7的管理员可以无缝地使用完全一致的管理命令做相关的权限设置，Alibaba Cloud Linux 2的默认权限设置与阿里云CentOS 7镜像完全一致。
+在阿里云ECS中运行Alibaba Cloud Linux是否收费？
+Alibaba Cloud Linux镜像本身是免费的，但是您需要为ECS实例等其他资源的支付费用。
+Alibaba Cloud Linux支持哪些阿里云ECS实例类型？
+Alibaba Cloud Linux支持大部分阿里云ECS实例类型，包括弹性裸金属服务器。
+说明
+Alibaba Cloud Linux不支持使用Xen虚拟机平台的实例。
+Alibaba Cloud Linux是否支持32位应用程序和库？
+暂不支持。
+Alibaba Cloud Linux是否支持图形化界面（GUI）？
+不承诺支持。您可以参考官方CentOS自行安装GUI，具体操作，请参见为Linux实例安装图形化界面。
+在Linux系统的ECS实例中，执行wget命令时提示“command not found”错误怎么办？
+问题现象
+在Linux实例中执行wget命令时提示“command not found”，执行yum install wget命令时提示“already installed and latest version”。
+问题原因
+检查/usr/bin目录中没有wget命令文件，但存在wge命令的文件，可能是由于命令文件被重命名导致报错。
+解决方案
+请您参考以下步骤进行操作。
+远程连接Linux实例。
+具体操作，请参见通过密码或密钥认证登录Linux实例。
+执行以下命令查询wge命令的路径。
+whereis wge
+命令返回结果如下，表示wge命令路径为/usr/bin/wge。
+wge：/usr/bin/wge
+根据上述的路径，执行以下命令重命名即可。
+cp /usr/bin/wge /usr/bin/wget
+重新执行wget命令，若不再提示以上报错信息，则表示问题已修复。
+在Linux实例系统的ECS实例中，使用wget命令下载时提示“Permission denied”错误怎么办？
+问题现象
+在Linux系统的ECS实例中，使用wget下载时提示以下信息。
+wget bash: /usr/bin/wget: Permission denied
+问题原因
+在Linux实例系统的ECS实例中，wget命令权限为000，没有读、写及执行权限。
+解决方案
+请您参考以下步骤进行操作。
+远程连接Linux实例。
+具体操作，请参见通过密码或密钥认证登录Linux实例。
+执行以下命令查看wget命令权限。
+ls -l /usr/bin/wget
+命令返回结果如下，说明wget命令权限为000，没有读、写、执行权限。
+-------- 1 root root 366800 Oct 31 2014 /usr/bin/wget
+执行以下命令，查看/usr/bin/wget目录属性。
+lsattr /usr/bin/wget
+命令返回结果如下，表示/usr/bin/wget目录属性为i（不允许在该目录下新建和删除文件）。
+----i--------e- /usr/bin/wget
+执行以下命令，移除/usr/bin/wget目录i属性。
+chattr -i /usr/bin/wget
+执行以下命令，对/usr/bin/wget目录进行授权。
+chmod 755 /usr/bin/wget
+重新执行wget命令，若不再提示以上报错信息，则表示问题已修复。
+安装AD域控制器失败，提示“安装Active Directory域服务二进制文件失败”错误怎么办？
+问题现象
+在Windows系统的ECS实例中，安装AD域控制器失败，提示“安装Active Directory域服务二进制文件失败”错误。
+问题原因
+通过打开事件查看器发现报错，Remote Registry服务被禁止，无法启动该服务。
+解决方案
+请参考以下操作启动Remote Registry服务。
+远程连接Windows实例。
+具体操作，请参见通过密码或密钥认证登录Windows实例。
+依次选择开始 > 运行，输入services.msc，然后单击确认。
+在服务窗口中，双击Remote Registry服务，进入Remote Registry属性窗口，设置以下选项。
+在启动类型区域，选择自动选项。
+在服务状态区域，单击启动，确保Remote Registry服务正常启动。
+单击确定，保存设置。
+安装AD域控制器时，提示“此计算机具有动态分配的IP地址”怎么办？
+问题现象
+在Windows系统的ECS实例中安装AD域控制器时，提示“此计算机具有动态分配的IP地址”。
+问题原因
+该Windows系统的ECS实例上至少有一个物理网络适配器未将静态IP地址分配给其IP属性。
+解决方案
+远程连接Windows实例。
+具体操作，请参见通过密码或密钥认证登录Windows实例。
+安装AD域控制器。具体操作，请参见ECS实例搭建Windows系统AD域。
+在安装AD域时弹出的静态IP分配选项框中，单击是。
+说明
+LoopBack使用了DHCP方式，可以在未分配静态IP地址的情况下继续执行操作。
+安装AD域控制器时，提示“0x0000232B RC0DE_NAME_ERROR”错误代码怎么办？
+问题现象
+在Windows系统的ECS实例中安装AD域控制器时，提示“0x0000232B RCODE_NAME_ERROR”错误代码。
+问题原因
+可能是由于DNS服务器中IP地址配置错误导致。
+解决方案
+请参考以下操作将Slave的内外网网卡的DNS服务器全部修改为Master的私网地址。
+远程连接Windows实例。
+具体操作，请参见通过密码或密钥认证登录Windows实例。
+进入Internet协议版本4（TCP/IPv4）属性窗口，修改DNS服务器地址，然后单击确定。
+说明
+更改DNS服务器地址为Master实际的私网地址。
+在 IP 地址区域保持选中自动获得 IP 地址，将 Master 的私网地址填入首选 DNS 服务器字段。
+检查是否能Ping通DNS服务器IP地址。
+安装AD域控制器时，提示“找不到网络路径”错误怎么办？
+问题现象
+在Windows系统的ECS实例中安装AD域控制器时，提示“找不到网络路径”错误。
+问题原因
+可能有以下几点原因导致：
+AD域控制器和客户端的TCP/IP NetBIOS Helper和Remote Registry服务没有启动。
+客户端与AD域控制器的DNS配置错误。
+客户端和AD域控制器的SID造成冲突。
+防火墙及安全软件进行了拦截。
+解决方案
+请参考以下操作进行排查。
+修改客户端SID
+请参考以下操作修改客户端SID。
+远程连接Windows实例。
+具体操作，请参见通过密码或密钥认证登录Windows实例。
+下载修改客户端SID的PowerShell脚本。
+下载地址：AutoSysprep.ps1
+脚本来源：阿里云官方
+打开CMD，输入PowerShell切换至Windows PowerShell界面。
+说明
+如果您的实例操作系统是64位，则不能使用32位的PowerShell（即Windows PowerShell (x86)），否则会报错。
+切换至脚本存储的路径，执行如下命令，查看脚本工具说明。
+.\AutoSysprep.ps1 -help
+执行如下命令，重新初始化服务器的SID。
+.\AutoSysprep.ps1 -ReserveHostname -ReserveNetwork -SkipRearm -PostAction "reboot"
+初始化完成后，会重启实例，您需要注意以下事项。
+IP地址的获取方式会从DHCP变成固定IP地址，请确保该固定IP地址和开始设置前ECS实例的IP地址一致。您也可以将获取方式改回DHCP，以自动获取控制台中为ECS实例分配的主私有IP地址。
+说明
+请不要在控制台修改ECS实例的主私有IP地址，否则IP地址变化会导致访问异常。
+初始化SID后，云服务器防火墙的配置被修改成微软的默认配置，导致云服务器无法Ping通。您需要关闭防火墙来宾或公用网络，或者放行需要开放的端口。下图表示防火墙来宾或公用网络的状态是已连接。
+打开控制面板修改防火墙设置，关闭来宾或公用网络防火墙。
+关闭后，可以Ping通服务器。
+允许客户端通过防火墙等安全软件
+请参考Windows系统防火墙策略配置指南允许客户端通过。
+如何处理CentOS DNS解析超时？
+如何检查与修复CentOS 7实例和Windows实例IP地址缺失问题？
+CentOS 7.9 ARM系统无法生成dump文件如何处理？
+CentOS/RedHat 7.x升级Systemd重启进入救援模式如何处理？
+如何解决RedHat 8.1/8.2镜像在弹性裸金属服务器实例规格族的ECS实例下启动慢的问题？
+如何处理CentOS DNS解析超时？
+问题原因
+因CentOS 6和CentOS 7的DNS解析机制变动，导致2017年02月22日以前创建的ECS实例或使用2017年02月22日以前的自定义镜像创建的CentOS 6和CentOS 7实例可能出现DNS解析超时的情况。
+解决方案
+请按下列步骤操作修复此问题：
+下载脚本fix_dns.sh。
+将下载的脚本放至CentOS系统的/tmp目录下。
+运行bash /tmp/fix_dns.sh命令，执行脚本。
+脚本的作用和逻辑说明如下：
+脚本作用
+判断DNS解析文件/etc/resolv.conf中是否存在options>single-request-reopen配置。更多信息，请参见resolv.conf文件说明。
+CentOS 6和CentOS 7的DNS解析机制，使用相同的网络五元组发送IPV4 DNS请求和IPV6 DNS请求，此时应开启single-request-reopen配置。开启该配置后，一旦需要处理同一socket发送的两次请求时，解析端会在发送第一次请求后关闭socket，并在发送第二次请求前打开新的socket。配置成功后，无需重启实例即可生效。
+脚本逻辑
+判断实例系统是否为CentOS。
+如果实例为非CentOS系统（如Ubuntu和Debian）：脚本停止工作。
+如果实例为CentOS系统：脚本继续工作。
+查询解析文件/etc/resolv.conf中options的配置情况。
+如果不存在options配置：
+默认使用阿里云options配置options timeout:2 attempts:3 rotate single-request-reopen。
+options timeout:2 attempts:3 rotate single-request-reopen
+; generated by /sbin/dhclient-script
+如果存在options配置：
+不存在single-request-reopen配置，则在options配置中追加该项。
+存在single-request-reopen配置，则脚本停止工作，不更改DNS nameserver的配置。
+如何检查与修复CentOS 7实例和Windows实例IP地址缺失问题？
+问题原因及解决方案，请参见检查与修复CentOS 7 实例和Windows实例IP地址缺失问题。
+CentOS 7.9 ARM系统无法生成dump文件如何处理？
+问题现象
+CentOS 7.9 ARM系统宕机后，通过ls /var/crash查询dump文件，没有生成vmcore文件。
+Welcome to Alibaba Cloud Elastic Compute Service !
+[xxx ~]# ls /var/crash/
+127.0.0.1-2023-09-19-13:22:31
+[xxx ~]# ls /var/crash/127.0.0.1-2023-09-19-13\:22\:31/
+vmcore-dmesg.txt
+问题原因
+CentOS 7.9 ARM系统带有CONFIG_ARM64_USER_VA_BITS_52=y特性的内核，系统中原生自带的makedumpfile软件版本与内核版本不匹配，因此无法生成dump文件。
+解决方案
+重要
+该方案仅适用于已正确开启kdump服务的系统。如果您没有开启kdump服务且按照本文操作修复问题，请在proc/cmdline文件中手动配置crashkernel参数。
+运行以下命令，下载相应的kexec-tools包。
+wget http://mirrors.aliyun.com/centos-vault/7.9.2009/os/Source/SPackages/kexec-tools-2.0.15-51.el7.src.rpm
+运行以下命令，安装RPM包。
+rpm -ivh kexec-tools-2.0.15-51.el7.src.rpm
+运行以下命令，下载patch补丁文件。
+cd /root/rpmbuild/SOURCES
+wget https://ecs-image-tools.oss-cn-hangzhou.aliyuncs.com/patch/rhelonly-kexec-tools-2.0.20-makedumpfile-arm64-Add-support-for-ARMv8.2-LVA-52-bi.patch
+运行以下命令，修改kexec-tools.spec文件。
+打开kexec-tools.spec文件。
+cd /root/rpmbuild/SPECS/
+vi kexec-tools.spec
+按i键进入编辑模式，并在文件相应位置加入如下两行内容。
+Patch999: rhelonly-kexec-tools-2.0.20-makedumpfile-arm64-Add-support-for-ARMv8.2-LVA-52-bi.patch
+%patch999 -p1
+添加位置如下：
+第一处添加位置：
+Patch723: kexec-tools-2.0.15-makedumpfile-Update-help-text-to-indicate-mem-usage-is-supp.patch
+Patch724: kexec-tools-2.0.15-makedumpfile-exclude-pages-that-are-logically-offline.patch
+Patch725: kexec-tools-2.0.15-makedumpfile-x86_64-Add-support-for-AMD-Secure-Memory-Encry.patch
+Patch726: kexec-tools-2.0.15-Limit-the-size-of-vmcore-dmesg.txt-to-2G.patch
+Patch727: kexec-tools-2.0.15-vmcore-dmesg-vmcore-dmesg.c-Fix-shifting-error-repor.patch
+Patch728: kexec-tools-2.0.15-makedumpfile-x86_64-Fix-incorrect-exclusion-by-e-option-wit.patch
+Patch999: rhelonly-kexec-tools-2.0.20-makedumpfile-arm64-Add-support-for-ARMv8.2-LVA-52-bi.patch
+# Patch 701 through 800 are meant for kdump anaconda addon
+%description
+第二处添加位置：
+%patch723 -p1
+%patch724 -p1
+%patch725 -p1
+%patch726 -p1
+%patch727 -p1
+%patch728 -p1
+%patch999 -p1
+%ifarch ppc
+%define archdef ARCH=ppc
+%endif
+%build
+%ifarch ia64 aarch64
+按Esc键退出编辑模式，并输入:wq保存退出。
+运行以下命令，检查安装依赖。
+yum-builddep kexec-tools.spec
+运行以下命令，构建RPM包。
+yum -y install rpm-build
+rpmbuild -ba kexec-tools.spec
+运行以下命令，安装修改后的RPM包。
+cd /root/rpmbuild/RPMS/aarch64
+rpm -ivh kexec-tools-2.0.15-51.el7.aarch64.rpm
+如果再次发生宕机，通过ls -lh /var/crash查询dump文件，可以正常生成vmcore文件，表示问题已解决。
+[root@xxx ~]# ls -lh /var/crash/127.0.0.1-2023-09-19-14\:10\:52/
+total 62M
+-rw------- 1 root root 62M Sep 19 14:10 vmcore
+-rw-r--r-- 1 root root 131K Sep 19 14:10 vmcore-dmesg.txt
+CentOS/RedHat 7.x升级Systemd重启进入救援模式如何处理？
+CentOS 7或RedHat 7系列的系统在升级Systemd至systemd-219-71.el7版本后，重启实例会进入救援模式，这样会导致系统网络服务和一般的应用软件服务异常。具体解决方案请参见CentOS 7.X或RedHat 7.X升级Systemd并重启后会进入救援模式。
+如何解决RedHat 8.1/8.2镜像在弹性裸金属服务器实例规格族的ECS实例下启动慢的问题？
+在弹性裸金属服务器实例规格族的ECS实例中，RedHat 8.1/8.2镜像相较于RedHat 7镜像启动时长多1~2分钟。为解决该问题，您可以在RedHat 8.1/8.2系统的/boot/grub2/grubenv文件中，将内核启动参数console=ttyS0 console=ttyS0,115200n8修改为console=tty0 console=ttyS0,115200n8，然后重启服务器使配置生效。
+为什么Ubuntu某些版本的ECS实例中启动安骑士进程后系统负载较高？
+在某些版本的Ubuntu（例如Ubuntu 18.04）的ECS实例中，启动安骑士进程（AliYunDun）后，系统平均负载较高。
+具体的原因和解决方案，请参见Ubuntu 18.04版本的ECS实例中启动安骑士进程后系统负载较高。
+Ubuntu系统服务为何会被自动重启？
+在Ubuntu系统中默认会自动更新软件包，服务为unattended-upgrade，此服务为自动运行，会定时从apt源检测软件包或者驱动是否存在更新，若存在，会更新软件包和驱动，会导致相关服务被自动重启，如不需要自动更新，建议禁用此服务。
+systemctl stop unattended-upgrade systemctl disable unattended-upgrade
+FreeBSD系统如何打补丁编译内核？
+阿里云的FreeBSD公共镜像已为内核添加了补丁，已满足系列V及以上的实例规格族的启动需求。具体的实例规格族可通过DescribeInstanceTypeFamilies接口的Generation参数查询。
+以下情况可能导致系统无法正常启动，您可以通过FreeBSD内核源码打补丁编译内核的方式，避免或解决系统无法启动的问题。
+使用非阿里云提供的FreeBSD镜像及相关自定义镜像创建ECS实例时，系列V及以上实例规格族的ECS实例可能出现无法正常启动的情况。
+使用FreeBSD公共镜像创建ECS实例，并使用了freebsd-update等更新内核补丁，可能会导致系列V及以上实例规格族的ECS实例无法正常启动。
+FreeBSD 13及以上不需要打补丁。本示例以FreeBSD 12.3为例，介绍如何使用FreeBSD内核源码打补丁编译内核。
+下载并解压FreeBSD内核源码。
+wget http://ftp-archive.freebsd.org/pub/FreeBSD-Archive/old-releases/amd64/12.3-RELEASE/src.txz -O /src.txz
+cd /
+tar -zxvf /src.txz
+下载补丁包。
+本示例中，为virtio驱动打补丁包0001-virtio.patch。
+cd /usr/src/sys/dev/virtio/
+wget https://ecs-image-tools.oss-cn-hangzhou.aliyuncs.com/0001-virtio.patch
+patch -p4 < 0001-virtio.patch
+复制内核文件，并编译安装内核。
+make -j<N>表示指定编译时的并行数，需要根据您执行编译的环境配置来决定。例如，1 vCPU环境建议设置-j2，即vCPU核数与变量N的比值为1:2。
+cd /usr/src/
+cp ./sys/amd64/conf/GENERIC .
+make -j2 buildworld KERNCONF=GENERIC
+make -j2 buildkernel KERNCONF=GENERIC
+make -j2 installkernel KERNCONF=GENERIC
+编译完成后，删除源码。
+rm -rf /usr/src/*
+rm -rf /usr/src/.*
+FreeBSD系统在KVM环境无法找到系统盘，如何处理？
+问题现象
+FreeBSD系统在KVM虚拟化环境上VNC登录时，无法找到系统盘，无法进入系统。
+Root mount waiting for: usbus0
+ugen0.2: <QEMU> at usbus0
+Trying to mount root from ufs:UUID=5565xxx [rw]...
+mountroot: waiting for device UUID=5565xxx ...
+Mounting from ufs:UUID=5565bxxx failed with error 19.
+Loader variables:
+vfs.root.mountfrom=ufs:UUID=5565bxxx
+vfs.root.mountfrom.options=rw
+Manual root filesystem specification:
+<fstype>:<device> [options]
+Mount <device> using filesystem <fstype>
+and with the specified (optional) option list.
+eg. ufs:/dev/da0s1a
+zfs:tank
+cd9660:/dev/acd0 ro
+(which is equivalent to: mount -t cd9660 -o ro /dev/acd0 /)
+? List valid disk boot devices
+. Yield 1 second (for background tasks)
+<empty line> Abort manual input
+mountroot>
+解决方案
+在VNC中输入?，查看相关rootfs的ufsid。
+Manual root filesystem specification:
+<fstype>:<device> [options]
+Mount <device> using filesystem <fstype>
+and with the specified (optional) option list.
+eg. ufs:/dev/da0s1a
+zfs:tank
+cd9660:/dev/acd0 ro
+(which is equivalent to: mount -t cd9660 -o ro /dev/acd0 /)
+? List valid disk boot devices
+. Yield 1 second (for background tasks)
+<empty line> Abort manual input
+mountroot> ?
+List of GEOM managed disk devices:
+gptid/2c1c7e9b-046a-11e5-a722-00163e68a6d5 ufsid/5565b5a09045**** gptid/25e4bb01-046a-11e5-a722-00163e68a6d5 gptid/0fba1a73-046a-11e5-a722-00163e68a6d5 vtbd0p3 vtbd0p2 vtbd0p1 vtbd0
+mountroot>
+继续输入ufs:/dev/ufsid/5565b5a09045****，按回车即可正常进入操作系统内部。
+输入用户名和密码，登录系统。
+运行以下命令，查看/etc/fstab配置。
+cat /etc/fstab
+命令输出的 fstab 配置中，UUID=5565b5a090xxx 所在行为使用 UUID 方式挂载的 ufs 文件系统配置条目。但是 FreeBSD 系统并不支持 UUID 的挂载方式，需要修改为 ufsid 方式。
+# cat /etc/fstab
+# Device Mountpoint FStype Options Dump Pass#
+/dev/vtbd0p2 none swap sw 0 0
+UUID=5565b5a090xxx ufs rw 1 1
+将FreeBSD系统的挂载方式修改为ufsid。
+运行以下命令，打开/etc/fstab。
+vi /etc/fstab
+按i键进入编辑模式。
+修改UUID=5565b5a09045****为/dev/ufsid/5565b5a09045****。
+修改完成后按Esc键，并输入:wq后按下回车键，保存并退出。
+运行以下命令，重启系统使配置生效。
+reboot
+为什么我无法使用ssh-rsa签名算法的SSH密钥对远程连接Fedora 33 64位系统的实例？
+当您使用Fedora 33 64位操作系统的ECS实例时，如果登录凭证设置的是ssh-rsa签名算法的SSH密钥对，可能无法顺利使用SSH远程连接实例。您可以通过以下任一方式解决该问题：
+将ssh-rsa签名算法的SSH密钥对替换为ECDSA签名算法等其他签名算法的SSH密钥对。
+在系统中运行update-crypto-policies --set LEGACY命令，将加密策略POLICY切换为LEGACY，即可继续使用ssh-rsa签名算法的SSH密钥对。
+为什么使用Fedora CoreOS镜像创建部分实例后，CPU信息只有实例规格的一半？
+使用Fedora CoreOS镜像创建部分实例（例如，通用型实例规格族g5）后，执行lscpu命令查看CPU信息，On-line CPU(s) list的总个数只有实例实际规格的一半。例如，创建实例时选择的CPU为2核，则On-line CPU(s) list个数只有1个。示例如下所示。
+[core@iZbp1fjhzdqnsr47keavplZ ~]$ lscpu
+Architecture: x86_64
+CPU op-mode(s): 32-bit, 64-bit
+Byte Order: Little Endian
+Address sizes: 46 bits physical, 48 bits virtual
+CPU(s): 2
+On-line CPU(s) list: 0
+Off-line CPU(s) list: 1
+Thread(s) per core: 1
+说明
+On-line CPU(s) list参数值代表CPU编号，图中示例表示只有0号CPU可用。
+这是因为Fedora CoreOS镜像的内核默认配置了mitigations=auto,nosmt启动参数，会自动为有漏洞的系统禁用同步多线程技术SMT（Simultaneous Multi-Threading ），导致可用CPU减半。mitigations=auto,nosmt参数可以通过执行cat /proc/cmdline命令查看。
+关于SMT的更多信息，请参见Automatically disable SMT when needed to address vulnerabilities和Policy for disabling SMT。
+Linux操作系统（GuestOS）常见问题与解决方案附录
+检查fstab文件中的块设备信息是否存在?
+如果实例中存在块设备，但块设备信息在fstab文件中不存在，重启系统时可能导致系统无法正常启动。您必须移除/etc/fstab文件中不存在的块设备信息。具体操作，请参见如何移除Linux实例“/etc/fstab”文件中不存在的块设备。
+检查fstab文件中块设备是否正确挂载?
+如果未正确挂载块设备，重启系统时可能导致系统无法正常启动。具体操作，请参见Linux实例中存在未正确挂载的磁盘。
+检查fstab文件内容格式是否正确?
+如果/etc/fstab配置文件存在格式错误，重启系统时可能导致系统无法正常启动。具体操作，请参见Linux实例的“/etc/fstab”配置文件存在格式错误。
+使用fsck命令检查系统文件
+如果文件系统损坏，可能会导致实例无法正常启动。具体操作，请参见Linux实例的文件系统检查与修复。
+检查limits设置是否正确
+Linux系统的/etc/security/limits.conf配置文件可以对系统资源进行限制，如果系统中nofile参数值超过了nr_open参数值，则可能导致无法远程连接实例。具体操作，请参见调整Linux实例的nofile参数后，远程连接失败或提示“Too many open files”错误怎么办？。
+检查关键系统用户（即root账号）的密码是否存在
+实例中关键的系统用户信息丢失，会导致无法登录Linux实例。具体操作，请参见Linux实例中修复非Unix格式文件。
+检查系统关键文件格式
+一些关键文件的格式如果不是Unix格式，可能会导致无法登录Linux实例。具体操作，请参见Linux实例中修复非Unix格式文件。
+检查SSH的访问权限配置是否正确
+Linux实例中关于SSH的访问权限配置异常，会导致无法登录Linux实例。具体操作，请参见SSH的访问权限异常导致无法远程连接Linux实例。
+检查SSH访问所需要的关键文件或目录是否存在
+Linux实例中SSH访问所需要的关键文件或目录丢失，例如实例中缺少sshd_config配置文件，可能会导致无法登录Linux实例。具体操作，请参见检查Linux实例是否存在SSH服务所需的必备文件或目录。
+检查大页内存设置是否过大
+当实例的大页内存设置过大，可能会导致无法登录Linux实例，需要调整/etc/sysctl.conf文件中大页内存的值。具体操作，请参见调整Linux实例大页内存的方法。
+检查操作系统是否OOM
+如果存在OOM问题，可能会导致无法登录Linux实例。具体操作，请参见如何处理Linux实例中的OOM问题？。
+检查系统防火墙是否打开
+如果服务器开启了防火墙，并设置了屏蔽外界访问的规则，那么在远程连接该服务器时，可能会导致访问失败。具体操作，请参见管理 Linux 实例的系统防火墙。
+检查TCP SACK是否开启
+当Linux实例未开启TCP SACK时，可能会影响Linux实例的网络性能。具体操作，请参见Linux实例开启TCP SACK的方法。
+检查UDP缓存是否溢出
+在Linux实例内如果存在UDP缓存溢出的现象，可能会影响Linux实例的网络性能，导致无法登录Linux实例。具体操作，请参见Linux实例UDP缓存溢出导致无法远程连接。
+检查SELinux是否开启
+如果系统启用了SELinux服务，可能在远程连接实例时报错。具体操作，请参见Linux实例中由于SELinux服务开启导致SSH远程连接异常。
+无法通过SSH或VNC登录实例
+您可以卸载异常实例的系统盘，然后挂载到其他实例作为数据盘，在其他实例中进行相应的操作。具体操作，请参见卸载Linux实例的系统盘并挂载到其他ECS实例作为数据盘的方法。
+连接实例时报错
+使用root用户通过SSH登录Linux实例时，报Permission denied, please try again错误。具体操作，请参见如何解决SSH登录Linux实例时的“Permission denied, please try again”错误？。
+检查NAT环境内核参数是否正确
+本地网络通过NAT共享的方式上网，并且Linux系统相关内核参数配置异常，导致无法通过SSH连接Linux实例，访问该实例上的HTTP服务也出现异常。具体操作，请参见Linux系统内核配置问题导致NAT环境访问实例出现异常。
+检查进程是否启动以及常见业务端口是否处于监听状态
+如果您无法访问Linux实例中的服务，可能的原因之一是该服务对应的进程未处于运行中。具体操作，请参见Linux实例启动常见服务并查询端口监听状态的方法。
+检查DHCP配置是否正确
+ECS实例默认使用DHCP为弹性网卡自动分配IP地址，并获得IP地址租约到期时间。如果网卡配置文件存在错误，或者网卡对应的dhclient进程未运行可能引发Linux实例的DHCP服务出现异常，导致实例网络不通。具体操作，请参见Linux实例中本地网卡的DHCP配置检查与修复。
+检查网络相关进程是否存在
+Linux系统内对应的网络进程不存在，且网络配置为DHCP，则会在IP地址的租约到期之后，出现无法续租导致网络中断的问题。具体操作，请参见Linux系统网络进程不存在。
+检查网卡多队列是否开启
+网卡多队列指实例规格支持的最大网卡队列数。单台ECS实例CPU处理网络中断存在性能瓶颈时，您可以将实例中的网络中断分散给不同的CPU处理，从而提升性能。具体操作，请参见网卡多队列。
+检查TCP backlog是否溢出
+在Linux实例内如果存在TCP backlog缓存溢出的现象，可能会影响Linux实例的网络性能，导致无法登录Linux实例。具体操作，请参见Linux实例TCP backlog缓存溢出导致无法远程连接实例。
+CPU使用率是否过高
+如果CPU持续保持高使用率，则会对系统稳定性和业务运行造成影响。具体操作，请参见Linux实例CPU使用率或负载较高问题的排查与处理。
+磁盘无法写入文件
+随着业务的发展和应用数据增长，您可以在线扩容指定云盘的容量，包括系统盘和数据盘。具体操作，请参见步骤一：扩容云盘容量或者离线扩容云盘。
+基于弹性裸金属实例规格的ECS实例，系统生成crash dump文件失败如何解决？
+问题原因及解决方案，请参见部分ECS实例生成crash dump文件失败如何解决？。
+Linux操作系统内核回写时出现softlockup异常如何解决？
+部分低版本的Linux操作系统内核在回写（writeback）文件缓存时，会出现softlockup异常。具体的解决方案，请参见Linux操作系统内核回写时出现softlockup异常的解决方案。
+在ECS实例内删除cgroup出现softlockup异常如何解决？
+具体的解决方案，请参见在ECS实例内删除cgroup出现softlockup异常的解决方案。
+ECS实例宕机相关解决方案
+ECS实例宕机并报错“Out of memory and no killable processes”如何处理？
+ECS实例宕机并产生“Objects remaining in kmalloc”告警日志，如何处理？
+ECS实例宕机并产生“RIP:get_target_pstate_use_performance”日志，如何处理？
+ECS实例宕机并产生“VFS: Unable to mount root fs on unknown-block”日志，如何处理？
+vSwitch中实例数量过多导致CentOS实例夯机或异常重启问题的解决方案
+公共镜像自带FTP上传吗？
+不自带，需要您自己安装配置。具体操作，请参见搭建FTP站点（Windows）和搭建FTP站点（Linux）。
+为什么ECS默认没有启用虚拟内存或Swap说明？
+Swap分区或虚拟内存文件，是在系统物理内存不够用的时候，由系统内存管理程序将那些很长时间没有操作的内存数据，临时保存到Swap分区或虚拟内存文件中，以提高可用内存额度的一种机制。
+但是，如果在内存使用率已经非常高，而同时I/O性能也不是很好的情况下，该机制其实会起到相反的效果。阿里云ECS云盘使用了分布式文件系统作为云服务器的存储，对每一份数据都进行了强一致的多份拷贝。该机制在保证用户数据安全的同时，由于3倍增涨的I/O操作，会降低本地磁盘的存储性能和I/O性能。
+综上，为了避免当系统资源不足时进一步降低ECS云磁盘的I/O性能，Windows系统实例默认没有启用虚拟内存，Linux系统实例默认未配置Swap分区。
+如何在公共镜像中开启kdump？
+公共镜像中默认未开启kdump服务。若您需要实例在宕机时，生成core文件，并以此分析宕机原因，请参见以下步骤开启kdump服务。本步骤以公共镜像CentOS 7.2为例。实际操作时，请以您的操作系统为准。
+设置core文件生成目录。
+运行vim /etc/kdump.conf打开kdump配置文件。vim命令使用详情，请参见Vim编辑器。
+设置path为core文件的生成目录。本示例中，在/var/crash目录下生成core文件，则path的设置如下。
+path /var/crash
+保存并关闭/etc/kdump.conf文件。
+开启kdump服务。
+根据操作系统对命令的支持情况，选择开启方式。
+方法一：依次运行以下命令开启kdump服务。
+systemctl enable kdump.service
+systemctl start kdump.service
+方法二：依次运行以下命令开启kdump服务。
+chkconfig kdump on
+service kdump start
+方法三：如果您的服务器已安装云助手，可参考如何解决实例迁移后的宕机问题？开启kdump服务。
+如何设置Linux系统的ECS实例的静态IP地址？
+您需要远程连接ECS实例进行设置。具体操作，请参见如何在Linux实例中设置静态IP地址。
+如何在Linux实例中自定义配置DNS？
+具体操作，请参见如何在Linux实例中自定义配置DNS。
+Linux操作系统配置IPv6地址后，安装了NTP服务的服务器时间无法同步，如何处理？
+问题现象
+在服务器上执行ntpq -p同步时间时，返回超时。
+[root@xxx]# ntpq -p
+localhost: timed out, nothing received
+***Request timed out
+解决方案
+说明
+本方法适用于CentOS 7及以下、Ubuntu 20.04及以下、Anolis OS（ANCK\RHCK）、Alibaba Cloud Linux、Debian等系列操作系统。
+远程连接Linux实例。
+具体操作，请参见使用Workbench登录Linux实例。
+运行以下命令，修改/etc/ntp.conf配置文件。
+vi /etc/ntp.conf
+按i键进入编辑模式。
+确认配置文件中包含 restrict -6 ::1 这一行，配置文件参考内容如下。
+driftfile /var/lib/ntp/drift
+pidfile /var/run/ntpd.pid
+logfile /var/log/ntp.log
+# Access Control Support
+restrict -6 ::1
+restrict default kod nomodify notrap nopeer noquery
+restrict -6 default kod nomodify notrap nopeer noquery
+restrict 127.xxx.xxx.xxx
+restrict 192.xxx.xxx.xxx mask 255.xxx.xxx.xxx nomodify notrap nopeer noquery
+restrict 172.xxx.xxx.xxx mask 255.xxx.xxx.xxx nomodify notrap nopeer noquery
+restrict 100.xxx.xxx.xxx mask 255.xxx.xxx.xxx nomodify notrap nopeer noquery
+restrict 10.xxx.xxx.xxx mask 255.0.xxx.xxx nomodify notrap nopeer noquery
+# local clock
+server 127.xxx.xxx.xxx
+fudge 127.xxx.xxx.xxx stratum 10
+修改完成后按Esc键，并输入:wq后按下回车键，保存并退出。
+运行以下命令，重启NTP服务。
+systemctl restart ntp
+为什么使用自定义镜像创建的实例，热插拔云盘/网卡会失败？
+问题现象
+热插拔云盘指实例处于运行中状态时挂载/卸载云盘；热插拔网卡指实例处于运行中状态时绑定/解绑弹性网卡。
+阿里云支持热插拔云盘和网卡，但热插拔是否成功需要操作系统内核（Kernel）支持。如果操作系统内核不支持，则会出现以下问题：
+挂载云盘或绑定弹性网卡后，在操作系统内部查看不到对应的设备。
+卸载云盘或解绑弹性网卡失败。
+解决方案
+普通云服务器和裸金属服务器的热插拔需要内核支持的功能不同，建议内核都支持PCI（Peripheral Component Interconnect）、ACPI（Advanced Configuration and Power Management Interface）热插拔功能（除CentOS 5等低版本系统外，一般都默认开启）。您可以通过以下步骤查看内核是否开启PCI/ACPI热插拔功能。
+远程连接Linux实例。
+具体操作，请参见使用Workbench登录Linux实例。
+执行如下命令，查看当前实例内核版本。
+uname -r
+返回信息如下所示，表示当前系统内核版本为3.10.0-1127.19.1.el7.x86_64。
+执行如下命令，查看/boot目录下的文件。
+ll /boot
+返回信息如下所示，config-3.10.0-1127.19.1.el7.x86_64即为系统内核的配置文件。
+[test@iZbp17e4ydp ~]$ ll /boot
+total 141852
+-rw-r--r--. 1 root root 153567 Aug 26 2020 config-3.10.0-1127.19.1.el7.x86_64
+-rw-r--r--. 1 root root 153562 Apr 1 2020 config-3.10.0-1127.el7.x86_64
+drwxr-xr-x. 3 root root 4096 Sep 14 2020 efi
+drwxr-xr-x. 2 root root 4096 Sep 14 2020 grub
+drwx------. 5 root root 4096 Jun 27 15:45 grub2
+drwx------. 1 root root 58572648 Sep 14 2020 initramfs-0-rescue-20200914151306980406746494236010.img
+-rw-------. 1 root root 18515275 Nov 30 2021 initramfs-3.10.0-1127.19.1.el7.x86_64.img
+-rw-------. 1 root root 10733878 Sep 14 2020 initramfs-3.10.0-1127.19.1.el7.x86_64kdump.img
+-rw-------. 1 root root 18199672 Sep 14 2020 initramfs-3.10.0-1127.el7.x86_64.img
+-rw-------. 1 root root 10731212 Sep 14 2020 initramfs-3.10.0-1127.el7.x86_64kdump.img
+-rw-r--r--. 1 root root 320536 Aug 26 2020 symvers-3.10.0-1127.19.1.el7.x86_64.gz
+-rw-r--r--. 1 root root 320512 Apr 1 2020 symvers-3.10.0-1127.el7.x86_64.gz
+-rw-------. 1 root root 3612420 Aug 26 2020 System.map-3.10.0-1127.19.1.el7.x86_64
+-rw-------. 1 root root 3611662 Apr 1 2020 System.map-3.10.0-1127.el7.x86_64
+-rwxr-xr-x. 1 root root 6762688 Sep 14 2020 vmlinuz-0-rescue-20200914151306980406746494236010
+-rwxr-xr-x. 1 root root 6765160 Aug 26 2020 vmlinuz-3.10.0-1127.19.1.el7.x86_64
+-rwxr-xr-x. 1 root root 6762688 Apr 1 2020 vmlinuz-3.10.0-1127.el7.x86_64
+执行如下命令，查看系统内核配置文件。
+cat /boot/config-3.10.0-1127.19.1.el7.x86_64
+当以下配置项都是y，表示该功能已经编译进内核，操作系统支持对应的热插拔。
+CONFIG_HOTPLUG_PCI_PCIE=y
+CONFIG_HOTPLUG_PCI=y
+CONFIG_HOTPLUG_PCI_ACPI=y
+当某个配置项是is not set ，表示内核未编译该特性，需要重新编译内核以支持该特性。
+当某个配置项是m ，表示编译成module，例如以下CONFIG_HOTPLUG_PCI_ACPI是编译成module的，需要加载对应的module。
+CONFIG_HOTPLUG_PCI_PCIE=y
+CONFIG_HOTPLUG_PCI=y
+CONFIG_HOTPLUG_PCI_ACPI=m
+以CentOS 5.x操作系统2.6的内核为例，CONFIG_HOTPLUG_PCI_ACPI对应的module为acpiphp.ko，如果需要加载，需要执行modprobe acpiphp命令。如果加载失败，您可以升级高版本内核或停止实例后进行冷插拔。
+重要
+不建议随意自行升级云服务器的内核和操作系统版本。如果需要升级内核，请参见避免Linux实例升级内核系统无法启动的方法。
+操作系统内核错误后可能出现实例关机，如何处理？
+问题现象
+当操作系统内出现非预期内核错误（kernel panic）时，加载第二内核（捕获内核）进行内存转储生成Kdump日志。由于与裸金属实例规格存在兼容性问题，在第二内核启动过程中磁盘识别失败，导致Kdump日志采集失败并且第二内核启动失败，实例处于关机状态，后续需要在控制台重新启动实例。
+更多关于裸金属实例规格的信息，请参见实例规格族。
+问题原因
+裸金属实例使用操作系统自带的Kdump服务生成dump文件时可能失败。
+ebm*6代系列裸金属实例，在选用如下镜像时会出现该问题。
+CentOS 8.3及以下CentOS版本
+Ubuntu 16/18
+Debian 10
+Alibaba Cloud Linux 2的4.19.91-24.al7之前的内核版本（4.19.91-24.al7版本已修复）
+ebm*7代系列裸金属实例，在选用Debian 10镜像时会出现该问题。
+解决方案
+CentOS等镜像
+建议更换更高版本的操作系统。具体操作，请参见更换操作系统（更换系统盘）。
+Alibaba Cloud Linux 2镜像
+建议按照以下操作，升级内核版本到4.19.91-24.al7及以上。
+远程登录ECS实例。
+具体操作，请参见使用Workbench登录Linux实例。
+运行以下命令，查询内核版本。
+uname -r
+运行以下命令，升级内核版本。
+sudo yum update kernel
+运行以下命令，重启ECS实例，以使新的内核版本生效。
+sudo reboot

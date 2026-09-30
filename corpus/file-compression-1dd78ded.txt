@@ -1,0 +1,78 @@
+# 压缩文件后向实例上传文件
+> https://help.aliyun.com/zh/ecs/user-guide/file-compression
+
+文件大小和数量影响上传效率。为提升向ECS传输大文件或多个文件的速度，建议先压缩文件或文件夹，上传后再解压。本文将指导您如何压缩、解压文件，并在传输后检查文件完整性。
+方案概述
+对于大文件和大量文件的传输场景，可以提高文件传输效率。此外由于Workbench等工具每次只能上传单个文件，您可以通过文件压缩的方式，将多个文件压缩成一个压缩包，上传该压缩包，间接实现批量上传的操作。
+操作流程
+在本地压缩文件：在发送文件的操作系统中，将文件或文件夹压缩为一个压缩包。
+向实例上传压缩包：通过工具，将压缩包上传到实例。选择上传文件的方式，请参见选择传输文件的方式。
+在实例中解压：压缩包上传完毕后，在实例中解压该压缩包，完成文件压缩上传的操作。
+选择压缩工具
+您可以根据以下表格，选择合适的压缩工具压缩文件。
+您也可以根据偏好，选择合适的压缩、解压工具，其他压缩工具或压缩格式本文不过多赘述。
+本地操作系统
+实例操作系统
+压缩包格式
+压缩工具
+压缩教程
+解压教程
+Windows
+Windows
+zip
+系统自带
+Windows压缩zip
+Windows解压zip
+Windows
+Linux
+tar.gz
+7-zip
+Windows压缩tar.gz
+Linux解压tar.gz
+macOS、Linux
+Windows
+zip
+zip（命令行）
+macOS、Linux压缩zip
+Windows解压zip
+macOS、Linux
+Linux
+tar.gz
+tar（命令行）
+macOS、Linux压缩tar.gz
+Linux解压tar.gz
+压缩教程
+Windows压缩zip压缩包
+在Windows压缩zip格式的压缩包可以直接使用Windows自带的压缩功能。具体操作如下：
+不同操作系统界面可能有所差别。
+找到待压缩的文件夹或文件，选中后右键，单击发送到 > 压缩(zipped)文件夹。
+压缩完成后会在目标文件夹旁边生成一个.zip后缀的压缩包。
+Windows压缩tar.gz压缩包
+在Windows压缩tar.gz压缩包时，需要安装额外的压缩工具，本文以通过7-Zip工具压缩为例。
+不同工具的操作步骤可能有所差别，请根据实际情况调整。
+将文件夹打包成一个tar包。
+找到待压缩的文件夹或文件，选中后右键，单击7-Zip > 添加到压缩包，在添加到压缩包界面，设置压缩格式为tar格式，单击确定。本步骤会首先将文件打包成一个tar包。
+本示例中，待压缩的文件夹为 Windows 桌面上名为 test 的文件夹。
+将tar包压缩成tar.gz包。
+找到步骤1中打包的压缩包，选中后右键，单击7-Zip > 添加到压缩包，在添加到压缩包界面，设置压缩格式为gzip格式，单击确定。本步骤会将步骤1中生成的tar包压缩成.tar.gz后缀的压缩包。
+操作完成后，会在原来文件夹的旁边生成一个.tar.gz后缀的压缩包。
+macOS、Linux压缩zip压缩包
+在macOS或Linux系统的终端中，输入以下命令完成压缩。
+zip -r <压缩包名称>.zip <待压缩文件夹>
+例如，将test文件夹压缩成test.zip压缩包，可输入以下命令完成。
+zip -r test.zip test
+macOS、Linux压缩tar.gz压缩包
+在macOS或Linux系统的终端中，输入以下命令完成压缩。
+tar -zcvf <压缩包名称>.tar.gz <待压缩的文件夹>
+例如，将test文件夹压缩成test.tar.gz压缩包，可输入以下命令完成。
+tar -zcvf test.tar.gz test
+解压教程
+在Windows实例中解压zip压缩包
+在Windows实例中，找到待解压的zip压缩包。
+选中右键后，单击全部解压缩，在弹出的提取压缩(Zipped)文件夹对话框中，设置解压位置后，单击下一步，等待文件解压完成。
+本示例中，压缩文件为桌面上的 test.zip。
+在Linux实例中解压tar.gz压缩包
+在Linux实例中，进入压缩包所在目录，输入以下命令完成解压操作。
+tar -zxvf <压缩包名称>.tar.gz
+例如要解压名称为test.tar.gz的压缩包，可以输入以下命令完成解压。
+tar -zxvf test.tar.gz

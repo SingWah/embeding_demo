@@ -1,0 +1,36 @@
+# 通过Agent购买并管理Linux实例
+> https://help.aliyun.com/zh/ecs/user-guide/purchase-and-manage-linux-instances-through-agent
+
+本教程介绍如何通过AI售卖页购买安装了iac-code的ECS Linux实例，并在iac-code中使用自然语言管理ECS Linux实例。AI售卖页是智能云资源购买助手。用户通过自然语言描述需求，即可完成方案规划、资源选型、成本估算、模板生成和部署，实现从需求到云资源购买的一站式流程。iac-code是面向基础设施即代码（IaC）场景的智能助手，支持通过自然语言管理云资源。
+操作步骤
+步骤一：创建ECS实例并在其内部署iac-code
+通过AI售卖页，使用自然语言完成ECS创建和iac-code部署。
+访问百炼控制台，等待页面加载完成，百炼会自动完成服务开通。
+访问ROS控制台，单击AI售卖。
+在AI售卖页输入我要创建一台2核4G的ECS，同时部署iac-code agent，按回车键或单击生成方案。
+说明
+AI会根据您的意图，自动设计方案，规划云资源，生成ROS模板。方案包括描述、架构图、价格等信息。
+待方案生成后，选择方案，单击确认部署。等待部署完成。
+说明
+AI会自动使用资源编排ROS服务完成部署。若部署过程中出现异常，系统将自动修复。
+AI售卖页自动完成了以下操作：
+创建VPC、交换机、安全组、ECS和EIP，并完成网络绑定。
+配置安全组，只开放iac-code Web的8766端口。
+创建ECS RAM Role，授予云资源管理权限并绑定到ECS。
+将ECS RAM Role设置为iac-code默认云凭证方式，无需配置AccessKey。
+在北京地域创建百炼API Key，并限制为仅部署出来的ECS公网IP可用。
+在ECS上安装Python和最新版iac-code。
+自动生成Web访问Token，配置百炼API Key和默认模型。
+创建systemd服务、启动iac-code Web，并检查服务是否正常。
+输出Web访问地址、访问Token、ECS ID和公网IP。
+部署完成后，查看Stack 输出，复制Web 访问 Token的值，单击公网访问地址的链接，访问部署在ECS内的iac-code。
+粘贴已复制的Web 访问 Token，单击进入，进入iac-code首页。
+步骤二：使用iac-code和控制台管理ECS实例
+查看当前ECS实例信息：在输入框中输入当前ECS信息，按回车键提交。
+在ECS实例内部署nginx：在对话框中输入帮我安装nginx，允许公网访问，按回车键提交。待Agent执行完成后，访问网站链接。
+查看机器负载：在对话框中输入查看下机器负载，按回车键提交。
+查看ECS详情页：在对话框中输入给我ECS详情页的地址，按回车键提交。待Agent执行完成后，访问网站链接，查看ECS详情页。
+步骤三：清理资源
+在AI售卖页中输入释放下资源。
+如果要求确认，则回复确认释放。
+等待执行完成。

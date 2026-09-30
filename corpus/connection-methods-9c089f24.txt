@@ -1,0 +1,95 @@
+# 选择ECS远程连接方式
+> https://help.aliyun.com/zh/ecs/user-guide/connection-methods
+
+阿里云提供多种连接方案，可根据操作系统、安全性、便捷性与网络环境，按需选择。
+选择合适的工具连接实例
+连接工具
+适用操作系统
+是否需本地安装软件
+是否必须开通公网
+是否支持免密登录
+是否需要登录阿里云
+Workbench（浏览器）
+Windows、Linux
+否
+否
+是
+是
+会话管理（浏览器）
+Windows、Linux
+否
+否
+是
+是
+VNC（浏览器）
+Windows、Linux
+否
+否
+否
+是
+Workbench CLI
+Linux
+是
+否
+是
+是
+阿里云客户端
+Windows、Linux
+是
+否
+是
+是
+SSH客户端工具（三方）
+Linux
+是
+是
+否
+否
+RDP客户端工具（三方）
+Windows
+是
+是
+否
+否
+连接工具介绍&指引
+Workbench
+Workbench是阿里云提供的免安装远程连接工具，同时支持文件传输、多屏终端等功能。
+相关文档
+使用Workbench登录Linux实例
+使用Workbench登录Windows实例
+阿里云客户端
+阿里云客户端是阿里云官方提供的管理资源的软件，安装后，可通过该软件连接ECS实例。
+相关文档
+使用阿里云客户端远程连接（SSH）Linux实例
+使用阿里云客户端远程连接（RDP）Windows实例
+Workbench CLI
+Workbench CLI是阿里云 ECS 提供的命令行连接工具，提供文件传输、会话内 AI Agent 助手等功能。
+相关文档
+使用 Workbench CLI 管理 ECS 实例
+在 AI Agent 中使用 Workbench CLI 操作 ECS 实例
+会话管理
+会话管理是云助手提供的高安全级连接功能，通过免除公网IP隔绝外部攻击，同时通过审计功能保证操作有据可查。
+相关文档
+在控制台通过会话管理连接实例
+通过会话管理CLI（ali-instance-cli）连接实例
+VNC
+VNC可直接查看实例中操作系统的实时界面。支持查看实例启动阶段或停止中的系统界面。由于不受安全组设置或实例中运行软件的限制，可以作为排查其他连接方式异常的手段。
+相关文档
+通过VNC连接实例
+RDP客户端工具（非阿里云官方）
+使用其他第三方RDP客户端工具连接Windows实例，实例需要分配公网IP或EIP。
+常见的RDP客户端有Microsoft Remote Desktop、Windows远程桌面、Windows App等。
+相关文档
+使用远程桌面/Windows App远程连接Windows实例
+SSH客户端工具（非阿里云官方）
+使用其他第三方SSH客户端工具连接Linux实例，实例需要分配公网IP或EIP。
+常见的SSH工具有OpenSSH客户端、PuTTY、XShell等。
+相关文档
+使用OpenSSH/Xshell远程连接Linux实例
+常见问题
+如何查看实例是否分配公网IP？
+可在实例列表页查看实例是否分配公网IP，若未分配请开通公网。
+在实例列表的IP地址列中，带有(公)标记的即为实例的公网IP地址；若该列仅显示私有IP，则表示未分配公网IP。
+如何查看ECS实例的操作系统？
+可在实例列表页查看实例的操作系统信息，Windows系统以外的操作系统大多是Linux系统。
+如果发现安装了错误的操作系统，需要重装，请参见更换操作系统（更换系统盘）。

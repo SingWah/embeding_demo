@@ -1,0 +1,23 @@
+# OpenAPI最终一致性模型详解与实践
+> https://help.aliyun.com/zh/ecs/developer-reference/final-consistency-of-alibaba-cloud-ecs-openapi-resources
+
+阿里云 ECS 是基于分布式架构设计的云服务系统，其 OpenAPI 的资源操作具备异步处理特征。因此，ECS 遵循资源最终一致性（Eventual Consistency）模型。
+最终一致性说明
+当通过 OpenAPI 对资源执行创建、修改或删除操作后，这些变更可能不会立即反映在随后的查询接口（Read Operations）或其他依赖该资源的操作接口中。数据在系统各组件间同步需要时间，变更最终会体现在所有相关的 OpenAPI 执行结果中。
+在使用 OpenAPI 进行资源编排或自动化管理时，请务必将最终一致性纳入流程设计的考量。此处提到的“资源”涵盖 ECS OpenAPI 支持的所有实体，包括但不限于实例、云盘、弹性网卡、安全组等。
+典型影响场景
+受最终一致性影响，由于数据同步延迟，以下场景可能出现预期之外的结果：
+资源创建场景（写后读）
+当资源创建请求（如RunInstances）返回成功后，立即基于返回的资源 ID 执行查询（DescribeInstances）或操作（RunCommand、AttachDisk），可能会在短时间内返回资源不存在的错误（如InvalidInstance.NotFound）或空列表。
+资源释放场景（删后读/删后写）
+当资源释放请求（如DeleteInstances）返回成功后，立即查询该资源，仍可能查看到资源信息。若立即对该资源 ID 执行操作（如RunCommand），OpenAPI 层面可能会返回调用成功，但实际后端执行通常会因资源已从物理层面移除而失败。
+资源属性变更场景
+当资源配置变更请求（如DetachDisk卸载云盘）返回成功后，立即查询实例详情，短时间内可能仍显示云盘处于挂载状态。
+最佳实践建议
+为确保自动化流程的稳定性，建议采用以下策略处理最终一致性带来的影响：
+策略一：基于事件驱动（推荐）
+在发起资源操作后，不要依赖轮询查询，而是订阅云监控或 EventBridge 的资源状态变化事件。当收到资源创建完成或状态变更完成的事件通知后，再执行后续步骤。更多信息，请参考实例事件通知。
+策略二：基于状态查询的轮询（Polling）
+在使用 OpenAPI 执行操作后，调用资源的查询接口（如DescribeInstances、DescribeDisks）检查资源状态。建议采用指数退避（Exponential Backoff）策略，即逐步增加轮询的间隔时间，直到资源进入期望状态（如Running、Stopped）或超时。为避免无限等待，等待时间最长可达到 5 分钟。
+策略三：基于特定错误码的重试
+在执行操作类接口时，如果遇到状态冲突类错误码（例如：停止实例后立即回滚云盘，可能返回IncorrectInstanceStatus），应将其视为暂时性错误。建议捕获此类特定错误码进行重试，并结合指数退避策略，建议最大重试窗口设置为 5 分钟

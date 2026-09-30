@@ -1,0 +1,103 @@
+# 将Linux和Windows数据盘的MBR分区转换为GPT分区
+> https://help.aliyun.com/zh/ecs/user-guide/convert-data-disk-mbr-partition-to-gpt-partition
+
+因分区格式限制，若数据盘为MBR分区类型，且希望将其扩容至2 TiB以上，需将分区类型转换为GPT后再扩容分区及文件系统。
+操作步骤
+请确保为数据盘且已完成容量扩展后执行以下操作。
+Linux数据盘
+重要
+转换过程中通常不会丢失数据，但建议手动创建单个快照备份云盘数据，以防误操作。
+登录ECS实例。
+访问ECS控制台-实例。在页面左侧顶部，选择目标资源所在的资源组和地域。
+进入目标实例详情页，单击远程连接，选择通过Workbench远程连接。根据页面提示登录，进入终端页面。
+判断是否需要分区转换。
+运行sudo fdisk -lu，查看目标云盘的分区类型（Disklabel type）和目标设备名称Disk字段。
+Disk /dev/vda: 50 GiB, 53687091200 bytes, 104857600 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: gpt
+Disk identifier: 36124873-A4C8-46EF-B436-FFE48CB27EFE
+Device Start End Sectors Size Type
+/dev/vda1 2048 6143 4096 2M BIOS boot
+/dev/vda2 6144 415743 409600 200M EFI System
+/dev/vda3 415744 104857566 104441823 49.8G Linux filesystem
+Disk /dev/vdb: 3 TiB, 3324304687104 bytes, 6492782592 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: dos
+Disk identifier: 0x1441bd90
+Device Boot Start End Sectors Size Id Type
+/dev/vdb1 2048 104857599 104855552 50G 83 Linux
+示例中，目标设备/dev/vdb，Disklabel为dos表示分区类型为MBR，且扩容后容量大于2TiB，需要转换分区。否则无需转换，可直接扩容分区。
+转换分区类型。
+安装gdisk工具。
+Alibaba Cloud Linux及CentOS 类型
+type sgdisk || sudo yum install -y gdisk
+Ubuntu及Debian类型
+sudo apt-get update
+type sgdisk || sudo apt-get install -y gdisk
+将MBR分区转换为GPT分区。
+请将命令中的<待转换设备名称>替换为第2步获取的目标设备名称。
+重要
+sgdisk仅可对整个设备（如 /dev/vdb）转换，严禁直接对分区（如 /dev/vdb1）使用，否则会损坏文件系统。
+sudo sgdisk -g <待转换设备名称>
+示例中，目标设备名称为/dev/vdb，需执行sudo sgdisk -g /dev/vdb。
+返回The operation has completed successfully表示命令执行成功。
+查看分区转换结果。
+<待转换设备名称>请替换为第2步获取的目标设备名称。
+sudo fdisk -lu <待转换设备名称>
+示例需执行sudo fdisk -lu /dev/vdb。
+回执中，若Disklabel type为gpt，表示分区格式转换成功，可继续扩容分区与文件系统
+若转换分区后数据出现异常或转换失败，可使用快照回滚云盘，恢复数据。
+Windows数据盘
+步骤一：转换分区格式并重新分区
+转换过程会删除数据，请务必手动创建单个快照备份云盘数据，待分区转换成功后，需要通过快照恢复数据。
+重要
+转换期间云盘数据不可用，可能会中断业务，建议在规划好的停机窗口内执行。
+登录ECS实例。
+访问ECS控制台-实例。在页面左侧顶部，选择目标资源所在的资源组和地域。
+进入目标实例详情页，单击远程连接，选择通过Workbench远程连接。选择连接方式为终端连接，输入账号和密码，登录图形化终端页面。
+判断是否需要分区转换。
+在Windows Server桌面，右键单击图标，然后单击磁盘管理。
+在磁盘管理界面，右键单击目标磁盘，在弹出菜单中选择属性。
+在弹出的对话框中，单击卷页签，查看磁盘分区形式。
+因分区格式限制，若为MBR分区且扩容后容量大于2TiB需转换分区。否则无需转换，直接扩容分区与文件系统。
+转换分区类型。
+右键单击目标磁盘下的卷，选择删除卷，并在弹出的删除简单卷对话框中，单击是。
+若删除卷失败，通常是因程序占用导致。建议在业务低峰期重启实例以解除占用，再尝试删除。
+重要
+删除卷会清除该卷上的所有数据，请务必在删除前，确保已备份数据。
+目标磁盘下全部的卷删除完毕后，右键单击磁盘，选择转换成GPT磁盘。
+查看分区转换是否生效。
+右键单击磁盘，在弹出菜单中选择属性>卷，若磁盘分区格式为gpt表示分区转换成功。
+重新分区。
+右键单击磁盘的未分配区域，选择新建简单卷。
+在新建简单卷向导对话框中，单击下一步。
+在指定卷大小对话框中，设置简单卷大小，然后单击下一步。
+可选择使用默认值创建单个分区，也可自定义卷大小以划分多个分区。
+在分配驱动器号和路径对话框中，选择分配以下驱动器号并选择盘符名称，然后单击下一步。
+在格式化分区对话框中，选择按下列设置格式化这个卷，设置格式化信息后，单击下一步。
+查看新建的简单卷信息，单击完成，关闭新建简单卷向导。
+步骤二：恢复云盘数据
+不可利用快照回滚，避免回滚至MBR格式。
+使用快照创建数据盘。
+将新数据盘挂载至ECS实例。
+手动将数据拷贝至原数据盘。
+确认业务恢复正常后，请及时删除快照，卸载并释放通过快照创建的数据盘，以停止计费。
+常见问题
+fdisk -lu的回执为什么没有Disklabel type？
+若无Disk label type字段，可通过System字段判断：Linux表示MBR分区，GPT表示GPT分区。
+部分低版本fdisk可能无法正确显示GPT分区表，可使用 gdisk -l /dev/vdb查看分区类型。
+运行转换分区sgdisk -g命令时，提示“Secondary partition table overlaps the last partition by 33 blocks!”。
+原因：云盘尾部剩余空间不足33个扇区，没有足够的空间用于分区转换。
+解决方案：在ECS控制台扩展云盘容量后，再转换分区格式。
+运行转换分区type sgdisk || yum install -y gdisk命令时，提示“Insufficient space in download directory”。
+报错信息：
+Error downloading packages:
+gdisk-0.8.10-3.1.al7.x86_64: Insufficient space in download directory /var/cache/yum/x86_64/2.1903/updates/packages
+* free 0
+* needed 190 k
+原因：下载目录（/var/cache/yum/x86_64/2.1903/updates/packages）空间不足。
+解决方案：需清理下载目录的空间后，再转换分区格式。

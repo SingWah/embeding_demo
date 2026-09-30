@@ -1,0 +1,17 @@
+# 部署LNMP环境（Linux、Nginx、MySQL和PHP）
+> https://help.aliyun.com/zh/ecs/user-guide/deploy-lnmp/
+
+LNMP架构是一种流行的网站服务器解决方案，它结合了Linux操作系统、Nginx Web服务器、MySQL数据库和PHP编程语言。本文介绍部署LNMP环境的几种方式，以及各自的适用场景，您可以按需选择任意一种部署LNMP环境的方式。
+LNMP架构
+Linux：作为LNMP架构的核心，Linux提供了一个稳定且免费的操作系统环境，支持多种发行版，如Alibaba Cloud Linux、CentOS、Ubuntu等。
+Nginx：Nginx是一个高性能的Web服务器，以其高并发处理能力而闻名。它能够处理静态内容，并可通过FastCGI与PHP协同工作，处理动态内容。
+MySQL：MySQL是一个关系型数据库管理系统，用于存储网站数据。它是LNMP架构中的数据存储组件，提供数据查询和存储功能。
+PHP：PHP是一种服务器端脚本语言，用于生成动态网页内容。它可以嵌入HTML中，与Nginx和MySQL协同工作，提供完整的Web应用开发功能。
+示意图
+部署方式
+方式
+适用场景
+使用扩展程序部署LNMP环境
+如果您不希望花费太多时间在配置服务器上，并且对自定义要求不高的话，可以使用快捷部署LNMP环境。
+部署LNMP环境
+如果你想要深入了解PHP如何连接MySQL数据库，以及Nginx如何代理PHP服务，那么手动安装LNMP是最直接的学习方式。

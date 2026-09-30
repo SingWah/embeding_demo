@@ -1,0 +1,113 @@
+# 弹性计算 Agent 权限策略与资源隔离
+> https://help.aliyun.com/zh/ecs/user-guide/ecagent-permission-config
+
+阿里云主账号管理员可通过系统策略或自定义策略为 RAM 用户授予弹性计算 Agent 的使用权限，并了解产品内部会话、任务、IM 渠道的资源隔离机制。
+典型场景
+弹性计算 Agent 提供完整权限与只读权限两类典型场景，覆盖大多数授权需求：
+完整权限：允许 RAM 用户完成服务开通、发起会话、创建定时任务、配置 IM 渠道、查看配额与用量等操作。
+只读权限：仅允许 RAM 用户查看会话、任务、IM 渠道、配额与用量。
+如需精细控制，可参考自定义权限策略，基于 Action 列表创建自定义策略进行选择性授权。
+完整权限策略
+完整权限适用于需要为 RAM 用户配置弹性计算 Agent 完整权限的场景，涵盖服务开通、会话、定时任务、IM 渠道创建、配额、用量等操作。对应的系统权限策略：AliyunECAgentFullAccess，主账号仅需将此策略授予 RAM 用户即可获得完整的弹性计算 Agent 权限。
+策略内容如下（可用于自定义等价策略）：
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecagent:OpenAgentService",
+"ecagent:DescribeAgentService",
+"ecagent:ModifyAgentServiceAttribute",
+"ecagent:DescribeAgentCreditUsage",
+"ecagent:InvokeAgent",
+"ecagent:CreateAgentSchedule",
+"ecagent:DeleteAgentThread",
+"ecagent:DeleteAgentSchedule",
+"ecagent:DescribeAgentScheduleAttribute",
+"ecagent:DescribeAgentSchedules",
+"ecagent:DescribeAgentThreadAttribute",
+"ecagent:DescribeAgentThreadMessages",
+"ecagent:DescribeAgentThreads",
+"ecagent:ModifyAgentScheduleAttribute",
+"ecagent:ModifyAgentThreadAttribute",
+"ecagent:StopAgent",
+"appflow:CreateUserAuthConfig",
+"appflow:ListUserAuthConfigs",
+"appflow:CreateFlow",
+"appflow:ListFlows",
+"appflow:EnableFlow",
+"appflow:DisableFlow",
+"appflow:Validation"
+"Resource": "*"
+说明
+IM 渠道底层通过 AppFlow 集成钉钉、飞书、企业微信，因此完整权限策略中包含 appflow:* 相关 Action。当前 ecagent 命名空间需保持一致，否则 RAM 用户将无法正常调用 API。
+只读权限策略
+只读权限适用于需要为 RAM 用户仅授予查询能力的场景，包括会话查询、任务查询、IM 渠道查询、用量查询等。对应的系统权限策略：AliyunECAgentReadOnlyAccess。
+策略内容如下（可用于自定义等价策略）：
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecagent:DescribeAgentService",
+"ecagent:DescribeAgentCreditUsage",
+"ecagent:DescribeAgentScheduleAttribute",
+"ecagent:DescribeAgentSchedules",
+"ecagent:DescribeAgentThreadAttribute",
+"ecagent:DescribeAgentThreadMessages",
+"ecagent:DescribeAgentThreads",
+"appflow:ListUserAuthConfigs",
+"appflow:ListFlows",
+"appflow:Validation"
+"Resource": "*"
+自定义权限策略
+如果需要为 RAM 用户配置更精细的权限，可基于上述 Action 列表创建自定义策略。以下示例仅允许发起会话并查询会话历史，禁止创建定时任务：
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecagent:OpenAgentService",
+"ecagent:DescribeAgentService",
+"ecagent:DescribeAgentCreditUsage",
+"ecagent:InvokeAgent",
+"ecagent:DescribeAgentThreadAttribute",
+"ecagent:DescribeAgentThreadMessages",
+"ecagent:DescribeAgentThreads"
+"Resource": "*"
+资源隔离
+弹性计算 Agent 从产品设计层面高度重视数据安全与隔离。产品将会话、定时任务、IM 渠道等均视为资源，在产品级别实现子用户维度的资源隔离，确保各子用户仅可访问和操作自身所属的资源。
+资源类型
+资源类型
+说明
+归属维度
+会话
+用户与 Agent 的对话记录及上下文
+子用户
+定时任务
+用户创建的周期性运维任务
+子用户
+IM 渠道
+用户配置的 IM 机器人接入渠道
+子用户
+隔离机制
+会话隔离：每个子用户的会话记录、对话上下文相互独立，子用户 A 无法查看或访问子用户 B 的会话内容。
+定时任务隔离：每个子用户创建的定时任务仅对创建者可见和可操作。
+IM 渠道隔离：每个子用户配置的 IM 渠道仅对创建者可见。IM 机器人加入到群聊后，仅能列出 IM 渠道所属账号的会话信息。
+隔离规则
+规则
+说明
+资源归属
+资源由创建该资源的子用户独占归属
+访问控制
+子用户仅可访问和操作自身所属资源，不可跨子用户访问
+权限继承
+资源的操作权限遵循子用户的 RAM 权限范围
+资源删除
+资源仅可由归属子用户删除，删除后不可恢复
+常见问题
+RAM 用户如何获得弹性计算 Agent 使用权限？
+主账号管理员为 RAM 用户授予以下权限之一：完整权限使用 AliyunECAgentFullAccess 系统策略，只读权限使用 AliyunECAgentReadOnlyAccess 系统策略。详见本文的完整权限策略与只读权限策略章节。
+主账号能否查看子用户的会话和任务？
+当前版本主账号无法直接查看子用户的会话和定时任务。未来管理账号多账号资源共享功能上线后将支持。
+同一主账号下的不同子用户能否共享 IM 渠道？
+当前不支持。当前版本 IM 渠道由创建者子用户独占。未来任务与会话分享功能上线后将支持共享。
+子用户被删除后，其名下的资源如何处理？
+子用户被删除后，其名下的定时任务自动停止执行，IM 渠道自动断开连接，会话记录按会话历史保留天数（90 天）到期自动清理。

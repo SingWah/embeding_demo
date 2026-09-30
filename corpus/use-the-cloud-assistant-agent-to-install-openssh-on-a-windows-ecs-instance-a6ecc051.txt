@@ -1,0 +1,107 @@
+# 使用云助手在Windows实例中安装OpenSSH
+> https://help.aliyun.com/zh/ecs/user-guide/use-the-cloud-assistant-agent-to-install-openssh-on-a-windows-ecs-instance
+
+云助手Agent是为ECS实例执行云助手命令的程序，本文介绍通过云助手Agent在Windows系统的ECS实例中安装OpenSSH程序的方法。
+前提条件
+实例内已安装云助手Agent。具体操作，请参见安装云助手Agent。
+实例已分配固定公网IP地址或绑定弹性公网IP（EIP）。如您不清楚如何开通公网，请参见开通公网。
+安全组已添加SSH的22端口的规则。具体操作，请参见添加安全组规则。
+说明
+关于云助手Agent适用的操作系统版本，请参见云助手概述的使用限制章节。
+操作步骤
+访问ECS控制台-云助手。
+在页面左侧顶部，选择目标资源所在的资源组和地域。
+在页面右上角，单击创建/执行命令。
+在创建执行命令页面，设置命令信息、选择实例或托管实例等。
+参数
+描述
+命令信息
+命令来源
+选择输入命令内容，创建一个新命令。
+命令类型
+选择命令类型。
+Windows：选择PowerShell。
+命令内容
+请粘贴以下命令到命令内容框中：
+$curDir = $PSScriptRoot
+Set-Location $curDir
+# Check the OS version
+$OSversion = [Environment]::OSVersion.Version
+if ($OSversion.Major -lt 6 -or ($OSversion.Major -eq 6 -and $OSversion.Minor -lt 1)) {
+throw "This script is not supported on Windows 2008 or lower"
+$Arch =([Array](Get-WmiObject -Query "select AddressWidth from Win32_Processor"))[0].AddressWidth
+if ($Arch -ne "64") {
+throw "Only 64-bit system architecture is supported"
+function Check-Env() {
+$srv_status = (Get-WmiObject -Class win32_service -Filter "name= 'sshd'").Status
+if ( $srv_status -match "OK") {
+Write-Host "system already installed opensshd"
+exit
+function Download-File($file_url = "{{sshd_download_url}}", $file_path = "C:\Programdata\OpenSSH-Win64.zip") {
+if (Test-Path $file_path) { return; }
+[System.Net.ServicePointManager]::SecurityProtocol=[System.Net.SecurityProtocolType]::Tls12
+Invoke-WebRequest -Uri $file_url -OutFile $file_path -UseBasicParsing
+if (! $?) { throw "$file_url download to $file_path error" }
+function Unzip-File($src_file = "C:\Programdata\OpenSSH-Win64.zip", $dst_file = "C:\Programdata") {
+Expand-Archive -Path $src_file -DestinationPath $dst_file
+if (! $?) { throw "Unzip $src_file to $dst_file error, please check" }
+function Install-Ssh() {
+powershell.exe -ExecutionPolicy Bypass -File C:\Programdata\OpenSSH-Win64\install-sshd.ps1
+if (! $?) {
+throw "Install openssh error, please check"
+Start-Service sshd
+Set-Service -Name "sshd" -StartupType Automatic; Start-Service sshd
+if (! $?) {
+throw "set sshd enable auto start or start sshd error , please check"
+Check-Env
+Download-File
+Unzip-File
+Install-Ssh
+使用参数：开启该功能后，您需指定命令中的参数{{sshd_download_url}}，即从OpenSSH官网获取需要下载安装的OpenSSH版本，参数示例：https://github.com/PowerShell/Win32-OpenSSH/releases/download/v9.5.0.0p1-Beta/OpenSSH-Win64.zip。
+执行计划
+单击立即执行。
+命令名称
+设置命令名称。
+命令描述
+设置命令的描述信息。建议设置命令用途等信息，方便后续管理维护。
+执行用户
+在ECS实例中执行命令的用户名称。
+使用最小权限执行命令是权限管理的最佳实践，建议您以普通用户身份执行云助手命令。更多信息，请参见设置普通用户执行云助手命令。
+说明
+默认情况下，在Linux实例中以root用户执行命令，在Windows实例中以System用户执行命令。
+执行路径
+Windows：默认在云助手Agent进程目录C:\ProgramData\aliyun\assist\$(version)。
+超时时间
+设置命令在实例中的超时时间，当执行命令的任务超时后，云助手将强制终止任务进程。
+单位为秒，默认为60秒，建议超时时间设置为300，具体时间可根据网络情况调整。
+选择实例
+选中需要执行命令的目标实例。
+选择托管实例
+选中需要执行命令的目标实例。
+说明
+托管实例是云助手托管的非阿里云服务器，更多信息，请参见混合云托管服务器。
+单击执行并保存，确认命令执行成功。
+执行状态显示为成功执行，ExitCode为0，输出中包含sshd and ssh-agent services successfully installed，表明OpenSSH服务安装成功。
+确认OpenSSH程序安装成功。
+通过VNC远程登录Windows实例。
+具体操作，请参见通过VNC连接实例。
+单击 > Windows PowerShell，打开Windows PowerShell命令终端。
+执行以下命令，确认安装OpenSSH程序成功。
+NETSTAT.EXE -ano
+系统显示类似如下，表示已正常监听22端口。
+PS C:\Users\Administrator> NETSTAT.EXE -ano
+活动连接
+协议 本地地址 外部地址 状态 PID
+TCP 0.0.0.0:22 0.0.0.0:0 LISTENING 2880
+TCP 0.0.0.0:135 0.0.0.0:0 LISTENING 892
+TCP 0.0.0.0:445 0.0.0.0:0 LISTENING 4
+TCP 0.0.0.0:3389 0.0.0.0:0 LISTENING 136
+TCP 0.0.0.0:47001 0.0.0.0:0 LISTENING 4
+TCP 0.0.0.0:49664 0.0.0.0:0 LISTENING 580
+TCP 0.0.0.0:49665 0.0.0.0:0 LISTENING 524
+TCP 0.0.0.0:49666 0.0.0.0:0 LISTENING 1116
+TCP 0.0.0.0:49667 0.0.0.0:0 LISTENING 1908
+TCP 0.0.0.0:49668 0.0.0.0:0 LISTENING 1824
+确认使用SSH客户端远程连接Windows实例成功。
+说明
+请使用Windows实例当前的用户名和密码登录实例。

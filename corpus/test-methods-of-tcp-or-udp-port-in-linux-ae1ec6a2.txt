@@ -1,0 +1,91 @@
+# Linux系统中TCP/UDP端口测试方法
+> https://help.aliyun.com/zh/ecs/user-guide/test-methods-of-tcp-or-udp-port-in-linux
+
+本文介绍在Linux系统的ECS实例中，如何测试TCP和UDP端口的连通性。
+测试TCP端口连通性
+请根据您待测试端口的当前状态，选择合适的方案：
+如果待测试的端口已被监听，可选择方法一：使用Telnet测试已有监听端口。
+如果待测试的端口未被监听，可选择方法二：创建新的监听端口测试。
+方法一：使用Telnet测试已有监听端口
+远程连接到Linux系统实例。
+具体操作，请参见使用Workbench登录Linux实例。
+执行以下命令，使用Telnet工具测试端口的连通性。
+例如，测试服务器121.11.XX.XX的1234端口连通性时，可执行sudo telnet 121.11.XX.XX 1234。
+# 请替换[$Host]为目标服务器IP地址、[$Port]为待测试端口号。
+sudo telnet [$Host] [$Port]
+若成功连接，系统会返回类似如下信息。不同Linux系统环境下，显示可能有所不同，但通常若包含 Connected to ...信息，则说明连接成功。
+说明
+如果端口未测通，请确认目标服务器的安全组是否放通测试端口，若未放通，则需添加对应的安全组规则，操作请参见添加安全组规则。
+Trying 121.11.XX.XX...
+Connected to 121.11.XX.XX.
+Escape character is '^]'.
+方法二：创建新的监听端口测试
+您需要准备两台实例，一台作为服务端，一台作为客户端，测试时，测试的是服务端中的端口连通性。
+服务端：待创建新监听端口并测试其连通性的服务器。
+客户端：通过连接服务端的端口，协助测试使用的服务器。
+远程连接到Linux系统实例。
+具体操作，请参见使用Workbench登录Linux实例。
+在服务端中，执行以下命令，确认是否安装Python及Python版本。
+python -V
+若系统显示Python版本信息，则说明Python已安装。
+若未安装，请参见部署Python环境安装Python。
+在服务端中，执行以下命令，使用Python自带的Web服务器临时创建新的监听端口。
+例如，使用Python 3.x创建新的监听端口1234时，可执行sudo python3 -m http.server 1234。
+Python 2.x
+# 请替换[$Port]为待测试端口号。
+sudo python -m SimpleHTTPServer [$Port]
+Python 3.x
+# 请替换[$Port]为待测试端口号。
+sudo python3 -m http.server [$Port]
+系统会返回类似如下信息。
+Serving HTTP on 0.0.0.0 port 1234 ...
+说明
+在客户端测试完成后，按Ctrl+C键终止进程。
+在客户端中，执行以下命令，使用Telnet工具测试服务端新监听端口的连通性。
+例如，测试服务端121.11.XX.XX的1234端口连通性时，可执行sudo telnet 121.11.XX.XX 1234。
+# 请替换[$Host]为服务端IP地址、[$Port]为待测试端口号。
+sudo telnet [$Host] [$Port]
+若成功连接，系统会返回类似如下信息。不同Linux系统环境下，显示可能有所不同，但通常若包含 Connected to ...信息，则说明连接成功。
+说明
+如果端口未测通，请确认服务端的安全组是否放通测试端口，若未放通，则需添加对应的安全组规则，操作请参见添加安全组规则。
+Trying 121.11.XX.XX...
+Connected to 121.11.XX.XX.
+Escape character is '^]'.
+测试UDP端口连通性
+您需要准备两台实例，一台作为服务端，一台作为客户端，测试时，测试的是服务端中的端口连通性。
+服务端：待测试UDP端口连通性的服务器。
+客户端：通过连接服务端的端口，协助测试使用的服务器。
+远程连接到Linux系统实例。
+具体操作，请参见使用Workbench登录Linux实例。
+分别在服务端和客户端实例执行以下命令，检查系统是否安装了nc程序。
+which nc
+若系统返回类似如下，则说明已安装nc程序。
+/usr/bin/nc
+说明
+如果未安装nc程序，您可以根据操作系统的不同，使用yum或apt-get等工具进行安装。例如sudo yum install -y nc。
+在服务端中，执行以下命令，监听某个需要测试的端口。
+例如，测试3333端口连通性时，可执行sudo nc -uvlp 3333。
+# 请替换[$Port]为待测试端口号。
+sudo nc -uvlp [$Port]
+若成功连接，系统会返回类似如下信息。
+Ncat: Version 7.92 ( https://nmap.org/ncat )
+Ncat: Listening on :::3333
+Ncat: Listening on 0.0.0.0:3333
+在客户端中，执行以下命令，连接服务端需要测试的端口。
+例如，连接服务端111.22.XX.XX的3333端口时，可执行sudo nc -u 111.22.XX.XX 3333。
+# 请替换[$Host]为服务端IP地址、[$Port]为待测试端口号。
+sudo nc -u [$Host] [$Port]
+连接成功后，在客户端中输入测试字符，例如test，如果服务端同步收到数据，则说明端口连通性正常。
+说明
+如果端口未测通，请确认服务端的安全组是否放通测试端口，若未放通，则需添加对应的安全组规则，操作请参见添加安全组规则。
+[ecs-user@ixxx ~]$ sudo nc -u 1xxx 3333
+test
+example
+服务端成功接收到客户端发送的 test 和 example 消息，说明 UDP 端口 3333 连通性正常。服务端终端输出示例：
+[ecs-user@ixxx ~]$ sudo nc -uvlp 3333
+Ncat: Version 7.92 ( https://nmap.org/ncat )
+Ncat: Listening on :::3333
+Ncat: Listening on 0.0.0.0:3333
+Ncat: Connection from 1xxx.
+test
+example

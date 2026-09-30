@@ -1,0 +1,122 @@
+# 安装SharePoint 2016
+> https://help.aliyun.com/zh/ecs/user-guide/install-sharepoint-2016
+
+SharePoint Server 2016是由Microsoft开发的企业协作平台和内容管理系统，可以共享和管理内容、知识和应用程序，加强团队合作、快速查找信息并在整个组织内实现无缝协作。本文介绍如何在Windows Server系统的ECS实例上安装SharePoint Server 2016。
+环境要求
+安装SharePoint Server 2016的系统环境需要满足如下要求：
+更多系统要求，请参见SharePoint Server 2016的硬件和软件要求。安装SharePoint时会提示安装依赖组件，如果依赖组件安装失败，会导致SharePoint无法安装。
+系统环境
+要求
+服务器
+操作系统： Windows Server 2012 R2、Windows Server 2016、Windows Server 2019
+vCPU和内存：4vCPU 8 GiB（请根据真实环境设计架构以及购买服务器配置）
+数据库
+SQL Server 2012、2014、2016、2017、2019、2022
+服务及组件
+AD
+DNS
+DHCP
+IIS
+Net Framework 3.5（安装SQL server 需要.net Framework 3.5支持）
+准备工作
+创建满足安装SharePoint Server 2016要求的Windows Server系统的ECS实例。具体操作，请参见自定义购买实例。
+本文使用以下配置：
+实例规格：4 vCPU、8 GiB的实例规格
+镜像： Windows Server 2019 数据中心版 64位中文版
+公网IP：选中分配公网 IPv4 地址
+步骤一：添加AD、DHCP、DNS、IIS服务
+添加AD、DHCP、DNS、IIS服务
+重要
+除额外说明的配置外，部分配置步骤已省略，配置时保持默认配置，单击下一页(N)即可。
+远程连接已创建的ECS实例。
+具体操作，请参见使用Workbench登录Windows实例。
+单击图标，然后单击服务器管理器。
+关闭IE增强安全设置。
+在左侧导航栏，选择本地服务器，然后单击IE 增强的安全设置右侧的启用。
+在Internet Explorer 增强的安全配置对话框中，选中管理员(A)和用户(U)下的关闭，然后单击确定。
+在左侧导航栏，选择仪表板，然后单击添加角色和功能。
+在安装类型步骤中，选中基于角色或基于功能的安装。
+在服务器角色步骤中，选中Active Directory 域服务、DHCP 服务器、DNS 服务器、Web 服务器(IIS)，然后单击下一页(N)。
+在功能步骤中，选中.NET Framework 3.5 功能，然后单击下一页(N)。
+展开 .NET Framework 3.5 功能，勾选其下所有子项：.NET Framework 3.5 (包括 .NET 2.0 和 3.0)、HTTP 激活、非 HTTP 激活。
+在确认步骤中，单击安装(I)。
+配置AD服务
+在结果步骤中，单击将此服务器提升为域控制器。
+在Active Directory 域服务配置向导对话框中，将选择部署操作设置为添加新林(F)，输入根域名（例如example.com），单击下一页(N)。
+输入目录服务还原模式（DSRM）密码，单击下一页(N)。
+在先决条件检查步骤中，单击安装(I)。
+安装完成后，系统会自动重启。
+先决条件检查全部通过后，页面顶部显示绿色提示“所有先决条件检查都成功通过”，同时列出三条黄色警告信息：
+Windows Server 2019 域控制器默认加密算法安全设置（参考知识库文章 942564）
+物理网络适配器未分配静态 IP 地址
+无法创建该 DNS 服务器的委派，建议手动创建
+配置DHCP服务
+再次远程连接已创建的ECS实例。
+具体操作，请参见使用Workbench登录Windows实例。
+打开服务器管理器。
+在服务器管理器界面，单击图标，然后单击完成 DHCP 配置。
+在DHCP 安装后配置向导对话框中，单击下一页(N)。
+在授权步骤中，选中使用以下用户凭据(U)，单击提交。
+步骤二：安装SQL Server
+前往SQL Server下载页，选择下载合适的SQL Server。
+本文中由于是测试环境，使用的是SQL Server 2022 Express版本。
+说明
+Express版本默认不支持TCP/IP协议，需要手动开启。
+Express版本默认（可能）没有管理控制台，需要单独安装SQL管理工具。
+建议使用企业版数据库生成系统，Express版本相对企业版本缺少部分功能。
+双击SQL Server安装包，选择安装类型为自定义(C)。
+选择SQL Server 2022下载位置，单击安装(I)。
+在SQL Server 安装中心界面，单击全新 SQL Server 独立安装或向现有安装添加功能。
+在适用于SQL Server 的Azure扩展步骤中，取消勾选适用于SQL Server 的Azure扩展，然后单击下一步(N)。
+在功能选择步骤中，保持默认，然后单击下一步(N)。
+在实例配置步骤中，选中默认实例(D)，然后单击下一步(N)。
+在数据库引擎配置步骤中，选中Windows 身份验证模式(W)，单击添加当前用户(C)，然后单击下一步(N)。
+根据界面提示，完成安装SQL Server。
+步骤三：安装配置SharePoint Server 2016
+安装SharePoint 2016必备组件
+前往SharePoint Server 2016下载页，下载SharePoint镜像文件。
+将Microsoft SharePoint Server 2016镜像文件解压，然后双击准备工具的可执行文件prerequisiteinstaller.exe。
+在产品准备工具界面，单击下一页(N)。
+产品准备工具将安装配置以下必备组件：Web 服务器(IIS)角色、Microsoft SQL Server 2012 Native Client、Microsoft ODBC Driver 11 for SQL Server、Microsoft Sync Framework Runtime v1.0 SP1 (x64)、Windows Server AppFabric、Microsoft Identity Extensions、Microsoft Information Protection and Control Client 2.1、Microsoft WCF Data Services 5.6、Microsoft .NET Framework 4.6。
+选中我接受许可协议的条款，单击下一页(N)。
+当显示安装完成界面时，说明组件已安装，请单击完成重启系统。
+安装完成界面显示各组件状态：部分组件（如 Microsoft SQL Server 2012 Native Client、Microsoft ODBC Driver 11 for SQL Server、Microsoft Sync Framework Runtime v1.0 SP1 (x64)）安装成功，部分组件（如 Windows Server AppFabric、Microsoft Identity Extensions 等）因需要重启而跳过安装。单击 完成 重启系统后将继续安装剩余组件。
+重启后，当显示安装完成界面时，说明已安装完成。
+安装SharePoint Server 2016
+打开Microsoft SharePoint Server 2016镜像文件，双击安装文件setup.exe，开始安装Microsoft SharePoint Server 2016。
+输入产品密钥，单击继续(C)。
+选中我接受许可协议的条款(A)，单击继续(C)。
+选择文件位置，单击立即安装(I)。
+安装位置默认为 C:\Program Files\Microsoft Office Servers，搜索索引文件位置默认为 C:\Program Files\Microsoft Office Servers\16.0\Data。
+配置SharePoint Server 2016
+选中立即运行 SharePoint 产品配置向导(R)，单击关闭(C)。
+在SharePoint 产品配置向导界面，单击下一步(N)。
+在弹出的对话框中，单击是(Y)，允许在配置过程中重启服务。
+选中创建新的服务器场(R)，然后单击下一步(N)。
+配置数据库设置和指定数据库访问账户信息，单击下一步(N)。
+由于SharePoint的数据库在本机，所以填写本机的数据库及账户。
+在配置数据库设置页面，数据库服务器(S)填写.（表示本机），数据库名称(A)填写 SharePoint_Config；在数据库访问帐户区域，用户名(U)填写 EXAMPLE\administrator，密码(P)填写对应密码。
+配置指定服务器场的密码，单击下一步(N)。
+设置服务器角色，选择前端，单击下一步(N)。
+设置SharePoint管理中心的端口号，单击下一步(N)。
+本示例以10000端口号为例，您可以根据实际情况设置端口号。
+在配置安全设置区域，选择验证方式为 NTLM。
+查看并确认SharePoint配置，单击下一步(N)。
+当显示如下所示时，说明SharePoint已配置成功。
+配置成功页面显示以下配置结果：
+配置数据库服务器：test1
+配置数据库名称：SharePoint_Config
+宿主管理中心 Web 应用程序：是
+管理中心 URL：http://test1:10000/
+验证提供程序：NTLM
+本地服务器角色：前端
+单击 完成 关闭向导并启动 SharePoint 管理中心网站。
+在浏览器中输入管理中心URL，即可访问SharePoint的管理中心。
+成功访问 SharePoint 管理中心首页后，页面展示以下管理功能模块入口：
+应用程序管理：管理 Web 应用程序、创建网站集、管理服务应用程序、管理内容数据库
+系统设置：管理此场中的服务器、管理服务器场中的服务、管理服务器场功能、配置备用访问映射
+监控：查看问题和解决方案、检查作业状态
+备份和还原：执行备份、从备份还原、执行网站集备份
+安全性：管理服务器场管理员组、配置服务帐户
+升级和迁移：转换服务器场许可证类型、查看产品和修补程序安装状态、查看升级状态
+一般应用程序设置、应用程序、Office 365、配置向导

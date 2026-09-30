@@ -1,0 +1,1432 @@
+# 实例健康诊断项有哪些
+> https://help.aliyun.com/zh/ecs/user-guide/diagnosis-and-diagnosis-result
+
+本文介绍诊断功能支持的ECS管理控制台诊断项和OpenAPI诊断指标，并提供了详细的诊断范围及建议操作供您参考。
+ECS管理控制台诊断项
+实例健康诊断功能支持以下诊断：
+计算服务健康诊断：诊断云服务器ECS底层的资源和虚拟化层，确保ECS底层服务无异常。
+网络服务健康诊断：检查实例内部网络组件状态，以及外部网络环境异常等情况。
+存储服务健康诊断：检查实例磁盘的运行状态是否存在异常。
+实例配置管理健康诊断：检查实例在启动过程中或运行中，是否被某个操作阻塞（block）导致实例无法启动或者运行异常。
+安全控制健康诊断：检查实例关联的所有安全组入方向常见端口的放行状态。
+费用类健康诊断：检查实例本身和实例关联组件（例如公网IP流量、EIP流量）是否欠费。
+资源配额健康诊断：检查核心资源的使用量是否即将达到配额上限。
+实例操作系统内相关配置诊断（Linux）：检查实例操作系统内的系统文件、关键进程、常用业务端口占用状态、防火墙状态等是否正常。
+实例操作系统内相关配置诊断（Windows）：检查实例操作系统内的常用业务端口占用状态、防火墙状态等是否正常。
+说明
+计算服务健康诊断、网络服务健康诊断、存储服务健康诊断、实例配置管理诊断发现的异常属于非实时态异常，诊断结果会包括过去12小时内存在过的异常以便查看历史问题，不一定需要实时修复。
+安全控制健康诊断、费用类诊断、资源配额诊断、实例操作系统内相关配置诊断发现的异常属于实时态异常，在当前诊断时就存在，建议实时修复此类异常。
+计算服务健康诊断结果说明
+诊断项（控制台）
+描述
+诊断范围及建议操作
+实例申请资源异常
+因CPU或内存资源不足，导致实例无法正常启动。
+检查该实例所需要的CPU、内存等物理资源是否充足。
+在需要重新为实例分配资源时，例如从节省停机模式启动实例，如果因为库存不足导致物理资源不足，将使实例无法启动。您可以等待几分钟后重新尝试开机，或者在其他地域或可用区尝试重新创建实例。
+实例操作系统异常
+实例操作系统出现了内核Panic、OOM异常或内部宕机等故障。
+检查该实例的操作系统（Guest OS）内部是否存在内核Panic、OOM异常或内部宕机等故障。
+此类故障可能是由于实例配置不当或用户空间的程序配置不当导致的，您可以尝试通过重启实例进行恢复。
+实例虚拟化异常
+实例在运行中出现崩溃或异常暂停。
+检查该实例底层虚拟化层核心服务是否出现异常。
+出现此类异常可能会导致实例崩溃或出现异常暂停，您可以尝试通过重启实例进行恢复。
+实例所在宿主机告警
+实例所在的物理设备出现故障告警。
+检查该实例所在的底层物理机是否有故障。
+如果底层物理机存在故障，则可能会影响实例的运行状态或性能。您可以尝试通过重启实例进行恢复。
+实例性能受限
+积分型实例当前处于性能受限模式。
+检查突发性能实例的CPU积分余额是否足够支付维持高性能所需的积分。
+如果积分不够，则该突发性能实例在业务高峰时只能使用基准性能，而无法启动突发性能。
+实例CPU异常
+实例因CPU争抢而出现异常，或者独享型实例的CPU绑定失败。
+检查共享型实例底层是否存在CPU争抢。
+如果存在CPU争抢，可能导致该实例无法获得CPU或出现其他异常。您可以尝试通过重启实例进行恢复。
+实例管控系统异常
+ECS实例后台管控系统发生异常。
+检查该实例的后台管控系统是否正常工作。
+如果后台管控系统未正常工作，可能会导致实例运行异常。您可以尝试通过重启实例进行恢复。
+实例性能短暂受损
+检查实例是否受到底层软硬件问题的影响，导致性能短暂受损。
+检查实例是否存在因底层软硬件问题导致的性能受损。
+如果存在性能受损，会提示发生时间，请您检查该实例的历史系统事件或者系统日志进行确认。具体操作，请参见查看历史系统事件和查看实例的系统日志和屏幕截图。
+网络服务健康诊断结果说明
+诊断项（控制台）
+描述
+诊断范围及建议操作
+实例的底层网络链路存在丢包
+实例对应的底层网络物理设施或网络服务存在丢包。
+检查该实例的底层网络链路是否存在丢包现象。
+如果存在，将影响实例的网络连通性或网络吞吐，例如导致实例无法远程连接，或网速过慢。您可以尝试通过重启实例进行恢复。
+实例的网络配置不一致
+实例当前生效的网络配置与底层服务配置存在不一致。
+检查该实例的底层网络配置是否一致。
+如果实例的底层网络配置不一致 ，将影响实例的网络性能。您可以尝试通过重启实例进行恢复。
+实例链路层异常
+实例网卡链路层出现异常。
+通过向网卡发送ARP（地址解析协议）请求来验证实例基础网络配置是否正常。
+如果请求失败，则很有可能是实例未正常启动或网络配置有问题，您可以尝试通过重启实例进行恢复。
+网卡加载异常
+实例的网卡加载异常。
+检查该实例的网卡是否能正常加载。
+如果网卡无法正常加载，将影响实例的网络连通性，例如实例无法远程连接。您可以尝试通过重启实例进行恢复。
+网卡丢包
+网卡入方向或出方向存在丢包现象。
+检查该实例的网卡入方向或出方向是否存在丢包现象。
+如果存在，将影响实例的网络连通性或网络吞吐，例如导致实例无法远程连接，或网速过慢。您可以尝试通过重启实例进行恢复。
+网络会话异常
+网卡会话无法正常建立，或会话数超过上限。
+检查该实例的网卡是否能正常建立会话。
+如果网卡无法建立会话或已建立的会话超过限制，将影响实例的网络连通性或网络吞吐，例如导致实例无法远程连接，或网速过慢。您可以尝试通过重启实例进行恢复。
+DDos攻击的防护状态异常
+检查实例的公网IP是否受到DDoS攻击以及防护状态。
+检查该实例的IP地址是否受到了DDoS攻击。
+阿里云免费提供的DDoS原生防护服务可以帮您完成一定程度的攻击流量清洗，缓解DDoS攻击造成的不可用，但如果攻击流量已超出您实例的防护能力，仍会导致实例进入不可用状态，无法正常访问。更多DDoS攻击详情，请参见什么是DDoS攻击。
+您可以视情况购买其他DDoS防护产品抵御DDoS攻击，更多信息，请参见如何选择DDoS防护产品。
+阿里云DDoS预防最佳方案，请参见DDoS攻击解缓方案。
+网络流量达到实例网络带宽上限
+检查实例的网络突发带宽是否受到限制。
+检查该实例的突发网络带宽。
+如果突发网络带宽已超过实例规格对应的网络突发带宽上限，会导致网络性能成为业务瓶颈，请您将实例升级至网络带宽能力更高的实例规格。具体操作，请参见修改实例规格。
+说明
+不同实例规格的网络突发带宽能力，请参见实例规格族。
+网络流量因达到实例网络带宽上限而受限
+检查实例的内外网带宽总量是否达到该实例规格对应的网络带宽上限。
+检查该实例的内外网带宽总量。
+如果带宽总量已超过实例规格对应的网络基础带宽上限，会导致网络性能成为业务瓶颈，请您将实例升级至网络带宽能力更高的实例规格。具体操作，请参见修改实例规格。
+说明
+不同实例规格的网络基础带宽能力，请参见实例规格族。
+存储服务健康诊断结果说明
+诊断项（控制台）
+描述
+诊断范围及建议操作
+磁盘扩容未生效
+在控制台对Linux实例的磁盘扩容后，检查是否需要进一步执行扩容命令。
+检查在控制台对该实例的磁盘扩容后，是否已经生效。如果在控制台完成了扩容操作但实际没有生效，需要手动执行扩容命令扩容分区和文件系统。具体操作，请参见步骤一：扩容云盘容量。
+实例磁盘IO hang
+磁盘IO hang，导致磁盘无法读写。
+检查该实例的系统盘是否存在IO hang的情况（即磁盘内的文件系统因读写IO延迟过高导致系统不稳定或宕机）。
+如果出现IO hang，云盘无法进行读写操作。建议您查看云盘的性能指标，具体操作，请参见查看云盘监控信息。
+如果您使用的是Alibaba Cloud Linux 2操作系统，检测IO hang的操作，请参见检测文件系统和块层的IO hang。
+实例磁盘加载异常
+创建或挂载磁盘时出现错误。
+检查该实例在启动时云盘是否能正常挂载。
+如果挂载失败，则会导致实例无法正常启动。请停止实例后再次启动实例，或重新挂载云盘，进行恢复。挂载云盘的操作，请参见挂载数据盘。
+实例云盘读写受限
+磁盘IO出现延迟过长，或达到该云盘类型的IO上限。
+检查该实例系统盘的读写IO是否存在延迟，以及读写的IOPS是否超过了该云盘的IOPS上限。
+如果云盘读写IOPS超过上限，则云盘读写将被限制，查看云盘指标的操作，请参见查看云盘监控信息。
+为避免该情况再次发生，请您降低磁盘的读写频率或升级为更高性能的云盘类型。各类云盘的读写性能指标，请参见块存储性能。
+实例磁盘扩缩容异常
+磁盘扩缩容后，操作系统调整文件系统的大小失败。
+检查该实例的系统盘在扩容后，云盘上的文件系统是否也调整成功。
+如果文件系统未成功调整，表示云盘容量因资源不足或其他原因导致扩容失败，新扩容的磁盘无法使用。请重新发起扩容操作。不同操作系统的扩容方法与限制，请参见云盘扩容指引。
+实例配置管理健康诊断结果说明
+诊断项（控制台）
+描述
+诊断范围及建议操作
+实例启动异常
+实例无法被管控系统正常启动。
+检查该实例的boot操作是否能正常执行加载。
+如果实例无法正常启动，您需要创建一个新的实例。
+实例核心操作异常
+您对实例进行管理控制的操作执行失败。
+检查您对该实例最近执行的管理操作，例如开机、关机、升配等是否执行成功。
+如果执行失败，您需要重新发起该操作。
+实例镜像加载异常
+实例所使用的镜像无法正常加载。
+检查该实例在启动时所使用的镜像是否能正常加载。
+镜像可能因为系统原因、镜像问题等加载失败。您可以尝试通过重启实例进行恢复。
+安全控制健康诊断结果说明
+诊断项（控制台）
+描述
+诊断范围及建议操作
+安全组入方向常用端口未放开
+对于Windows实例，检查安全组的3389端口放开情况；对于Linux实例，检查安全组的22端口放开情况。
+检查该实例关联的安全组常见端口的放开状态。
+如果常见端口未放行，可能会导致部分服务无法正常运行或实例无法访问。检查放行的常见端口如下：
+入方向SSH端口（22），需放行。
+入方向RDP端口（3389），需放行。
+费用类健康诊断结果说明
+诊断项（控制台）
+描述
+诊断范围及建议操作
+检查包年包月实例是否已到期
+检查以包年包月方式购买的实例是否已到期。
+如果该实例是包年包月的计费方式，检查实例是否已到期。
+到期后，实例将被关机停服，实例无法访问。到期后资源状态变化，请参见包年包月。您需要续费来恢复服务，更多信息，请参见如何续费包年包月实例。
+检查按量实例是否因为欠费导致停服
+检查以按量付费方式购买的实例是否因欠费被停止而无法使用。
+如果该实例是按量付费的计费方式，检查账号是否欠费。
+欠费后，实例将被关机停服，实例无法访问。账号欠费后资源状态变化，请参见按量付费。您需要充值后重启才能恢复实例。
+检查实例的组件是否已欠费
+检查实例的云盘或网络带宽是否因账号欠费而无法正常使用。
+检查包年包月实例关联的按量付费云盘或网络带宽是否因账号欠费而无法正常使用。
+实例组件欠费被停服后，实例的访问也将受到影响。您需要充值进行恢复。
+资源配额健康诊断结果说明
+诊断项（控制台）
+描述
+诊断范围及建议操作
+云盘容量配额不足
+云盘容量即将达到限额。
+如果当前账户的云盘容量即将超过配额上限，您可以在ECS管理控制台申请提升配额，具体操作，请参见ECS配额管理。
+镜像数量配额不足
+当前账户镜像数量即将达到限额。
+如果当前账户的镜像总数即将达到配额上限，请您进入云服务器ECS通用配额列表，单击当前账户保有自定义镜像数量限额操作列的申请，提升镜像数量配额。
+弹性网卡创建数达到上限
+当前账户拥有的弹性网卡（辅助网卡）即将达到限额。
+如果当前账户的弹性网卡数量即将超过配额上限，您可以在ECS管理控制台申请提升配额，具体操作，请参见ECS配额管理。
+网卡总队列数达到上限
+当前实例使用的网卡队列数已达到上限。
+如果您需要调整网卡队列数，请参见网卡多队列。
+如果实例的网卡队列数不能满足您的需求，请升配实例规格，更多信息，请参见实例规格族和升降配方式概述。
+安全组总数达到上限
+当前账户创建的安全组数量即将达到限额。
+如果您的安全组总数即将达到配额上限，请您进入云服务器ECS通用配额列表，单击安全组总数量上限操作列的申请，提升安全组数量配额。
+资源加入安全组达到上限
+当前网卡可加入的安全组即将达到限额。
+如果网卡可加入的安全组即将达到配额上限，您可以在ECS管理控制台申请提升配额，具体操作，请参见ECS配额管理。
+如果您调整了一台ECS实例或弹性网卡可以加入的安全组数量限制，相应的安全组最大规则数量也会发生变化。更多信息，请参见安全组使用限制。
+安全组内规则达到上限
+当前安全组内的规则数即将达到限额。
+如果安全组内的规则数即将达到配额上限，您可以在ECS管理控制台申请提升配额，具体操作，请参见ECS配额管理。
+如果您调整了安全组的最大规则数，您的ECS实例或弹性网卡可加入的安全组数量也会发生变化。更多信息，请参见安全组使用限制。
+实例操作系统内相关配置诊断结果说明（Linux）
+诊断项（控制台）
+描述
+诊断范围及建议操作
+总CPU使用率过高
+实例当前CPU的使用率已经超过80%（基于top命令返回的数据）。
+检查该实例的总CPU使用率。
+如果使用率过高，请您定位使用较多CPU资源的进程并判断是否正常。查询CPU资源使用情况的操作，请参见Linux实例CPU使用率或负载较高问题的排查与处理。
+disk中inode检查
+检查Disk中inode是否足够。
+检查该实例磁盘的inode使用率。
+如果使用率过高，可能会导致无法在磁盘上创建新的文件，请您根据需要扩容磁盘。具体操作，请参见云盘扩容指引。
+DHCP服务检查
+检测DHCP配置情况下，网络相关进程是否存在，不存在的情况下可能会导致网络租约到期之后丢失。
+检查该实例eth0网卡的DHCP服务进程。
+如果DHCP服务进程不存在，可能会导致实例的IP地址在租约到期后无法续租，进而导致网络中断。开启DHCP服务进程的方法，请参见如何在Linux实例中配置网络为DHCP。
+fstab中的设备检查
+检查fstab中的设备是否存在。
+检查该实例的/etc/fstab文件。
+如果/etc/fstab文件中配置了不存在的设备，可能会导致实例无法启动。移除/etc/fstab文件中不存在设备的方法，请参见Linux实例的/etc/fstab文件配置错误导致系统启动异常问题解决方法。
+fstab中的设备挂载状态检查
+检查fstab设备是否正确挂载。
+检查该实例的/etc/fstab文件。
+如果/etc/fstab文件中设备未配置自动挂载，会导致实例启动后无法直接使用设备。请您执行mount命令手动挂载设备，或在/etc/fstab文件中配置自动挂载。配置磁盘自动挂载的方法，请参见在fstab文件中配置UUID方式自动挂载数据盘。
+fstab文件的格式检查
+检查fstab内容格式是否正确。
+检查该实例的/etc/fstab文件。
+如果/etc/fstab文件中存在格式错误，可能会导致实例无法启动。修改/etc/fstab文件格式的方法，请参见Linux实例的/etc/fstab文件配置错误导致系统启动异常问题解决方法。
+系统防火墙状态检查
+检查系统防火墙是否打开。
+检查该实例的防火墙。
+如果实例开启了防火墙，并设置了屏蔽外界访问的规则，可能会导致无法远程连接实例。开启和关闭防火墙的方法，请参见管理 Linux 实例的系统防火墙
+系统文件状态检查
+检查关键系统文件状态。
+fsck诊断发现实例的文件系统存在异常，可能会导致部分数据丢失，进而导致实例无法访问等问题。
+检查并修复文件系统的方法，请参见Linux实例的文件系统检查与修复。
+limits设置检查
+检查limits设置是否正确。
+检查该实例的/etc/security/limits.conf文件。
+如果/etc/security/limits.conf文件中nofile的值过大，可能会导致无法远程连接实例。修改limits系统参数的方法，请参见调整Linux实例的nofile参数后，远程连接失败或提示“Too many open files”错误怎么办？。
+内存设置检查
+检查大页内存设置是否过大。
+检查该实例的/etc/sysctl.conf文件。
+如果/etc/sysctl.conf文件中设置的大页内存数量和大页内存值过大，会导致大页内存（大页内存数量*大页内存值）超过总内存。调整大页内存的方法，请参见调整Linux实例大页内存的方法。
+常见业务端口监听状态检查
+检查常见业务端口（例如22和3389）是否处于监听状态。
+检查该实例的常见业务端口。
+如果端口未处于监听状态，可能会导致不能访问实例上的应用。检查并修改常见业务端口的方法，请参见Linux系统中TCP/UDP端口测试方法。
+CPU使用率超过50%的进程
+实例当前CPU的使用率已经超过50%（基于top命令返回的数据）。
+检查该实例中进程的CPU使用率。
+如果一些进程的CPU使用率过高，请您判断进程是否正常。检查CPU使用率的方法，请参见Linux实例CPU使用率或负载较高问题的排查与处理。
+单个CPU使用率过高
+单个CPU的使用率超过85%（基于top命令返回的数据）。
+检查该实例的单个CPU在一段时间内的使用率。
+如果单个CPU的使用率过高，请您定位使用较多CPU资源的进程并判断是否正常。检查CPU使用率的方法，请参见Linux实例CPU使用率或负载较高问题的排查与处理。
+系统关键进程启动状态检查
+检查系统关键进程是否启动。
+检查该实例的系统关键进程。
+如果系统关键进程处于未运行状态，可能会导致实例无法访问。
+NAT环境内核参数检查
+检查NAT环境内核参数是否正确。
+检查该实例内与NAT环境相关的内核参数配置。
+如果NAT环境相关的内核参数配置存在异常，会导致无法通过SSH连接实例，以及访问实例上的HTTP服务时出现异常。请您检查并调整/etc/sysctl.conf中的net.ipv4.tcp_tw_recycle和net.ipv4.tcp_timestamps参数的取值。修复NAT环境内核参数的方法，请参见为什么客户端配置NAT后，无法访问服务端的ECS或RDS？。
+TCP SACK设置检查
+检查TCP SACK是否开启。
+检查该实例是否开启了TCP SACK。
+如果未开启TCP SACK，可能会影响实例的网络性能。开启TCP SACK的方法，请参见Linux实例开启TCP SACK的方法。
+检查操作系统是否OOM
+检查操作系统是否OOM。
+检查该实例的操作系统是否发生了OOM（Out of Memory）问题。
+如果发生了OOM问题，请您检查实例当前的可用内存大小是否足以支撑实例上运行的业务，并在必要时升级配置提升实例内存。分析OOM根因并解决OOM问题的方法，请参见如何处理Linux实例中的OOM问题？。
+系统关键文件格式检查
+检查系统关键文件格式。
+检查该实例的系统关键文件格式是否为Unix格式。
+如果系统关键文件格式错误（不是Unix格式），可能会导致无法远程连接实例。修改系统文件格式的方法，请参见Linux实例中修复非Unix格式文件。
+selinux状态检查
+检查SELinux是否开启。
+检查该实例是否开启了SELinux服务。
+如果开启了SELinux服务，会导致SSH远程连接实例时报错，请您视情况选择临时或永久关闭SELinux服务。关闭SELinux服务的方法，请参见Linux实例中由于SELinux服务开启导致SSH远程连接异常。
+系统关键用户状态和密码设置检查
+检查关键系统用户（Linux系统检查root账号、Windows系统检查Administrator账号）的密码是否存在等。
+检查该实例操作系统的关键系统用户。
+如果不存在关键系统用户，可能会导致无法登录实例。请您检查/etc/passwd中关键系统用户的状态和密码设置情况。检查关键系统用户的方法，请参见Linux实例中关键的系统用户不存在。
+SSH访问权限检查
+检查SSH的访问权限配置是否正确。
+检查该实例的SSH访问权限配置。
+如果SSH访问权限配置不正确，可能会导致无法登录实例。修改SSH访问权限的方法，请参见SSH的访问权限异常导致无法远程连接Linux实例。
+SSH关键文件系统检查
+检查SSH访问所需要的关键文件或目录是否存在。
+检查该实例中SSH服务所需的关键文件或目录。
+如果SSH服务所需的关键文件或目录不存在，可能会导致无法SSH登录实例。修复SSH服务所需的关键文件或目录的方法，请参见检查Linux实例是否存在SSH服务所需的必备文件或目录。
+SSH是否允许root用户登录检查
+检查SSH配置是否允许root用户连接。
+检查SSH配置是否允许root用户连接。
+如果禁止使用root用户登录实例，会导致使用root用户登录实例时返回Permission denied, please try again错误。修复root用户登录实例报错的问题，请参见如何解决SSH登录Linux实例时的“Permission denied, please try again”错误？。
+网卡多队列开启状态检查
+网卡多队列是否开启。
+检查该实例的网卡是否开启了网卡多队列特性。
+如果未开启网卡多队列特性，可能会影响实例网络性能。开启网卡多队列的方法，请参见网卡多队列。
+实例操作系统内相关配置诊断结果说明（Windows）
+诊断项（控制台）
+描述
+诊断范围及建议操作
+Windows操作系统的版本检查
+微软已经不再维护Windows Server 2008及之前的版本。
+检查该实例的Windows系统版本。
+阿里云和微软不再维护Windows Server 2008及之前的版本，请您视情况重装更高版本的Windows系统。实例重装系统的方法，请参见更换系统盘（更换操作系统）。
+总CPU的使用率过高
+检查Windows CPU使用率总体超过85%。
+检查该实例的CPU使用率。
+如果CPU总使用率过高，请您定位使用较多CPU资源的进程并判断是否正常。检查CPU使用率的方法，请参见Windows实例CPU使用率较高问题的排查与处理。
+单CPU使用率过高
+检查单CPU使用率超过80%。
+检查该实例的CPU使用率。
+如果单个CPU的使用率过高，请您定位使用较多CPU资源的进程并判断是否正常。检查单个CPU使用率的方法，请参见Windows实例CPU使用率较高问题的排查与处理。
+内存使用率偏高
+检查Windows系统内存使用率是否超过80%。
+检查内存的使用率是否超过80%。
+如果该实例当前内存的总使用率已经超过80%，会列出内存使用率排名前5的进程，请检查对应进程是否正常。分析Windows内存使用率过高的具体操作，请参见Windows系统内存分析工具的介绍。
+Windows常用业务端口占用状态检查
+检查Windows系统的3389端口是否开放。
+检查该实例的3389端口。
+如果未开启3389端口，会导致无法使用远程桌面连接RDP服务访问实例。开启3389端口允许远程桌面连接的方法，请参见Windows实例如何启动远程桌面连接RDP服务。
+Windows系统网卡状态检查
+检查Windows网卡是否打开。
+检查该实例的网卡。
+如果网卡处于不可用状态，会导致无法远程连接实例。检查并修复网卡状态的方法，请参见检查网络。
+网卡IPv4地址检查
+检查Windows系统网卡是否已获得IPv4地址。
+检查网卡是否已经获取到IPv4地址。
+如果网卡未获取到IPv4地址，可能会导致服务无法访问。请检查该实例是否已启用DHCP服务或配置静态IP地址。开启DHCP服务的具体操作，请参见如何在工作组中安装和配置DHCP服务器。
+系统网络代理状态检查
+检查系统是否设置了网络代理信息。
+检查系统是否设置了网络代理。
+如果设置了网络代理，可能会导致服务无法正常访问，请根据业务需要选择是否关闭这些网络代理。Windows系统关闭网络代理的具体操作，请参见如何重置你的Internet Explorer代理设置。
+DHCP配置状态检查
+检查Windows系统网卡的DHCP服务是否开启
+检查网卡上DHCP服务的状态。
+如果网卡上的DHCP服务处于关闭状态，可能会导致服务无法访问，请根据业务需要调整对应网卡的DHCP配置。Windows配置DHCP服务的具体操作，请参见如何在工作组中安装和配置 DHCP 服务器。
+Windows虚拟磁盘驱动状态检查
+检查VirtIO驱动的版本。
+检查该实例的VirtIO驱动版本。
+如果VirtIO驱动版本过低，会导致实例磁盘无法在线扩容。升级VirtIO版本的方法，请参见更新Windows实例的virtio驱动。
+磁盘容量检查
+检查系统C盘容量是否小于1 GB。
+检查该实例系统盘（C盘）的可用空间。
+如果可用空间小于1 GB，可能会导致系统运行缓慢，甚至实例无法启动，请您根据需要扩容磁盘。具体操作，请参见云盘扩容指引。
+Windows防火墙状态检查
+检查Windows防火墙的状态是否为打开状态。
+检查该实例的防火墙状态。
+如果防火墙处于开启状态，可能会导致无法访问实例上的服务，请视情况调整防火墙的相关策略配置。配置防火墙策略的方法，请参见Windows系统防火墙策略配置指南。
+crash dump配置状态检查
+检查系统是否开启了crash dump信息采集。
+检查是否开启了采集crash dump信息。
+如果未开启采集crash dump信息，当系统出现异常重启或蓝屏时，无法保存相关信息进行故障排查，请根据业务需要选择是否要开启采集crash dump信息。Windows开启采集crash dump信息的具体操作，请参见为实例开启或关闭内核崩溃转储服务。
+Administrator账号检查
+检查Administrator账号是否存在。
+检查是否存在Administrator账号。
+如果不存在Administrator账号，可能会导致服务无法正常访问，请根据业务需要选择是否要创建Administrator账号。Windows系统创建账号的具体操作，请参见如何使用管理控制台添加或删除管理员。
+OpenAPI诊断指标分类
+基本概念
+诊断指标（DiagnosticMetric）：实例或账号状态进行检查的单位，如CPU使用率。
+诊断结果条目（Issue）：对诊断指标进行检查，发现的关联条目，条目按照严重等级分为Info、Warn、Critical。每个诊断指标可能关联多个诊断结果条目，如果没有关联诊断结果条目，说明对该诊断指标的检查没有发现问题，但并不意味着该诊断指标实际中不存在问题。
+诊断指标集合（DiagnosticMetricSet）：一组诊断指标的集合，可以一次性对诊断指标里的所有指标进行诊断。
+重要
+诊断结果只能作为参考，不能保证100%准确，诊断正常并不代表系统相关指标不存在问题。
+实例健康诊断功能支持以下诊断，按照功能和模块，我们对所有的诊断指标进行了分类，当前的分类如下：
+分类标识码
+分类名称
+说明
+ECSService.ServiceHealth
+计算服务健康诊断
+对云服务器物理机资源和虚拟化层进行检查。
+ECSService.InstanceNetwork
+网络服务健康诊断
+检查实例内部网络组件状态，以及外部网络环境异常等情况。
+ECSService.InstanceStorage
+存储服务健康诊断
+检查实例磁盘的运行状态是否存在异常。
+ECSService.InstanceConfigure
+实例配置管理诊断
+检查实例在启动过程中或运行中，是否被某个操作阻塞（block）导致实例无法启动或者运行异常。
+ECSService.SecurityGroup
+安全控制健康诊断
+检查实例关联的所有安全组入方向常见端口的放行状态。
+ECSService.AccountBalance
+费用类诊断
+检查实例本身和实例关联组件（例如公网IP流量、EIP流量）是否欠费。
+ECSService.GuestOS
+实例操作系统内相关配置诊断（Linux）
+检查实例操作系统内的系统文件、关键进程、常用业务端口占用状态、防火墙状态等是否正常。
+ECSService.GuestOS
+实例操作系统内相关配置诊断（Windows）
+检查实例操作系统内的常用业务端口占用状态、防火墙状态等是否正常。
+ECSService.ActionTrace
+用户行为回溯诊断
+对ECS实例状态类、实例费用类、安全组相关等操作行为审计、追溯。
+说明
+计算服务健康诊断、网络服务健康诊断、存储服务健康诊断、实例配置管理诊断所发现的异常属于非实时状态异常，诊断结果会包括过去12小时内存在的异常，用于查看历史问题，不一定需要实时修复。
+安全控制健康诊断、费用类诊断、资源配额诊断、实例操作系统内相关配置诊断发现的异常属于实时态异常，在当前诊断时就存在，建议实时修复此类异常。
+计算服务健康诊断结果说明
+诊断指标ID
+诊断指标说明
+诊断结果条目ID
+诊断指标条目说明
+建议操作
+Instance.ControllerError
+检查该实例的后台管控系统是否正常工作。
+Instance.ECSService.MngServiceException
+后台管控系统未正常工作，可能会导致实例运行异常。
+您可以尝试通过重启实例进行恢复。
+Instance.CPUException
+检查共享型实例底层是否存在CPU争抢。
+Instance.ECSService.CPUBindFailure
+存在CPU争抢，可能导致该实例无法获得CPU或出现其他异常。
+您可以尝试通过重启实例进行恢复。
+Instance.CPUSplitLock
+实例遇到Intel CPU的Split Lock问题。
+Instance.ECSService.CPUSplitLock
+实例遇到Intel CPU的Split Lock问题。
+请您检查ECS上应用程序是否存在导致该问题的异常代码并进行优化。
+Instance.GuestOSCrash
+实例的操作系统Crash。
+Instance.ECSService.GuestOSCrashed
+操作系统Crash。
+请您检查ECS上应用程序是否存在导致该问题的异常代码并进行优化。
+Instance.HostDownAlert
+检查该实例所在的底层物理机是否有故障。
+Instance.ECSService.HostDown
+底层物理机存在故障，可能会影响实例的运行状态或性能。
+您可以尝试通过重启实例进行恢复。
+Instance.PerformanceAffected
+检查实例是否存在因底层软硬件问题导致的性能受损。
+Instance.ECSService.PerformanceAffected
+实例存在性能受损，请您检查该实例的历史系统事件或者系统日志进行确认，具体操作，请参见查看历史系统事件和查看实例的系统日志和屏幕截图。
+您可以尝试通过重启实例进行恢复。
+Instance.PerfRestrict
+检查突发性能实例的CPU积分余额是否足够支付维持高性能所需的积分。
+Instance.ECSService.BurstPerformanceRestricted
+余额积分不够，该突发性能实例在业务高峰时只能使用基准性能，而无法启动突发性能。
+检查该实例是否满足您的业务需求，如果不满足，建议对实例进行配置升级。具体操作，请参见包年包月实例升配规格或更改按量付费实例规格。
+Instance.ResourceNotEnough
+检查该实例所需要的CPU、内存等物理资源是否充足。
+Instance.ECSService.ResourceOutOfStock
+在需要重新为实例分配资源时，例如从节省停机模式启动实例，如果因为库存不足导致物理资源不足，将使实例无法启动。
+您可以等待几分钟后重新尝试开机，或者在其他地域或可用区尝试重新创建实例。
+Instance.SystemException
+检查该实例的操作系统（Guest OS）内部是否存在内核Panic、OOM异常或内部宕机等故障。
+Instance.ECSService.GuestOSException
+操作系统内部异常，可能是由于实例配置不当或用户空间的程序配置不当导致。
+您可以尝试通过重启实例进行恢复。
+Instance.VirtException
+检查该实例底层虚拟化层核心服务是否出现异常。
+Instance.ECSService.VirtualizationException
+出现此类异常可能会导致实例崩溃或出现异常暂停。
+您可以尝试通过重启实例进行恢复。
+Instance.RecentUtilHigh
+检查历史负载是否超过80%。
+Instance.UtilizationHigh.IntranetBandwidth
+您选择的诊断时间范围内实例的内网带宽负载达到过上限的80%，内网带宽负载过高意味着您的实例正在进行大量的内网流量传输。
+目前阿里云无法确定具体的进程信息，请您结合业务进一步分析，详细监控信息请登录云监控控制台查看。
+Instance.UtilizationHigh.DiskIOPS
+您选择的诊断时间范围内实例的IOPS负载曾达到过上限的80%，IOPS负载高意味着您的实例正在进行频繁的IO读写。
+目前阿里云无法确定具体的进程信息，请您结合业务进一步分析，详细监控信息请登录云监控控制台查看。
+Instance.UtilizationHigh.DiskBPS
+您选择的诊断时间范围内实例的BPS负载曾达到过上限的80%，BPS负载过高意味着您的实例在进行大量的数据传输。
+目前阿里云无法确定具体的进程信息，请您结合业务进一步分析，详细监控信息请登录云监控控制台查看。
+Instance.UtilizationHigh.CPU
+您选择的诊断时间范围内，实例的CPU负载曾达到过80%，CPU负载高意味着您的实例正在进行高频的计算任务。
+详细监控信息请登录云监控控制台查看。
+Instance.KMSInvalid
+检查KMS密钥是否正常。
+Instance.KMSInvalid.SecretInvalid
+当前实例使用了密钥管理服务KMS（Key Management Service）提供的密钥服务对系统盘或数据盘进行了加密，但目前因密钥失效导致实例启动失败。
+您可以登录密钥管理服务KMS控制台查看该实例云盘所使用的密钥的状态，如果出现欠费，请及时续费后再次尝试启动本实例。
+如果实例当前已正常启动和运行，请忽略此提醒。
+网络服务健康诊断结果说明
+诊断指标ID
+诊断指标说明
+诊断结果条目ID
+诊断指标条目说明
+建议操作
+Instance.ArpPingError
+通过向网卡发送ARP（地址解析协议）请求来验证实例基础网络配置是否正常。
+Instance.ECSService.ARPPingIssue
+实例网卡链路层出现异常。
+如果请求失败，则很有可能是实例未正常启动或网络配置有问题，您可以尝试通过重启实例进行恢复。
+Instance.DDoSStatus
+检查该实例的IP地址是否受到了DDoS攻击。
+Instance.Security.SufferDDoSAttacks
+在条目附加信息中会返回如下样例数据：
+"Status": "DDoSDefense",
+"StartTime": "2022-07-07T02:25:20Z"
+${Status}表示发生的事件，分为DDoSDefense和DDoSHole，表示遭到了DDoS攻击进入防御或者黑洞。
+${StartTime} 表示事件发生时间。
+阿里云免费提供的DDoS原生防护服务可以帮您完成一定程度的攻击流量清洗，缓解DDoS攻击造成的不可用，但如果攻击流量已超出您实例的防护能力，仍会导致实例进入不可用状态，无法正常访问。更多DDoS攻击详情，请参见DDoS攻击介绍。
+您可以视情况购买其他DDoS防护产品抵御DDoS攻击，更多信息，请参见阿里云DDoS防护产品概述。
+阿里云DDoS预防最佳方案，请参见DDoS攻击解缓方案。
+Instance.NetworkBoundLimit
+检查该实例的内外网带宽总量。
+Instance.Network.IOLimit
+带宽总量已超过实例规格对应的网络基础带宽上限，导致网络性能成为业务瓶颈。
+将实例升级至网络带宽能力更高的实例规格。具体操作，请参见修改实例规格。
+Instance.NetworkBurstLimit
+检查该实例的突发网络带宽是否达到上限。
+Instance.Network.BurstBoundLimit
+突发网络带宽已超过实例规格对应的网络突发带宽上限，导致网络性能成为业务瓶颈。
+将实例升级至网络带宽能力更高的实例规格。具体操作，请参见修改实例规格。
+Instance.NetworkLoadFailure
+检查该实例的网卡是否能正常加载。
+Instance.Network.ENILoadFailure
+如果网卡无法正常加载，将影响实例的网络连通性，例如实例无法远程连接。
+您可以尝试通过重启实例进行恢复。
+Instance.NetworkSessionError
+检查该实例的网卡是否能正常建立会话。
+Instance.Network.SessionException
+如果网卡无法建立会话或已建立的会话超过限制，将影响实例的网络连通性或网络吞吐，例如导致实例无法远程连接，或网速过慢。
+您可以尝试通过重启实例进行恢复。
+Instance.PacketDrop
+检查该实例的网卡入方向或出方向是否存在丢包现象。
+Instance.Network.PacketDrop
+如果存在丢包，将影响实例的网络连通性或网络吞吐，例如导致实例无法远程连接，或网速过慢。
+您可以尝试通过重启实例进行恢复。
+Instance.NetworkConfigConsistency
+检查实例网络指标是否正常。
+Instance.NetworkConfig.Inconsistent
+系统监测到该实例当前生效的网络配置与底层服务配置存在不一致，可能导致实例的网络性能受到影响。
+如果实例当前已正常运行，请忽略此提醒。
+如果实例的丢包问题依然存在，请根据业务需要选择合适的时间尝试重启实例进行恢复。
+Instance.NetworkLinkException
+检查云系统内部链路是否存在丢包。
+Instance.Network.LinkException
+该实例在检测时间内遇到了底层网络链路丢包问题，可能导致实例性能受损，目前该问题已恢复。
+如果实例当前已正常运行，请忽略此提醒。
+如果实例的丢包问题依然存在，请根据业务需要选择合适的时间尝试重启实例进行恢复。
+存储服务健康诊断结果说明
+诊断指标ID
+诊断指标说明
+诊断结果条目ID
+诊断指标条目说明
+建议操作
+Instance.DiskLimit
+检查该实例系统盘的读写IO是否存在延迟，以及读写的IOPS是否超过了该云盘的IOPS上限。
+Instance.Disk.IOLimit
+云盘读写IOPS超过上限，读写将被限制。查看云盘指标的操作，请参见查看云盘监控信息。
+为避免该情况再次发生，请您降低磁盘的读写频率或升级为更高性能的云盘类型。各类云盘的读写性能指标，请参见块存储性能。
+Instance.DiskLoadFailure
+检查该实例在启动时云盘是否能正常挂载。
+Instance.Disk.EBSLoadFailure
+挂载失败，实例无法正常启动。
+请停止实例后再次启动实例，或重新挂载云盘，进行恢复。挂载云盘的操作，请参见挂载数据盘。
+Instance.IOHang
+检查该实例的系统盘是否存在IO hang的情况（即磁盘内的文件系统因读写IO延迟过高导致系统不稳定或宕机）。
+Instance.Disk.IOHang
+系统盘出现IO hang，云盘无法进行读写操作。
+建议您查看云盘的性能指标，具体操作，请参见查看云盘监控信息。如果您使用的是Alibaba Cloud Linux 2操作系统，检测IO hang的操作，请参见检测文件系统和块层的IO hang。
+Instance.ResizeFsFailure
+检查该实例的系统盘在扩容后，云盘上的文件系统是否也调整成功。
+Instance.Disk.ResizeFailure
+文件系统未成功调整，新扩容的磁盘无法使用。
+请重新发起扩容操作。不同操作系统的扩容方法与限制，请参见扩容概述。
+Instance.DiskFull
+检查历史时间段内磁盘空间使用率是否达到100%。
+Instance.Disk.Full
+该实例的磁盘于某一时间段内出现了磁盘空间使用率达到100%的情况，可能导致实例无法正常使用。
+根据需要选择以下合适的方案进行操作，确保系统的正常运行。
+如果实例当前处于运行中，请通过VNC方式访问实例，查看实例的磁盘使用率，并根据业务需要，删除磁盘中不必要的目录或文件，或对磁盘空间使用率高的磁盘进行扩容即可。更多信息，请参见选择ECS远程连接方式和云盘扩容指引。
+如果实例已无法启动，请根据修复实例磁盘满的方法进行操作。具体操作，请参见解决Linux实例磁盘空间不足或解决Windows实例磁盘空间不足。
+实例配置管理诊断结果说明
+诊断指标ID
+诊断指标说明
+诊断结果条目ID
+诊断指标条目说明
+建议操作
+Instance.BootFailure
+检查该实例的boot操作是否能正常执行加载。
+Instance.ECSService.BootIssue
+实例无法正常启动。
+您可以尝试通过重启实例进行恢复。
+Instance.ImageLoadFailure
+检查该实例在启动时所使用的镜像是否能正常加载。
+Instance.ECSService.ImageIssue
+镜像可能因为系统原因、镜像问题等加载失败。
+您可以尝试通过重启实例进行恢复。
+Instance.OperationFailure
+检查您对该实例最近执行的管理操作，例如开机、关机、升配等是否执行成功。
+Instance.ECSService.OperationError
+存在操作执行失败的异常。
+如果执行失败，您需要重新发起该操作。
+Instance.BootScreenshot
+操作系统因系统本身原因无法正常启动。
+Instance.BootScreenshot.Exception
+该实例因操作系统内配置异常、异常关机等问题导致操作系统无法正常启动。
+您可以通过VNC登录启动异常的实例进行修复。更多信息，请参见实例启动异常常见错误与对应解决方案。
+安全控制健康诊断结果说明
+诊断指标ID
+诊断指标说明
+诊断结果条目ID
+诊断指标条目说明
+建议操作
+Instance.SGIngress
+检查实例网卡安全组规则入方向常用端口是否放开。
+Instance.Network.SSHPortRuleDeny
+事件信息示例如下，表示Linux入方向SSH端口（22）未放行。
+"Policy": "accept",
+"Port": "22",
+"Service": "SSH",
+"Protocol": "TCP",
+"Direction": "ingress"
+如果您需要通过SSH访问该实例，请为该实例安全组配置入方向允许SSH访问的规则。具体操作，请参见添加安全组规则。
+Instance.SgRule.PingPortDeny
+事件信息示例如下，表示实例不允许PING。
+"Policy": "accept",
+"Port": "-1",
+"Service": "PING",
+"Protocol": "ICMP",
+"Direction": "ingress"
+如果您需要通过PING该实例，请为该实例安全组配置入方向允许PING的规则。具体操作，请参见添加安全组规则。
+Instance.SgRule.WinRemotePortDeny
+表示实例不允许远程桌面。
+"Policy": "drop",
+"Port": "3389",
+"Service": "WIN-REMOTE-DESKTOP",
+"Protocol": "TCP",
+"Direction": "ingress"
+如果您需要通过远程桌面访问该实例，请为该实例安全组配置入方向允许远程桌面相关的规则。具体操作，请参见添加安全组规则。
+Instance.SecurityRisk
+检查实例是否存在安全风险。
+Instance.Security.Risk
+该实例目前存在安全风险，可能导致实例无法正常使用。
+更多安全风险，您可以登录云安全中心查看。
+费用类诊断结果说明
+诊断指标ID
+诊断指标说明
+诊断结果条目ID
+诊断指标条目说明
+建议操作
+Instance.ExpenseException
+检查ECS实例的计费状态是否存在异常。
+Account.Balance.ExpenseException
+该实例部分组件目前的费用状态异常（包括包月到期或者账号欠费），导致实例无法远程登录或正常使用。
+费用状态异常的组件如下，请根据业务需要，尽快对实例进行续费或者充值后，重新启动实例后再登录实例。
+{$InstanceId}/{$Ip} 目前处于{status}状态。
+示例如下：
+"InstanceId":"i-bp1amip45xxxxxxxx",
+"Status":"AccountNotEnough/AccountNotEnough/Expired/NotExpired"
+或者：
+"Ip":"123.x.x.x",
+"Status":"AccountEnough/AccountNotEnough/Expired/NotExpired"
+返回结果属性说明如下：
+AccountEnough: 不欠费。
+AccountNotEnough: 欠费。
+Expired: 包年包月到期。
+NotExpired: 没有到期。
+关于ECS计费说明、欠费和续费操作可参考计费概述。
+实例操作系统内相关配置诊断结果说明（Linux）
+诊断指标ID
+诊断指标说明
+诊断结果条目ID
+诊断指标条目说明
+建议操作
+GuestOS.CPUUtil
+检查CPU使用率是否过高。
+GuestOS.CPU.HighUtilization
+该实例总CPU的总使用率已超过80%。
+CPU使用率排名前5的进程如下，请检查这些进程是否正常。
+"ProcessCPUUsageTop5": [
+"Pid": "1234",
+"CommandName": "/usr/bin/cpu_load.py",
+"AverageCPU": 80
+返回结果属性说明如下：
+${ProcessCPUUsageTop5} ：系统内CPU使用率Top5的进程列表。
+${Pid}：进程ID。
+${CommandName}：进程名称。
+${AverageCPU}：CPU平均使用率。
+查询CPU资源使用情况的操作，请参见Linux实例CPU使用率或负载较高问题的排查与处理。
+GuestOS.CoreCPU.HighUtilization
+该实例一个或多个CPU的使用率已超过85%。
+单个CPU使用率超过85%的信息如下，请检查如下进程是否正常。
+"CPUCoreUsage": [
+"Processor": 1,
+"AverageCPU": 80
+返回结果属性说明如下：
+${CPUCoreUsage}：CPU使用率超过85%的核心列表。
+${Processor}：CPU核心编号
+${AverageCPU}：CPU核心使用率。
+查询CPU资源使用情况的操作，请参见Linux实例CPU使用率或负载较高问题的排查与处理。
+GuestOS.MemUtil
+检查实例内存使用率是否过高
+GuestOS.Memory.HighUtilization
+该实例当前内存的总使用率超过80%。
+内存使用率排名前5的进程示例如下：
+"TotalPercent": 95,
+"TopUtilizationProcesses": [
+"Pid": "1223",
+"CommandName": "/usr/bin/mem.py",
+"PhysicalMemoryPercent": 50
+返回结果属性说明如下：
+${TotalPercent}：内存整体使用率。
+${TopUtilizationProcesses}：使用内存Top5的进程列表。
+${Pid}：进程ID
+${CommandName}：进程名称。
+${PhysicalMemoryPercent}：当前进程内存使用率。
+请根据需要关闭不需要的服务或进程，如果是您正常的业务导致，建议您对ECS配置进行升级。
+查询CPU资源使用情况的操作，请参见Linux实例内存使用率较高问题的排查与处理。
+GuestOS.DiskUtil
+检查实例系统盘使用率是否过高
+GuestOS.SystemDisk.InsufficientSpace
+该实例当前部分磁盘对应文件系统的使用率或inode使用率已经超过了80%，可能导致在这些分区上无法创建新的文件。
+使用率过高的磁盘信息示例如下：
+"FilesystemName": "ext4",
+"FilesystemType": "ext4",
+"MountPoint": "/root",
+"SpaceUsedPercent": 10,
+"InodeUsedPercent": 50
+返回结果属性说明如下：
+${FilesystemName}：文件系统名称。
+${FilesystemType}：文件系统类型。
+${SpaceUsedPercent}：磁盘使用率。
+${InodeUsedPercent}：Inode使用率。
+请根据需要选择对磁盘进行扩容，具体操作，请参见云盘扩容指引。
+解决Inode容量满的方法，请参见解决Linux实例磁盘空间满问题。
+GuestOS.SystemConfig
+检查系统关键配置
+GuestOS.AuditConfig.AutoShutdown
+该实例Audit服务的配置文件中存在高风险的参数配置，当存放Audit服务审计日志的文件系统空间不足时会导致操作系统被自动关机，且重新启动后由于Audit服务会继续写入审计日志很可能导致操作系统不断被关机。
+"ActionValue": "halt",
+"ConfigPath": "/etc/audit/auditd.conf",
+"ActionKey": "space_left_action"
+${ConfigPath}：Audit服务对应的配置文件。
+${ActionKey} = ${ActionValue}：高风险的参数配置，该配置会导致文件系统空间不足时操作系统会不时被自动关机。
+请根据业务需要修改Audit服务对应配置文件中配置项，具体操作，请参见如何修改auditd服务配置避免因磁盘空间不足导致实例自动关机。
+GuestOS.LimitsFile.UnreasonableConfig
+该实例系统文件/etc/security/limits.conf中部分配置大于系统默认值，可能导致实例无法远程登录。
+可能的异常配置属性如下：
+"LimitDomain": "unused",
+"SysctlValue": 1048576,
+"LimitItem": "nofile",
+"LimitType": "hard",
+"LimitValue": 1048577
+返回结果属性说明如下：
+${LimitItem}：系统文件路径。
+${LimitDomain} ：Domain。
+${LimitValue}：Value。
+${LimitType} ：Type。
+${SysctlValue}：系统配置值（nr_open）。
+调整limits.conf文件的配置，具体操作，请参见调整Linux实例的nofile参数后，远程连接失败或提示“Too many open files”错误怎么办？。
+GuestOS.HugePageSize.UnreasonableConfig
+该实例系统文件/etc/sysctl.conf配置的大页内存数量不当，可能导致实例无法远程登录。
+"SysctlNrhugepages": 10,
+"Hugepagesize": 100,
+"TotalMemory": 1024000
+${SysctlNrhugepages}：当前设置的大页内存数量（KB）。
+${Hugepagesize}：每页内存的大小（KB）。
+${TotalMemory}}：实例的总内存大小（KB）。
+请根据需要调整大页内存数量。具体操作，请参见调整Linux实例大页内存的方法。
+GuestOS.SELinuxService.Enabled
+该实例当前SELinux服务开启，可能导致SSH远程连接实例时无法登录。
+请根据业务需要，选择临时或永久关闭SELinux服务解决SSH连接异常问题。具体操作，请参见Linux实例中由于SELinux服务开启导致SSH远程连接异常。
+GuestOS.NvmeIOTimeout.UnreasonableConfig
+该实例系统文件中NVMe磁盘配置的IO读写超时配置的时间过小，可能导致NVMe磁盘在IO超时后变成只读挂载，进而导致后续写入操作失败。
+"File": "/proc/sys/nvme_core/io_timeout",
+"CurrentSetting": 100
+返回结果属性说明如下：
+${File}：配置文件。
+${CurrentSetting}：IO超时值。
+请根据需要将该配置调整为4294967295。具体操作，请参见Linux系统的ECS实例中NVMe磁盘IO超时参数配置不当，导致NVMe磁盘不可用如何处理？。
+GuestOS.SysctlUnknownNmiPanic.Enabled
+该实例内核中不可屏蔽中断配置不当，会导致实例遇到不可屏蔽中断时出现非预期的内核panic，并导致实例重启。
+"File": "/proc/sys/kernel/unknown_nmi_panic",
+"CurrentSetting": 100
+返回结果属性说明如下：
+${File}：配置文件
+${CurrentSetting}：配置值
+请根据需要将该配置调整为0。具体操作，请参见为什么Linux实例设置内核参数kernel.unknown_nmi_panic后，实例异常重启？。
+GuestOS.NetworkInterfaceMultiQueue.Disabled
+该实例某个或多个网卡未开启网卡多队列特性，可能对网络性能造成影响。
+"InterfaceName": "eth1",
+"Status": "disable"
+返回结果属性说明如下：
+${InterfaceName}：网卡名称。
+${Status}：网卡多队列状态。
+请根据需要将该配置调整为开启状态，开启网卡多队列的方法，请参见网卡多队列。
+GuestOS.SysctlIPv4TCPSACK.Disabled
+该实例网络tcp_sack未开启，可能会影响实例的网络性能。
+"File": "/proc/sys/net/ipv4/tcp_sack",
+"Value": 0
+返回结果属性说明如下：
+${File}：配置文件。
+${Value}：配置值。
+请根据需要将该配置调整为1，开启tcp_sack的方法，请参见Linux实例开启TCP SACK的方法。
+GuestOS.SysctlIPv4TCPTWRecycle.Enabled
+该实例NAT相关的内核参数配置存在异常，导致用户无法通过SSH连接实例，还会导致该实例上的HTTP服务访问出现异常。
+"File": "/proc/sys/net/ipv4/tcp_tw_recycle",
+"Value": 1
+返回结果属性说明如下：
+${File}：配置文件路径。
+${Value}：当前的配置值。
+请根据需要将该配置调整为0，修复NAT环境内核参数的方法，请参见Linux系统常用内核网络参数介绍与常见问题处理。
+GuestOS.SysctlIPv4TCPTWReuse.Disabled
+该实例的内核参数配置未开启TIME-WAIT sockets重用能力，即不允许将TIME-WAIT状态的socket用于新的TCP连接，可能会影响实例的单机网络发送请求性能。
+"CurrentSetting": 0
+${CurrentSetting}：内核参数net.ipv4.tcp_tw_reuse当前的值。
+请根据业务需要，将net.ipv4.tcp_tw_reuse对应值调整为1，即开启TIME_WAIT socket重用能力，提升实例的网络发送请求性能。具体操作，请参见Linux实例常用内核网络参数介绍与常见问题处理。
+GuestOS.SysctlNetfilterNfMaxConnections.Unreasonable
+该实例过去一段时间的历史系统日志中存在错误日志，该问题是由于内核模块nf_conntrack （负责跟踪网络连接条目以配合NAT地址转换功能）所使用的哈希表空间已满所致，可能导致实例出现间歇性网络丢包。
+"Timeout": 432000,
+"KernelMessages": [
+"source": "dmesg command",
+"message": "[14124341.747244] nf_conntrack: table full, dropping packet"
+"source": "/var/log/messages",
+"message": "Nov 15 23:51:16 iZm5efna3fievtdlq82p1mZ kernel: nf_conntrack: table full, dropping packet"
+"ConnectionMax": 65536
+${Timeout}：net.netfilter.nf_conntrack_tcp_timeout_established的值。
+${ConnectionMax}：net.netfilter.nf_conntrack_max的值。
+${KernelMessages.source}：历史系统日志。
+${KernelMessages.message}：错误日志内容。
+请根据业务需要和系统情况，调整实例内核配置文件中上面两个参数对应值的大小，避免该问题。具体操作，请参见Linux实例常用内核网络参数介绍与常见问题处理。
+GuestOS.PidMax.TooSmall
+该实例系统内当前已运行的进程数超过最大进程数（kernel.pid_max）的三分之二，可能导致系统后续无法创建新的进程。
+"PidMax": 900,
+"ProcessCount": 615
+${PidMax}：该参数对应的值kernel.pid_max。
+${ProcessCount}：目前系统中已有的进程数量。
+请根据业务需要，调高kernel.pid_max对应的值。具体操作，请参见在Linux系统内启动某个服务时提示task: Cannot allocate memory该如何处理？。
+GuestOS.SysctlTcpMaxTwBuckets.Unreasonable
+该实例过去一段时间的历史系统日志中存在错误日志，该问题是由于实例存在过多TIME_WAIT连接所致，可能导致实例上的连接被意外关闭或者实例无法响应新的连接，进而影响实例的访问或实例上业务的响应。
+"TwBuckets": 262144,
+"KernelMessages": [
+"source": "dmesg command",
+"message": "[336877.139205] TCP: time wait bucket table overflow"
+"source": "/var/log/messages",
+"message": "Nov 1 14:08:32 iZbp13lj7h3lh086kdl7kpZ TCP: time wait bucket table overflow"
+${KernelMessages.source}：历史系统日志。
+${KernelMessages.message}：错误日志内容。
+${TwBuckets}：内核配置参数 net.ipv4.tcp_max_tw_buckets。
+该问题通常是由于内核配置参数net.ipv4.tcp_max_tw_buckets配置不当所致，请根据业务需要，调整实例内核配置中该参数对应值的大小，加速连接的关闭，避免该问题。具体操作，请参见Linux实例常用内核网络参数介绍与常见问题处理。
+GuestOS.SystemUserPwd
+系统账号和密码设置检查
+GuestOS.SystemUser.MissingInfo
+该实例的系统账号不存在，可能会导致实例无法登录。
+"MissingUsername": "postfix",
+"Source": "/etc/passwd"
+返回结果属性说明如下：
+${Source}：配置文件路径。
+${MissingUsername}：系统账号。
+请根据需要补充该账号的信息，检查系统用户不存在的方法，请参见Linux实例中关键的系统用户不存在。
+GuestOS.SystemUserFile.NotUnixFormat
+该实例系统账号对应文件的文件格式错误，可能会导致实例无法登录。
+"File": "/etc/passwd"
+返回结果属性说明如下：
+${File}：非法文件路径。
+请根据需要修改该文件的文件格式。修改系统文件格式的方法，请参见Linux实例中修复非Unix格式文件。
+GuestOS.SystemUserFile.InvalidExtensionAttribute
+该实例系统账号对应文件的扩展属性配置不当，可能导致实例的部分功能无法正常工作，比如通过控制台修改root账号的密码不生效等。
+"CorrectAttribute": "e",
+"File": "/etc/passwd",
+"CurrentAttribute": "ie"
+返回结果属性说明如下：
+${File}：文件路径。
+${CurrentAttribute}：当前配置值。
+${CorrectAttribute}：正确配置值。
+请根据需要修改该文件的文件格式。修改系统文件格式的方法，请参见Linux实例中修复非Unix格式文件。
+GuestOS.FileSystems
+文件系统状态检查
+GuestOS.Filesystems.UUIDConflicts
+该实例存在相同UUID的文件系统，可能导致实例启动时自动挂载非预期的文件系统，进而导致实例无法正常启动。
+拥有相同UUID的文件系统信息如下：
+"CorrectAttribute": "e",
+"File": "/etc/passwd",
+"CurrentAttribute": "ie"
+返回结果属性说明如下：
+${FirstDevice}：冲突设备1。
+${SecondDevice}：冲突设备2。
+${UUID}：冲突的UUID。
+请您根据需要修改文件系统的UUID，避免重复。
+修改文件系统UUID的方法，请参见修改云盘的UUID。
+GuestOS.FstabFile.InvalidFormatExists
+该实例/etc/fstab文件中存在格式错误，可能会导致实例无法启动。
+详细信息如下：
+"Line": 10,
+"File": "/dev/vdb1"
+返回结果属性说明如下：
+${File}：文件路径。
+${Line}：格式错误行号。
+请根据需要进行修正/etc/fstab文件。更多信息，请参见Linux实例的/etc/fstab文件配置错误导致系统启动异常问题解决方法。
+GuestOS.FstabFile.InvalidDevice
+该实例的/etc/fstab文件中配置的某个设备不存在，可能会导致实例无法启动。
+"MountPoint": "/mnt",
+"Device": "UUID=48609326-10e3-40c2-93b3-3f0d9798d7a9"
+返回结果属性说明如下：
+${Device}：不存在的设备UUID。
+${MountPoint}：设备挂载点。
+请根据需要移除/etc/fstab中不存在的设备。更多信息，请参见Linux实例的/etc/fstab文件配置错误导致系统启动异常问题解决方法。
+GuestOS.FstabFile.LossMountDevice
+该实例存在未在/etc/fstab中配置自动挂载的磁盘，可能会导致实例无法启动。
+"Device": "z",
+"MountAttribute": "-rw"
+返回结果属性说明如下：
+${Device}：未配置自动挂载的设备。
+${MountAttribute}：建议挂载属性。
+修改磁盘建议的挂载属性，具体操作，请参见Linux实例的/etc/fstab文件配置错误导致系统启动异常问题解决方法。
+GuestOS.FileSystems.PartitionUnaligned
+该实例的磁盘存在未按照推荐的2048扇区进行分区对齐的情况，当云盘扩容后，可能会因分区未对齐导致Linux内部自动执行分区扩容的操作失败，最终导致文件系统的可用空间未增加。
+"DeviceStart": 512,
+"Unit": "kB",
+"DeviceName": "/dev/vdb"
+${DeviceName}：磁盘设备名称。
+${DeviceStart}：该设备的第一个分区的开始位置。
+${Unit}：单位。
+请根据业务情况，修复磁盘分区未对齐的问题。具体操作，请参见云盘扩容后使用growpart扩展GPT分区失败该如何处理？。
+GuestOS.FstabFile.IncorrectType
+该实例在/etc/fstab文件中配置的设备文件系统与设备实际的文件系统不一致，可能会导致实例无法启动或设备挂载失败。
+"ConfigFileSystem": "extext",
+"Device": "UUID=b9a7ad07-b910-4ba6-9582-e88bf440479c",
+"RealFileSystem": "ext4"
+${Device}：设备。
+${RealFileSystem}：实际的文件系统。
+${ConfigFileSystem}：配置的文件系统。
+请更改/etc/fstab中配置的文件系统，使其与设备实际的文件系统保持一致。具体操作，请参见Linux实例的/etc/fstab文件配置错误导致系统启动异常问题解决方法。
+GuestOS.Mountpoint.Multiple
+该实例/etc/fstab文件中存在同一个文件系统挂载到多个挂载点的配置记录，可能导致文件系统读写冲突。
+"Device" : {
+"filesystemFeatures" : [ "has_journal", "ext_attr", "resize_inode", "dir_index", "filetype", "needs_recovery", "extent", "64bit", "flex_bg", "sparse_super", "large_file", "huge_file", "uninit_bg", "dir_nlink", "extra_isize" ],
+"name" : "/dev/vdb1",
+"type" : "ext4",
+"uuid" : "b055d7bb-2801-40d2-9ddb-1b6fd9b208bc"
+"ConfigPath" : "/etc/fstab",
+"Entries" : [ {
+"mountPoint" : "/usr/local/attachment",
+"options" : "defaults",
+"name" : "/dev/vdb1",
+"passNumberOnParallelFsck" : 0,
+"type" : "ext4",
+"dumpFrequency" : 0
+}, {
+"mountPoint" : "/home/sunmooc",
+"options" : "defaults",
+"name" : "/dev/vdb1",
+"passNumberOnParallelFsck" : 0,
+"type" : "ext4",
+"dumpFrequency" : 0
+{ConfigPath}：文件路径。
+{Device.name}：设备名称。
+{Entries.mountPoint}：挂载点。
+请根据业务需求，修改/etc/fstab文件配置，使得文件系统与挂载点一一对应。具体操作，请参见Linux实例的/etc/fstab文件配置错误导致系统启动异常问题解决方法。
+GuestOS.NetworkStatus
+网络配置和状态检查
+GuestOS.Network.InvalidNetmask
+该实例的IPv4地址或对应的子网掩码配置不当，导致该IP地址配置无效，影响实例无法正常连接和访问。
+"IP": "10.0.0.1"
+返回结果属性说明如下：
+${IP}：未配置子网掩码的IP。
+请根据需要修改子网掩码，具体操作，请参见Linux系统的ECS实例如何设置静态IP地址。
+GuestOS.Network.InvalidDefaultRoute
+该实例系统内未配置默认路由，可能导致实例无法正常连接。
+"Status": "unconfigured"
+返回结果属性说明如下：
+${Status}：默认路由配置状态。
+请根据业务需要，修改网卡配置或者系统路由配置，补充所需的路由规则。具体操作，请参见在Linux实例中访问外部网络地址，提示“Network is unreachable”错误怎么办？。
+GuestOS.DHCPService.Disabled
+该实例上网卡的DHCP服务进程处于关闭状态，可能导致实例的IP地址在租约到期之后，出现无法续租导致网络中断的问题。
+网卡{InterfaceName}的DHCP配置异常。
+"Status": "enable",
+"InterfaceName": "eth0"
+返回结果属性说明如下：
+${Status}：网卡DHCP启用状态。
+${InterfaceName}：网卡名称。
+请检查DHCP服务相关配置，具体操作，请参见Linux实例网络服务异常处理方案。
+GuestOS.Udev.MacAddressNotExist
+该实例内核使用的设备动态管理udev规则中，残留了MAC地址与网卡实际配置不一致的规则，可能导致实例网络无法正常使用或者网络设备命名不符合预期。
+"MacAddress": "00:00:00:01:01:02",
+"DeviceName": "eth${fakeMaxInterfaceNumber}"
+${MacAddress}：udev中配置的MAC地址。
+${DeviceName}：网卡设备名称。
+请根据业务需要，修改udev规则，清除与实际配置不一致的MAC地址和网卡设备名称。具体操作，请参见多网卡场景下，Linux实例操作系统的网卡名称发生漂移如何解决？。
+GuestOS.DHCPService.CustomPort
+CentOS、RHEL 7的某些系统的ECS实例上自带的dhclient版本低于4.2.5-60，低于该版本的dhclient存在软件缺陷，会占用除标准端口67/68或546/547以外的其他端口。如果实例内的其他服务或进程也使用了该端口，可能出现端口冲突问题，从而导致您的业务或者服务进程启动失败或不可用。
+"OccupiedPort": 31045,
+"DhclientVersion": "isc-dhclient-4.2.5"
+"OccupiedPort": 38964,
+"DhclientVersion": "isc-dhclient-4.2.5"
+${OccupiedPort： 该实例DHClient服务正在使用非默认端口
+${DhclientVersion}：该实例DHClient服务的版本。
+请根据业务需要，尽快升级DHClient服务版本以修复此问题。具体操作，请参见在CentOS或RHEL 7实例上，启动某个服务或进程时提示端口冲突错误。
+GuestOS.NetworkConfig.InvalidInterface
+该实例的网络配置文件中指定了不存在的网卡设备，可能导致系统网络服务启动失败或运行异常。
+该问题是由于网卡配置文件中指定的网卡设备不存在导致。可能原因如下：
+创建或者配置实例时，没有配置指定数量的弹性网卡。
+卸载实例的辅助网卡后忘记删除对应配置文件。
+制作自定义镜像时未删除对应配置文件。
+"ConfigFile": "/etc/sysconfig/network-scripts/ifcfg-eth101",
+"DeviceName": "eth101"
+${ConfigFile}：网卡配置文件。
+${DeviceName}：指定的网卡设备。
+请根据业务需要，添加所需要的弹性网卡，或者删除不存在网卡对应的配置文件。具体操作，请参见启动网络服务时提示Job for network.service failed because the control process exited with error code. 该如何处理？
+GuestOS.Firewall
+系统防火墙状态检查
+GuestOS.NetworkFirewall.Enabled
+该实例的防火墙（即iptables设置）目前处于开启状态，如果服务器开启了防火墙，并设置了屏蔽外界访问的规则，可能会导致远程访问实例失败。
+请您根据业务需要，调整防火墙的配置。具体操作，请参见管理 Linux 实例的系统防火墙。
+GuestOS.CloudInitService
+Cloud-init服务状态检查
+GuestOS.CloudinitService.BadDriverStatus
+该实例的cloud-init驱动目前处于异常状态，可能导致实例在系统初始化阶段的相关系统配置无法正确执行，进而导致实例无法正常访问。
+"CloudinitEnabled": "enabled",
+"CloudInitSupport": "vpc",
+"GrowpartInstall": "installed",
+"CloudinitInstall": "installed"
+返回结果属性说明如下：
+${CloudInitInstall}：CloudInit安装状态。
+${CloudInitEnabled}：CloudInit启用状态。
+${GrowpartInstall}：Growpart安装状态。
+${CloudInitSupport}：CloudInit支持的网络类型。
+请根据需要检查并启动实例内的cloud-init服务进程。具体操作，请参见安装cloud-init。
+GuestOS.CloudinitService.StartFailed
+该实例的cloud-init在启动时未能正常结束，可能导致实例系统相关配置失败，从而无法访问实例。
+您可以通过VNC登录实例，查看cloud-init系统日志，并根据需要重启实例。
+GuestOS.SSHServiceStatus
+SSH服务状态检查
+GuestOS.SSH.ForbiddenRootLogin
+该实例SSH服务当前禁止root账号登录，导致实例root账号无法通过SSH访问。
+"File" : "/etc/ssh/sshd_config"
+返回结果属性说明如下：
+${File}：禁止root账号登录的配置文件。
+修复root远程登录报错的问题。具体操作，请参见如何解决SSH登录Linux实例时的“Permission denied, please try again”错误？。
+GuestOS.SSH.MissingCriticalFileOrDirectory
+该实例SSH服务对应的关键文件或目录缺失，会导致实例无法通过SSH访问。
+"Files": [
+"File": "/var/empty/*"
+返回结果属性说明如下：
+${File}：缺失的关键文件或目录。
+请根据需要重新配置SSH相关目录和文件。具体操作，请参见检查Linux实例是否存在SSH服务所需的必备文件或目录。
+GuestOS.SSH.IncorrectSSHFilePermission
+该实例SSH服务依赖的文件访问权限配置不当，会导致实例无法通过SSH访问。
+"Files": [
+"File": "/etc/ssh/ssh_host_ecdsa_key",
+"CurrentPermission": "0777"
+返回结果属性说明如下：
+${Files}：权限配置错误的文件列表。
+${File}：权限配置错误的文件路径。
+${CurrentPermission}：当前的文件权限配置。
+请根据需要重新配置SSH相关目录和文件。具体操作，请参见检查Linux实例是否存在SSH服务所需的必备文件或目录。
+GuestOS.SSH.ListeningPortMismatchWithConfig
+该实例sshd进程当前正在监听的地址和端口与配置的地址和端口不一致，可能导致SSH连接到预期的地址和端口时失败。
+sshd进程当前正在监听的地址和端口，不在sshd的配置文件/etc/ssh/sshd_config内。
+"Address": "0.0.0.0",
+"Port": 2223
+返回结果属性说明如下：
+${Address}：监听的地址。
+${Port}：监听的端口。
+请根据实际情况需要，调整sshd配置文件中的监听地址与端口后，重启sshd进程使其生效。
+具体操作，请参见SSH的访问权限异常导致无法远程连接Linux实例。
+GuestOS.TimeSyncService
+时间同步服务状态检查
+GuestOS.TimeSyncService.Disabled
+该实例的时间同步服务目前未正常工作或配置不当，可能导致实例系统内的时间与实际标准时间出现偏差，进而影响实例内部分应用无法正常工作。
+"Status": "disabled",
+"ServiceName": "chronyd"
+返回结果属性说明如下：
+${ServiceName}：服务名称。
+${Status}：服务状态。
+请根据需要调整时间同步服务相关配置。具体操作，请参见时间同步。
+GuestOS.OSOOM
+检查系统是否发生过OOM
+GuestOS.Memory.OOM
+该实例Guest OS内部曾经发生了OOM（Out of Memory）问题。
+系统最近一次发生OOM的时间和详情日志如下：
+"Message": "Mar 25 15:54:50 iZm5ej4ue05oijaudem8shZuser.err: Out of memory testing"
+请您检查当前实例内存大小是否足以支撑实例上运行的业务，必要时，请升级配置提升实例内存。
+分析OOM的根因并解决的方法，请参见如何处理Linux实例中的OOM问题？。
+实例操作系统内相关配置诊断结果说明（Windows）
+诊断指标ID
+诊断指标说明
+诊断结果条目ID
+诊断指标条目说明
+建议操作
+GuestOS.WinCPUUtil
+检查CPU是否使用率过高
+GuestOS.CPU.HighUtilization
+该实例总CPU的总使用率已超过80%。
+CPU使用率排名前5的进程如下，请检查这些进程是否正常。
+"ProcessCPUUsageTop5": [
+"Pid": "1234",
+"CommandName": "/usr/bin/cpu_load.py",
+"AverageCPU": 80
+返回结果属性说明如下：
+${ProcessCPUUsageTop5} ：系统内CPU使用率Top5的进程列表。
+${Pid}：进程ID。
+${CommandName}：进程名称。
+${AverageCPU}: CPU平均使用率。
+请您检查CPU进程是否存在异常，如果是正常业务导致，建议对ECS配置进行升级。
+核查单个CPU使用率过高的方法，请参见Windows实例CPU使用率较高问题的排查与处理。
+GuestOS.WinCoreCPU.HighUtilization
+该实例一个或多个CPU的使用率已超过85%。
+单个CPU使用率超过85%的信息如下，请检查如下进程是否正常。
+"CPUCoreUsage": [
+"Processor": 1,
+"AverageCPU": 80
+返回结果属性说明如下：
+${CPUCoreUsage}：CPU使用率超过85%的核心列表。
+${Processor}：CPU核心编号。
+${AverageCPU}：CPU核心使用率。
+请检查如下进程是否正常，核查单个CPU使用率过高的方法，请参见Windows实例CPU使用率较高问题的排查与处理。
+GuestOS.WinMemoryUtil
+检查内存使用率是否过高
+GuestOS.WinMemory.HighUtilization
+该实例当前内存的总使用率超过80%。
+内存使用率排名前5的进程如下：
+"TopUtilizationProcesses": [
+"TotalMemory": 134389760,
+"Pid": "4560",
+"CommandName": "powershell"
+"AverageMemory": 87.0
+返回结果属性说明如下：
+${CPUCoreUsage}：CPU使用率超过85%的核心列表。
+${Processor}：CPU核心编号。
+${AverageCPU}： CPU核心使用率。
+请根据需要关闭不需要的服务或进程，分析Windows内存使用率过高的方法，请参见Windows系统内存分析工具的介绍。
+GuestOS.WinMemory.LicenseCorrupted
+该实例的Windows许可证数据库被破坏或配置错误，导致Windows系统任务管理器上显示的硬件保留的内存大小远大于可用内存，进而导致监控到的实例内存使用率过高。
+"MemoryForHardware": 19723407362
+返回结果属性说明如下：
+${MemoryForHardware}：硬件内存大小（单位B）。
+恢复Windows许可证数据库，然后重启实例，即可恢复正常。
+修复Windows系统许可证数据库被破坏或配置不当的方法，请参见Windows实例为硬件保留内存过多导致实例卡顿如何处理。
+GuestOS.WinSysDiskUtil
+系统盘容量使用率过高
+GuestOS.WinFileSystem.InsufficientSpace
+该实例系统盘（C盘）当前的剩余空间过小，可能导致系统运行缓慢甚至实例无法启动。
+"FreeSize": 2860625,
+"FilesystemName": "C:"
+返回结果属性说明如下：
+${FilesystemName}：实例系统盘盘符。
+${FreeSize}：剩余空间（单位B）。
+请您根据需要对系统盘进行扩容，或对实例规格进行升级。
+具体操作，请参见云盘扩容指引。
+GuestOS.WinSystemConfig
+检查系统关键配置状态检查
+GuestOS.WinOSVersion.Low
+该实例Guest OS的操作系统版本过低，阿里云和微软已不再维护。
+"Version": "10.0.14393"
+返回结果属性说明如下：
+${Version}：操作系统版本。
+请您根据需要重装系统，升级到更高版本的Windows系统。实例重装系统的方法，请参见更换系统盘（更换操作系统）或操作系统迁移。
+GuestOS.VirtIOVersion.Low
+该实例操作系统的VirtIO驱动版本过低，会导致实例磁盘无法在线扩容。
+设备{Device}当前使用的VirtIO版本为{Version}，该驱动版本不支持磁盘在线扩容。
+"Version": 58010,
+"Device": "Red Hat VirtIO Ethernet Adapter"
+返回结果属性说明如下：
+${Device}：驱动名称
+${Version}：版本
+请根据需要选择是否升级VirtIO的版本。
+升级VirtIO版本的方法，请参见更新Windows实例的virtio驱动。
+GuestOS.WinCrashDump.Disabled
+该实例系统crash dump配置为关闭状态，当系统出现异常重启或蓝屏时，系统无法保存相关信息进行故障排查。
+"Status" : "disable"
+返回结果属性说明如下：
+${Status}：该实例系统crash dump配置状态。
+请根据业务需要选择是否要开启crash dump配置。
+Windows开启crash dump方法，请参见为实例开启或关闭内核崩溃转储服务。
+GuestOS.KMSService.MismatchedKey
+该实例采用密钥管理服务KMS进行Windows系统激活，但KMS客户机所使用的激活密钥与Windows版本不一致，导致Windows系统激活失败。
+"PartialProductKey" : "4M64B"
+返回结果属性说明如下：
+${PartialProductKey}：KMS Client Setup key的最后5位。
+请根据Windows激活教程，选择与Windows系统版本匹配的密钥进行激活。
+使用KMS激活Windows系统的方法，请参见
+使用KMS域名激活ECS实例的正版Windows Server系统。
+GuestOS.KMSService.Disconnected
+该实例当前无法正常连接到密钥管理服务（KMS）的激活服务器，导致实例激活失败。
+"KMSServerStatus": "KmsServerStable"
+返回结果属性说明如下：
+${KMSServerStatus}： KMS Server状态。
+请检查实例内的防火墙配置或者第三方软件，是否拦截KMS激活服务器的访问，并根据需要修改相关配置。
+检查KMS激活服务器的方法，请参见ECS实例使用的Windows系统激活失败如何解决？。
+GuestOS.SPPSVCService.Unhealthy
+该实例的软件保护平台服务（SPPSVC.exe）未正常启动或运行，会导致Windows系统无法激活和无法进入激活设置项。
+"SppsvcStatus": "Disabled"
+返回结果属性说明如下：
+${SppsvcStatus}：sppsvc服务状态。
+请根据Windows激活教程，尝试重新启动SPPSVC.exe服务，并将SPPSVC负责状态修改为自动（延迟启动），确保该服务下次自动启动。
+GuestOS.SystemPatch.Incorrect
+该实例安装了不正确的系统补丁，可能导致系统异常重启或宕机。
+实例当前错误的补丁如下：
+"IncorrectHotfixName": "KB5009547"
+返回结果属性说明如下：
+${IncorrectHotfixName}：异常补丁名称。
+请根据业务需要选择合适的时间卸载对应的错误补丁。
+卸载Windows补丁的方法，请参见如何卸载Windows实例中的系统补丁？。
+GuestOS.WinFiles.Missing
+该实例系统目录（C:\Windows\）中的部分关键系统文件缺失，可能导致实例登录后出现黑屏或运行异常。
+"MissingFile" : "C:\\Windows\\write.exe"
+${MissingFile}：缺失的系统文件。
+请根据业务需要，尽快恢复该系统文件。具体操作，请参见远程登录Windows实例出现黑屏，无法进入桌面怎么办？。
+GuestOS.OperatingSystem.Unactivated
+该实例使用的Windows系统处于未激活状态，可能导致Windows的部分个性化服务无法正常使用。
+请根据Windows激活教程，使用正确的密钥管理服务（KMS）激活该实例的Windows系统。具体操作，请参见Windows系统ECS实例激活失败。
+GuestOS.WinSystemInit
+系统初始化状态检查
+GuestOS.SysPrepService.Interrupted
+该实例因创建时过早重启实例导致系统准备服务（SysPrep）的初始化过程中断，操作系统的部分关键配置未能正确完成，可能导致实例无法正常启动。
+"ImageState": "IMAGE_STATE_COMPLETE1"
+返回结果属性说明如下：
+${ImageState}：镜像状态。
+由于实例第一次创建时系统初始化未能正确完成，请您根据需要选择通过更换系统盘重装系统，或重新创建一个新实例来替代本实例。
+具体操作，请参见更换系统盘（更换操作系统）或重新初始化系统盘（重置操作系统）。
+GuestOS.SysPrepService.InitFailed
+该实例在第一次创建时的系统初始化流程未能正常结束，可能导致实例无法正常工作。
+报错信息如下：
+"Events": "install_virtio_error "
+返回结果属性说明如下：
+${Events}：事件。
+请您根据需要选择通过更换系统盘重装系统或重新创建一个新实例来替代本实例。
+具体操作，请参见更换系统盘（更换操作系统）或重新初始化系统盘（重置操作系统）。
+GuestOS.WinSystemUser
+Administrator账号检查
+GuestOS.WinAdministrator.NotExist
+该实例系统账号Administrator不存在，可能会导致服务无法正常访问的情况。
+"Status": "disable"
+返回结果属性说明如下：
+${Status}：Administrator启用状态。
+请根据业务需要开启Administrator账号。
+Windows系统创建账号的方法，请参见通过管理控制台增加或删除管理员。
+GuestOS.WinNetworkStatus
+网络配置和状态检查
+GuestOS.WinNetworkInterfaceDriver.Disabled
+该实例的网卡目前处于不可用状态，可能导致实例无法远程连接。
+网卡当前状态为关闭。
+"Status": "not OK",
+"Device": "Red Hat VirtIO Ethernet Adapter"
+返回结果属性说明如下：
+${Device}：网卡驱动名称
+${Status}：状态
+请根据需要修复网卡的状态。
+检查并修复网卡状态的方法，请参见检查网络。
+GuestOS.WinRDPPort.Closed
+该实例系统内端口目前处于未开放状态，或者防火墙处于开启状态，导致无法使用远程桌面连接RDP服务来访问该实例。
+"Status": "disable",
+"Port": 3387
+"Status": "disable",
+"Port": 3388
+返回结果属性说明如下：
+${Port}：端口。
+${Status}：状态。
+请根据需要调整该端口的开放状态。
+开启3389端口允许远程桌面连接的方法，请参见Windows实例如何启动远程桌面连接RDP服务。
+GuestOS.WinDHCPService.Disabled
+该实例网卡上的DHCP配置处于关闭状态，可能会导致服务无法访问的情况。
+"Status": "enable",
+"Device": "Red Hat VirtIO Ethernet Adapter"
+返回结果属性说明如下：
+${Device}：设备名称。
+${Status}：设备状态。
+请根据需要调整该端口的开放状态。
+开启Windows配置DHCP服务的方法，请参见安装和配置DHCP服务器。
+GuestOS.WinNetworkInterface.LackIPV4Address
+该实例的某个网卡未获取到IPv4地址，可能会导致服务无法访问的情况。
+"Name": "eth0"
+返回结果属性说明如下：
+${Name}：网卡名称。
+请根据需要检查该实例的DHCP服务是否启用或检查实例的静态地址是否配置。
+开启Windows配置DHCP服务的方法，请参见安装和配置DHCP服务器。
+GuestOS.NetworkProxy.Enabled
+该实例配置了网络代理，可能会导致服务无法正常访问的情况。
+"Name": "ie"
+返回结果属性说明如下：
+${Name}：网卡上配置的代理。
+请根据需要确定是否关闭这些网络代理。
+Windows系统关闭网络代理的具体操作，请参见如何重置代理设置。
+GuestOS.WinPort.Conflict
+该实例的远程桌面协议（RDP）服务所使用的端口被其他进程占用，出现端口冲突，可能导致实例无法通过远程桌面进行访问。
+"ConflictPort": "3389",
+"ConflictServer": "svchost node"
+${ConflictPort}：服务端口。
+${ConflictServer}：占用端口的服务。
+请根据业务需要，通过VNC登录实例，并修改前面两个服务使用的端口，确保远程桌面服务能正常工作。具体操作，请参见远程登录Windows实例发生端口冲突如何解决？。
+GuestOS.WinDiskStatus
+Windows磁盘状态检查
+GuestOS.SystemDisk.Corrupted
+该实例的系统盘（C盘）目前处于异常状态，可能会导致实例重启后无法启动，或实例驱动无法正常安装等问题。
+"Result": "检测结果或者报错信息"
+返回结果属性说明如下：
+${Result}：系统盘检查的结果。
+请您选择合适的时间，选择以下2种方式恢复系统盘。
+通过chkdsk命令检查所有磁盘的状态，发现并定位异常磁盘。然后通过sfc命令进行手动修复或替换。
+方案二：通过系统盘的磁盘快照进行恢复。具体操作，请参见Windows实例系统盘异常如何解决和使用快照回滚云盘。
+GuestOS.VirtIODriver.DiskIDConflicts
+该实例因virtIO驱动版本过低导致出现重复的磁盘uniqueID，在做磁盘重置操作时可能会导致实例上磁盘数据丢失。
+拥有相同uniqueID的磁盘信息如下：
+"DiskUniqueIds": "磁盘uniqueid列表"
+返回结果属性说明如下：
+${DiskUniqueIds}：磁盘uniqueid列表。
+请根据需要尽快升级virtIO驱动解决此问题。
+升级virtIO驱动的方法的具体操作，请参见更新Windows实例的virtio驱动。
+GuestOS.WinFirewall
+Windows防火墙状态检查
+GuestOS.WinFirewall.Enabled
+该实例的防火墙目前处于开启状态，可能会导致服务无法访问的情况。
+"Status": "enabled",
+"Name": "Public"
+返回结果属性说明如下：
+${Name}：防火墙名称。
+${Status}：状态。
+请根据业务需要调整防火墙的相关策略配置。配置防火墙策略的具体操作，请参见Windows系统防火墙策略配置指南。
+GuestOS.WinDriverStatus
+Windows关键驱动状态检查
+GuestOS.DiskFilterDriver.Vestigital
+该实例的磁盘过滤驱动存在残留文件，可能导致实例无法识别新挂载的磁盘。
+"UpperFilters": "Test"
+返回结果属性说明如下：
+${LowerFilters}：下层过滤驱动的名称。
+${UpperFilters}：上层过滤驱动的名称。
+请根据业务需要，清除无效的磁盘过滤驱动，并重启实例即可。清除无效的磁盘过滤驱动的具体操作，请参见如何检查Windows实例注册表中的磁盘驱动残留项。
+GuestOS.VirtIODriver.Low
+该实例的Virtio驱动版本为{VirtioVersion}，此版本太低可能影响实例出现蓝屏、网络丢包、磁盘数据丢失等风险。
+"VirtioVersion": "virtio驱动版本",
+"RecommendedVersion":"推荐版本"
+请根据业务需要，选择合适的时间尽快升级系统的VirtIO驱动版本。
+升级Windows系统VirtIO驱动版本的具体操作，请参见更新Windows实例的virtio驱动。
+Instance.Type.Xen
+该实例的实例规格过老（基于Xen架构），可能导致实例的操作系统启动失败或设备管理器异常。
+"Status" : "disable"
+返回结果属性说明如下：
+${Status}：Xen驱动残留，可能造成系统启动失败或者设备管理器异常。
+请根据业务需要对实例进行变配，升级到新一代的实例规格。
+具体操作，请参见包年包月实例升配规格或更改按量付费实例规格。
+GuestOS.WinSystemProcess
+Windows关键系统进程状态检查
+GuestOS.RDPService.Unavailable
+该实例的远程桌面连接服务（RDP）被禁用或损坏，导致实例无法通过远程桌面进行访问。
+请根据业务需要重启或重新安装远程桌面连接服务（RDP）。更多信息，请参见Windows实例如何启动远程桌面连接RDP服务。
+GuestOS.RDP.BlockedByFirewall
+该实例的远程桌面连接服务（RDP）的访问被防火墙拦截，可能导致实例无法通过RDP进行连接。
+"Rule": "v2.29|Action=Block|Active=TRUE|Dir=In|Protocol=6|Profile=Public|LPort=3389|Name=RDPPORTLatest-TCP-In|"
+返回结果属性说明如下：
+${Rule}：防火墙规则。
+请根据业务需要，选择关闭防火墙，或者在防火墙规则中添加放行RDP（对应3389端口）的规则。
+Windows系统中放行RDP访问的具体操作，请参见 Windows系统防火墙策略配置指南。
+GuestOS.WSUS.Disconnected
+该实例的服务器更新服务（WSUS）目前连接异常，可能导致实例操作系统的产品更新无法正常进行。
+请根据业务需要重新配置服务器更新服务（WSUS）。具体操作，请参见微软官方文档规划WSUS部署。
+GuestOS.Metaserver.Disconnected
+该实例的元数据服务（metaserver）目前无法正常连接或连接超时，可能导致实例的元数据无法正常访问。
+请检查实例的防火墙配置是否拦截了IP地址100.100.100.200，如果该IP地址被拦截，请在防火墙设置中放行该IP地址后再访问元数据服务。
+关于实例元数据的更多信息，请参见实例元数据。
+GuestOS.WinLicence.Expired
+该实例的多人远程桌面服务的许可证已到期，导致RDP服务无法正常使用，进而导致实例无法通过远程桌面进行访问。
+请通过VNC登录实例，并根据业务需要，购买微软多人远程服务授权或者卸载远程桌面服务。
+修复Windows远程桌面许可证的方法，请参见远程桌面服务认证到期导致远程登录Windows实例失败怎么办？。
+GuestOS.WinThirdPartSoftware
+第三方软件安装状态检查
+GuestOS.Operation.InfluencedByAntivirusProcess
+该实例的安装了第三方杀毒软件，可能导致实例的某些管理操作（比如重置密码、无法远程连接等）无法正常工作，进而造成实例异常。
+已安装的杀毒软件名称如下：
+"AntivirusName": "QQPCRTP"
+返回结果属性说明如下：
+${AntivirusName}：杀毒软件名称。
+请根据业务需要选择是否卸载对应软件。
+用户行为回溯诊断结果说明
+诊断指标ID
+诊断指标说明
+诊断结果条目ID
+诊断指标条目说明
+建议操作
+Instance.UnexpectedSgCreationOrDeletion
+通过角色扮演查询指定时间范围内创建、删除安全组的相关操作，若未创建过AliyunServiceRoleForECSSelfService角色，则系统会自动创建。
+Instance.UnexpectedSgCreationOrDeletion.Log
+展示创建、删除安全组的相关操作。
+"accountId":"11111174379****",
+"requestId":"8EB3E59F-878C-5613-8EB3-FE59FDBA****",
+"eventSource":"ecs-unit-share.cn-hangzhou.aliyuncs.com",
+"eventTime":"2022-11-29 14:51:00",
+"eventName":"CreateSecurityGroup",
+"sourceIpAddress":"cloudmonitor.aliyuncs.com",
+"eventType":"ApiCall",
+"referencedResources":"[[i-bp17557glrxatoi4****]]",
+"userName":"AliyunServiceRoleForCloudMonitor:cloudmonitor"
+您可以通过操作审计查看更多详情，具体操作，请参见通过操作审计控制台查询事件。
+Instance.UnexpectedSgMember
+通过角色扮演查询指定时间范围内实例加入、移出安全组的相关操作，若未创建过AliyunServiceRoleForECSSelfService角色，则系统会自动创建，更多信息。
+Instance.UnexpectedSgMember.Log
+展示实例加入、移出安全组的相关操作。
+"accountId":"11111174379****",
+"requestId":"8EB3E59F-878C-5613-8EB3-FE59FDBA****",
+"eventSource":"ecs-unit-share.cn-hangzhou.aliyuncs.com",
+"eventTime":"2022-11-29 14:51:00",
+"eventName":"JoinSecurityGroup",
+"sourceIpAddress":"cloudmonitor.aliyuncs.com",
+"eventType":"ApiCall",
+"referencedResources":"[[i-bp17557glrxatoi4****]]",
+"userName":"AliyunServiceRoleForCloudMonitor:cloudmonitor"
+您可以通过操作审计查看更多详情，具体操作，请参见通过操作审计控制台查询事件。
+Instance.UnexpectedFee
+通过角色扮演查询指定时间范围内实例费用类的相关操作，若未创建过AliyunServiceRoleForECSSelfService角色，则系统会自动创建。
+Instance.UnexpectedFee.Log
+展示实例费用类的相关操作。
+"accountId":"11111174379****",
+"requestId":"8EB3E59F-878C-5613-8EB3-FE59FDBA****",
+"eventSource":"ecs-unit-share.cn-hangzhou.aliyuncs.com",
+"eventTime":"2022-11-29 14:51:00",
+"eventName":"Runinstances",
+"sourceIpAddress":"cloudmonitor.aliyuncs.com",
+"eventType":"ApiCall",
+"referencedResources":"[[i-bp17557glrxatoi4****]]",
+"userName":"AliyunServiceRoleForCloudMonitor:cloudmonitor"
+您可以通过操作审计查看更多详情，具体操作，请参见通过操作审计控制台查询事件。
+Instance.UnexpectedCreationOrRelease
+通过角色扮演查询指定时间范围内创建、删除实例的相关操作，若未创建过AliyunServiceRoleForECSSelfService角色，则系统会自动创建。
+Instance.UnexpectedCreationOrRelease.Log
+展示创建、删除实例的相关操作。
+"accountId":"11111174379****",
+"requestId":"8EB3E59F-878C-5613-8EB3-FE59FDBA****",
+"eventSource":"ecs-unit-share.cn-hangzhou.aliyuncs.com",
+"eventTime":"2022-11-29 14:51:00",
+"eventName":"Runinstances",
+"sourceIpAddress":"cloudmonitor.aliyuncs.com",
+"eventType":"ApiCall",
+"referencedResources":"[[i-bp17557glrxatoi4****]]",
+"userName":"AliyunServiceRoleForCloudMonitor:cloudmonitor"
+您可以通过操作审计查看更多详情，具体操作，请参见通过操作审计控制台查询事件。
+Instance.UnexpectedRunningStatus
+通过角色扮演查询指定时间范围内影响实例运行状态的相关操作，若未创建过AliyunServiceRoleForECSSelfService角色，则系统会自动创建。
+Instance.UnexpectedRunningStatus.Log
+展示影响实例运行状态的相关操作。
+"accountId":"11111174379****",
+"requestId":"8EB3E59F-878C-5613-8EB3-FE59FDBA****",
+"eventSource":"ecs-unit-share.cn-hangzhou.aliyuncs.com",
+"eventTime":"2022-11-29 14:51:00",
+"eventName":"Runinstances",
+"sourceIpAddress":"cloudmonitor.aliyuncs.com",
+"eventType":"ApiCall",
+"referencedResources":"[[i-bp17557glrxatoi4****]]",
+"userName":"AliyunServiceRoleForCloudMonitor:cloudmonitor"
+您可以通过操作审计查看更多详情，具体操作，请参见通过操作审计控制台查询事件。

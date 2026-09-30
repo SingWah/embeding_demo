@@ -1,0 +1,26 @@
+# 通过OOS扩展程序在ECS实例上一键安装Hermes Agent，无需手动配置环境与依赖。
+> https://help.aliyun.com/zh/ecs/user-guide/install-hermes-agent-on-ecs-instances-using-the-oos-extension
+
+通过系统运维管理（OOS）的扩展程序功能，可一键在 ECS 实例上安装 Hermes Agent，无需手动配置环境与依赖。
+工具概览
+Hermes Agent 是具备自我进化能力的 AI 智能体，内置完整的学习闭环。核心能力包括：
+跨会话持久化记忆：记住代码风格、项目偏好和沟通习惯。
+经验自动沉淀：任务完成后自动提炼经验，打包为可复用的技能卡。遇到类似问题时直接调用，降低资源消耗。
+主控协调：负责任务拆解、流程调度和交互确认。
+扩展程序详情：Hermes Agent 扩展程序。
+操作步骤
+步骤一：进入 OOS 扩展程序页面
+登录系统运维管理（OOS）控制台。
+在左侧导航栏，选择服务器管理 > 扩展程序。
+在公共扩展程序页签中，找到 Hermes Agent 扩展程序卡片。
+目标 ECS 实例需已安装并运行云助手服务，OOS 通过云助手下发安装任务。阿里云官方镜像默认预装云助手，无需额外操作。
+步骤二：安装 Hermes Agent
+找到 Hermes Agent 扩展程序卡片，单击安装扩展程序。
+在安装扩展程序面板中，选择需要安装的实例。
+单击创建，等待安装完成。
+验证安装
+通过 SSH 登录 ECS 实例，执行以下命令验证 Hermes Agent 是否安装成功。
+hermes --version
+相关文档
+扩展程序概述
+使用Hermes Agent与Claude Code构建AI开发团队

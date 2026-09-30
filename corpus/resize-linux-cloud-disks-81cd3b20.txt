@@ -1,0 +1,366 @@
+# 扩容云盘（Linux）
+> https://help.aliyun.com/zh/ecs/user-guide/resize-linux-cloud-disks
+
+云盘扩展容量后，需扩容分区与文件系统才可使用新增容量空间。由于云盘不可缩容，请在操作前充分评估业务容量需求。
+扩容流程
+云盘扩容主要包含两个步骤：
+扩展云盘容量：在ECS控制台购买扩容空间。这类似于买了更大的硬盘，但还没装进电脑。支付成功不代表扩容结束。
+扩容分区与文件系统：在服务器操作系统里“激活”新空间。 相当于进入电脑系统，让系统识别并使用这块新硬盘的空间。
+步骤一：扩展云盘容量
+前提条件
+请确保满足以下任一条件：
+云盘已挂载到ECS实例，需要确保实例未过期，且实例状态为运行中（Running）或已停止（Stopped）。
+云盘状态为待挂载（Available）。
+操作步骤
+访问ECS控制台-块存储-云盘。在页面左侧顶部，选择目标资源所在的资源组和地域。
+单击目标云盘操作列中的扩容。
+强烈建议提前为云盘创建快照备份数据，避免扩容时误操作导致数据丢失，在确定目标盘与须知页面核实信息后，单击创建快照，设置快照名称和保留时间后单击确认。
+重要
+使用快照会产生费用。
+当是否支持扩容列变为是后，单击确认扩容。
+快照创建时长受到数据量和带宽等因素影响，可访问ECS控制台-快照，在目标快照的进度列中查看进度。
+在配置扩容方式与容量向导页面，设置扩容参数并确认费用后，单击扩容。
+重要
+扩展云盘容量时会收取新增容量的费用。
+参数
+说明
+扩容后的容量
+扩容后容量不允许小于当前容量。
+扩容方式
+在线扩容（推荐）：扩展容量后无需重启实例，修改后的容量直接生效。
+离线扩容：云盘处于待挂载状态、实例处于已停止状态或部分实例规格仅支持离线扩展容量。
+（条件必选）若为包年包月云盘，请在支付弹框中等待5秒倒计时结束后，单击确认，去支付，完成支付后返回扩容流程，单击已完成支付，关闭。
+如果未完成支付，但单击了已完成支付，关闭，无法继续扩容，需要单击去支付订单，完成支付后返回扩容流程。
+步骤二：扩容分区及文件系统
+前提条件
+若云盘状态为待挂载（Available），需挂载至ECS实例。
+若在上一步通过离线扩容方式扩展容量，云盘已挂载到ECS实例，请先重启或启动实例。
+如果数据盘未创建文件系统，请依照初始化数据盘完成后续操作。
+重要
+在线扩容时，若同时满足以下条件，可能导致 GDT（组描述符表）被写入错误的物理块，覆盖业务数据并造成数据损坏。请务必依照系统类型，迁移操作系统或升级内核后再扩容。
+扩容前云盘容量大于 16 TiB（16,384 GiB）。
+扩容前云盘容量非 8 GiB 整数倍。
+文件系统类型为ext4。
+使用受影响的内核版本。
+操作步骤
+在完成云盘容量扩展后，需要扩容分区和文件系统方可使用新增的容量。阿里云提供了两种方式：
+通过控制台扩容（推荐）：在控制台利用云助手进行扩容，无需手动输入命令，操作便捷。
+通过命令行扩容：登录实例手动输入命令来执行扩容。该方式操作性强，适用范围广泛。
+通过控制台扩容（推荐）
+若不慎关闭该页面，可前往实例详情页的块存储页签，再次进入操作界面。
+在未分配区块中，单击扩容上一个分区及文件系统。
+如果未授权云助手，每次扩容均需按界面指引完成授权。
+当页面提示云助手查询或执行失败或实例操作系统版本不支持时，请通过命令行扩容云盘。
+在通过云助手进行扩容分区及文件系统操作对话框中单击立即执行，当提示云助手执行扩容分区及文件系统成功时表示扩容已完成。单击关闭退出指令界面。
+重要
+操作前请确认命令无误，防止意外导致扩容失败。
+通过命令行扩容
+扩容分区
+重要
+请先在实例详情页面中查看操作系统版本，CentOS 6及以下、OpenSUSE 42.3、Debian 8及以下版本，请通过离线扩容分区和文件系统方式操作。
+登录ECS实例。
+访问ECS控制台-实例。在页面左侧顶部，选择目标资源所在的资源组和地域。
+进入目标实例详情页，单击远程连接，选择通过Workbench远程连接。根据页面提示登录，进入终端页面。
+执行分区扩容。
+运行sudo lsblk，确认待扩容云盘设备名称及分区编号。
+$ sudo lsblk
+NAME MAJ:MIN RM SIZE RO TYPE MOUNTPOINT
+vda 253:0 0 50G 0 disk
+├─vda1 253:1 0 2M 0 part
+├─vda2 253:2 0 200M 0 part /boot/efi
+└─vda3 253:3 0 39.8G 0 part /
+vdb 253:16 0 40G 0 disk /data
+如果待扩容云盘不存在分区，则无需扩容分区，可直接扩容文件系统。示例中数据盘vdb不存在分区，无需扩容分区。
+如果待扩容云盘容量大于分区总容量，需要扩容分区。示例中系统盘vda容量为50GiB，存在三个分区，分区总容量为40GiB，需对最后一个编号为3的分区vda3扩容。
+重要
+仅支持对单块云盘的最后一个分区扩容。
+如果sudo lsblk显示vgx形式，表明正在使用LVM管理磁盘分区，在控制台完成容量扩展操作后，需通过LVM扩容逻辑卷。
+设备类型
+设备名称
+分区编号
+非NVMe协议云盘
+格式为vd[a-z]，如vda（系统盘），vdb，vdc等。
+格式为vd[a-z]<分区编号>，如vda3分区编号为3。
+NVMe协议云盘
+格式为nvmeXn1，如nvme0n1，nvme1n1，nvme2n1等。
+格式为nvmeXn1p<分区编号>，如nvme0n1p1分区编号为1。
+安装扩容工具。
+Alibaba Cloud Linux、CentOS等类型
+type growpart || sudo yum install -y cloud-utils-growpart
+sudo yum update cloud-utils-growpart
+type sgdisk || sudo yum install -y gdisk
+Debian、Ubuntu等类型。
+sudo apt-get update
+sudo apt-get install -y cloud-guest-utils
+type sgdisk || sudo apt-get install -y gdisk
+执行分区扩容指令。
+将命令中的<设备名称>与<分区编号>调整为步骤a中获取到的设备名称与分区编号后执行命令。
+重要
+请注意，设备名称和分区编号之间有空格。
+sudo LC_ALL=en_US.UTF-8 growpart /dev/<设备名称> <分区编号>
+当回执内容中包含关键字CHANGED，表示指令执行成功。若执行失败可通过扩容分区的常见问题定位并修复问题。
+命令中的LC_ALL=en_US.UTF-8是用于适配中文系统编码的环境变量。
+校验分区扩容结果。
+运行sudo lsblk命令，若分区总量等于设备容量，示例中设备vda容量大小与分区总量都为50GiB，表明分区扩容完成。接下来需要扩容文件系统，才能使新增空间可用。
+$ sudo lsblk
+NAME MAJ:MIN RM SIZE RO TYPE MOUNTPOINT
+vda 253:0 0 50G 0 disk
+├─vda1 253:1 0 2M 0 part
+├─vda2 253:2 0 200M 0 part /boot/efi
+└─vda3 253:3 0 49.8G 0 part /
+vdb 253:16 0 40G 0 disk /data
+扩容文件系统
+运行命令sudo lsblk -f，记录待扩容云盘的目标设备名称、文件系统类型和挂载目录，后续执行扩容文件系统指令时需要使用。
+$ sudo lsblk -f
+NAME FSTYPE LABEL UUID MOUNTPOINT
+vda
+├─vda1
+├─vda2 vfat 7938-FA03 /boot/efi
+└─vda3 ext4 root 33b46ac5-7482-4aa5-8de0-60ab4c3a4c78 /
+vdb ext4 3d7a3861-da22-484e-bbf4-b09375894b4f /data
+如果设备存在分区，目标设备名称为最后一个分区名称。示例中系统盘vda目标设备名称为vda3，文件系统类型为ext4，挂载目录为/。
+如果设备不存在分区，目标设备名称与设备名称一致。示例中数据盘vdb目标设备名称为vdb，文件系统类型为ext4，挂载目录为/data。
+执行扩容文件系统。
+ext2/ext3/ext4
+将命令中的变量<目标设备名称>替换为从上一步中获取的目标设备名称后执行。
+sudo resize2fs /dev/<目标设备名称>
+xfs
+将命令中的<挂载目录>替换为从上一步中获取的挂载目录后执行。
+sudo xfs_growfs <挂载目录>
+检查文件系统扩容是否成功。
+运行sudo df -Th，确认文件系统大小（回执中Size字段对应的值）是否与云盘容量基本一致。
+文件系统创建时会占用部分容量用于存储元数据，因此文件系统大小可能小于控制台容量。
+计费说明
+扩展云盘容量时会收取新增容量的费用，计费方式和原云盘一致。
+包年包月云盘：容量扩展成功后，将立即以新容量进行计费。按剩余时长补足新旧容量差额费用。
+差额费用=包月价格/30天*剩余时长*新增容量。
+剩余时长单位为天，数值精确到秒。
+按量付费云盘：容量扩展成功后，将立即按新容量进行计费。计费时长以小时为单位折算，下一小时将生成当前小时的消费明细。
+如果已购买存储容量单位包SCU，可自动抵扣按量付费云盘账单。更多信息，请参见块存储计费。
+相关文档
+如果因误操作导致扩容失败，可利用扩容前创建的快照回滚云盘，将云盘数据恢复至扩容前状态，已扩展的容量不会回退。
+目前不支持直接对已扩容的云盘进行缩容操作。若需云盘缩容，可通过阿里云服务器迁移中心间接实现。
+如果想扩容Windows实例的云盘，请参考扩容云盘（Windows）。
+常见问题
+扩展云盘容量的常见问题
+为什么扩展容量后，系统下容量不生效？
+在完成云盘容量扩展后，操作系统无法自动识别新增的容量空间，还需要根据实际使用的分区和文件系统类型来手动扩容。
+如何通过API接口扩容云盘？
+强烈建议扩展云盘容量前调用API接口CreateSnapshot为云盘创建快照备份数据，防止误操作导致数据丢失。
+使用快照会产生快照费用。
+快照创建完成后，可通过调用API接口ResizeDisk扩展云盘容量。
+扩容云盘容量后，还需要扩展分区及文件系统。
+通过调用 RunCommand接口向目标实例发送指令（可参考通过命令行扩容指令）搭配调用 DescribeInvocations接口查询命令回执，实现分区与文件系统的扩容。
+确认扩容置灰，无法选择怎么办？
+检查云盘是否正在创建快照。创建快照期间不支持扩容。请等待快照完成后，再执行扩容操作。
+已经做了离线扩容，但不想重启实例怎么办？
+离线扩容需重启实例生效。若业务不允许重启，但已选择离线扩容，可以通过以下任一方法避免重启：
+二次扩容：通过一次1GiB的在线扩容，可使新增容量和之前的离线扩容在线生效。该操作属于二次扩容，会产生额外费用，请根据实际业务需求谨慎操作。
+重新挂载：该操作涉及卸载，会影响当前业务，请根据需求谨慎操作。
+对于数据盘，可卸载数据盘后，再重新挂载数据盘至当前实例。
+对于系统盘，无法在线生效，除重启外也可停止实例，卸载系统盘后挂载至当前实例，使离线扩容生效。
+在线扩容后，系统下无法识别新增容量怎么办？
+以下情况仅支持离线扩容，可通过重启实例或重新挂载方式，识别新增容量。
+以下实例规格仅支持离线扩容。
+ecs.ebmc4.8xlarge
+ecs.ebmhfg5.2xlarge
+ecs.ebmg5.24xlarge
+ecs.t1
+ecs.s1
+ecs.s2
+ecs.s3
+ecs.c1
+ecs.c2
+ecs.m1
+ecs.m2
+操作系统内核版本低于3.6或自定义镜像存在内核裁剪的实例，仅支持离线扩容。
+如何再次进入云助手扩容分区与文件系统界面？
+在实例详情页的块存储页面中，开启云助手检测功能。
+单击目标云盘的系统内状态检测下的2/3检测已通过，重新进入。
+扩容分区后分区容量没有生效。
+执行sudo lsblk查看Size字段，若分区容量与设备容量不一致，表示未生效。扩容分区通常无需重启。若扩容分区未生效，可能是操作系统版本较低的原因，需要重启实例使其生效。
+扩容分区的常见问题
+运行扩容分区growpart命令时，提示no tools available to resize disk with 'gpt'.FAILED: failed to get a resizer for id ''。
+操作系统没有安装gdisk工具。扩容GPT分区时还需要gdisk工具，请根据操作系统类型安装。
+CentOS等类型。
+type sgdisk || sudo yum install -y gdisk
+Debian、Ubuntu等类型。
+sudo apt-get update
+type sgdisk || sudo apt-get install -y gdisk
+运行扩容分区growpart命令时，提示sudo: growpart: command not found。
+操作系统没有安装growpart工具。请根据操作系统类型，分别运行以下指令安装growpart工具（扩容GPT分区时还需要gdisk工具）。
+CentOS等类型。
+type growpart || sudo yum install -y cloud-utils-growpart
+sudo yum update cloud-utils-growpart
+type sgdisk || sudo yum install -y gdisk
+Debian、Ubuntu等类型。
+sudo apt-get update
+sudo apt-get install -y cloud-guest-utils
+type sgdisk || sudo apt-get install -y gdisk
+运行扩容分区growpart命令时，提示unexpected output in sfdisk --version [sfdisk，来自 util-linux 2.23.2]。
+原因：中文版操作系统使用了非en_US.UTF-8的字符编码类型。
+解决方案：
+运行locale命令查看ECS实例的字符编码类型，如果不是en_US.UTF-8，请将其修改为该编码。
+运行以下命令，切换字符编码类型。
+export LANG=en_US.UTF-8
+如果问题仍未解决，运行以下命令，切换字符编码类型。
+export LC_ALL=en_US.UTF-8
+如果问题仍未解决，请尝试运行reboot命令重启ECS实例。
+重要
+当通过切换字符编码，成功完成扩容分区后，建议按需切回原有字符编码。
+运行扩容分区growpart命令时，提示mkdir: cannot create directory ... No space left on device。
+磁盘容量空间不足，导致创建临时目录失败。需要清理无用的文件后再进行扩容。
+运行扩容分区growpart命令时，提示unexpected output in sfdisk --version [sfdisk (util-linux-ng 2.17.2)]。
+fdisk版本与growpart版本不兼容。需要尝试将growpart版本降低到0.27。
+运行扩容分区growpart命令时，提示FAILED: unable to determine partition type。
+云盘未分区，无需执行扩容分区操作。直接扩容文件系统即可。
+运行扩容分区growpart命令时，提示WARNING: MBR/dos partitioned disk is larger than 2TB. Additional space will go unused。
+MBR分区类型不支持2 TiB以上的云盘。需先转换数据盘MBR分区为GPT分区，然后再扩容GPT分区。
+执行sudo lsblk，分区只扩容到了2TiB。
+MBR分区类型不支持2 TiB以上的云盘。需先转换数据盘MBR分区为GPT分区，然后再扩容GPT分区。
+在CentOS 6中安装growpart工具时提示Error: Cannot retrieve repository metadata。
+CentOS 6操作系统版本已结束生命周期（EOL），需将CentOS 6 EOL切换源后再安装工具。
+运行扩容分区growpart命令时，提示NOCHANGE: partition 1 could only be grown by 2015 [fudge=2048]。
+扩容分区时无可用容量空间，通常是因为控制台离线扩容云盘后未重启实例，导致云盘尚未生效。离线扩容后，必须通过ECS控制台或API接口重启或启动实例（在实例内部执行reboot命令重启无效）。
+扩容文件系统的常见问题
+运行resize2fs命令时，提示Couldn't find valid filesystem superblock. 或open: Is a directory while opening /mnt。
+扩容文件系统时需要指定正确的云盘分区名称，非设备名称或挂载目录。
+运行resize2fs命令时，提示The filesystem is already ... blocks long. Nothing to do!。
+原因：文件系统无可扩容的容量空间，可能是分区未扩容或者扩容未生效导致。
+解决方案：
+请先确认是否已成功利用growpart扩容分区，如果遗漏需先执行growpart命令扩容分区。
+如果成功执行了growpart命令扩容分区，可能是因为操作系统版本较低，无法在线更新系统分区表。请尝试执行重启实例后，再执行resize2fs命令。
+运行resize2fs命令时，提示resize2fs: Permission denied to resize filesystem。
+原因：一般是文件系统本身不一致存在错误，导致文件系统扩容失败。
+解决方案：
+运行dmesg -T | grep fs命令，如果输出There are errors in the filesystem类似信息，说明文件系统不一致。
+手动创建单个快照为云盘做好数据备份。
+在业务允许的情况下，运行umount命令，根据实际环境卸载已挂载的分区或者整块盘。
+如果是系统盘（无法umount），则要卸载并挂载系统盘至其他实例的方式，进行修复。
+尝试使用e2fsck命令进行修复。
+运行resize2fs命令时，提示inodes (4294967296) must be less than 4294967295。
+原因：初始化时未正确设置 bytes-per-inode。
+若需扩容至64TiB，需要在创建文件系统时，在命令中添加-i 65536。
+解决方案：创建新盘进行数据拷贝。
+重要
+bytes-per-inode在云盘初始化后无法更改。
+为当前实例新建目标容量的空数据盘。
+在初始化数据盘，创建ext4文件系统时，在指令中添加-i 65536。
+将原盘数据手动拷贝至新盘。
+验证业务是否恢复。操作完成后，建议重启相关服务并检查业务是否正常运行。
+确认业务正常运行后，可卸载原数据盘，并将其释放。具体操作，请参见卸载数据盘和释放云盘。
+系统下云盘容量为什么与购买容量不一致？
+文件系统创建时会占用部分容量用于存储元数据，因此文件系统大小可能小于控制台容量。
+如何查看文件系统类型？
+通过控制台查看
+在实例详情页的块存储页面中，单击目标云盘的系统内状态检测下的内容。
+在磁盘分区情况检测弹框中，查看目标设备的文件系统类型。
+通过命令行查看
+运行命令sudo lsblk -f，查看目标设备的FSTYPE。
+$ sudo lsblk -f
+NAME FSTYPE LABEL UUID MOUNTPOINT
+vda
+├─vda1
+├─vda2 vfat 7938-FA03 /boot/efi
+└─vda3 ext4 root 33b46ac5-7482-4aa5-8de0-60ab4c3a4c78 /
+vdb ext4 3d7a3861-da22-484e-bbf4-b09375894b4f /data
+如果设备存在分区，目标设备为最后一个分区名称。示例中系统盘vda目标设备名称为vda3，文件系统类型为ext4。
+如果设备不存在分区，目标设备与设备名称一致。示例中数据盘vdb目标设备名称为vdb，文件系统类型为ext4。
+受影响的ECS实例系统和内核版本
+重要
+使用受影响内核版本，扩容ext4文件系统时，若扩容前云盘容量大于 16 TiB（16,384 GiB）且非 8 GiB 整数倍，在线扩容可能导致 GDT（组描述符表）被写入错误的物理块，覆盖业务数据并造成数据损坏，因此请务必先依据系统类型迁移操作系统或升级内核，再执行扩容。
+可在系统下执行uname -r查看系统内核版本。
+操作系统类型
+受影响的系统版本及内核版本
+如何修复
+Alinux
+Alibaba Cloud Linux 2：全部内核版本
+Alibaba Cloud Linux 3：< 5.10.134-18
+Alibaba Cloud Linux 2：迁移至 Alibaba Cloud Linux 3
+Alibaba Cloud Linux 3：升级Linux ECS实例内核至最新
+Anolis
+Anolis 7：全部内核版本
+Anolis 8.2-8.9 ANCK及RHCK：所有内核版本
+Anolis 7：
+为系统盘创建快照。
+建议更换操作系统至 Alibaba Cloud Linux 3 或 Alibaba Cloud Linux 4。
+通过原系统盘快照恢复系统盘中的数据。
+Anolis 8.2-8.9 ANCK及RHCK：升级Linux ECS实例内核至最新
+Debian
+Debian 8-9：全部内核版本
+Debian 10：< 4.19.0-27-amd64
+Debian 11.0-11.9：< 5.10.0-29-amd64
+Debian 12.0-12.5：< 6.1.0-20-amd64
+Debian 8-9：
+为系统盘创建快照。
+建议更换操作系统至 Alibaba Cloud Linux 3 或 Alibaba Cloud Linux 4。
+通过原系统盘快照恢复系统盘中的数据。
+Debian 10-12：升级Linux ECS实例内核至最新
+Ubuntu
+Ubuntu 16.04：全部内核版本
+Ubuntu 18.04：全部内核版本
+Ubuntu 20.04：< 5.4.0-189-generic
+Ubuntu 22.04：< 5.15.0-116-generic
+Ubuntu 24.04：< 6.8.0-35-generic
+Ubuntu 16.04-18.04：
+为系统盘创建快照。
+建议更换操作系统至 Alibaba Cloud Linux 3 或 Alibaba Cloud Linux 4。
+通过原系统盘快照恢复系统盘中的数据。
+Ubuntu 20.04-24.04：升级Linux ECS实例内核至最新
+RHEL
+RedHat 7：全部内核版本
+RedHat 8：< 4.18.0-553.16.1.el8_10
+RedHat 9.0-9.4：< 5.14.0-503.11.1.el9_5
+RedHat 7-8：迁移至 RedHat 9或 Alibaba Cloud Linux 3
+RedHat 8-9：升级Linux ECS实例内核至最新
+Rocky Linux
+Rocky Linux 8：< 4.18.0-553.16.1.el8_10
+Rocky Linux 9.0-9.4：< 5.14.0-503.14.1.el9_5
+升级Linux ECS实例内核至最新
+AlmaLinux
+AlmaLinux 8：< 4.18.0-553.16.1.el8_10
+AlmaLinux 9.0-9.4：< 5.14.0-503.11.1.el9_5
+升级Linux ECS实例内核至最新
+CentOS Stream
+CentOS Stream 8：全部内核版本
+CentOS Stream 9：< 5.14.0-472.el9
+CentOS Stream 8：
+为系统盘创建快照。
+建议更换操作系统至 Alibaba Cloud Linux 3 或 Alibaba Cloud Linux 4。
+通过原系统盘快照恢复系统盘中的数据。
+CentOS Stream 9：升级Linux ECS实例内核至最新
+CentOS
+全部内核版本
+建议迁移至 Alibaba Cloud Linux 3
+Fedora
+Fedora 33-37：全部内核版本
+Fedora 38：< 6.8.4-100.fc38
+Fedora 39：< 6.8.4-200.fc39
+Fedora 33-37：
+为系统盘创建快照。
+建议更换操作系统至 Alibaba Cloud Linux 3 或 Alibaba Cloud Linux 4。
+通过原系统盘快照恢复系统盘中的数据。
+Fedora 38-39：升级Linux ECS实例内核至最新
+SLES
+SLES 12
+SLES 12SP1-SP4：全部内核版本
+SLES 12SP5：< 4.12.14-122.222.1
+SLES 15
+SLES 15SP1-SP4：全部内核版本
+SLES 15SP5：< 5.14.21-150500.55.73.1
+SLES 15SP6：< 6.4.0-150600.23.14.2
+SLES 12SP1-SP4 或 SLES 15SP1-SP4：
+为系统盘创建快照。
+建议更换操作系统至 Alibaba Cloud Linux 3 或 Alibaba Cloud Linux 4。
+通过原系统盘快照恢复系统盘中的数据。
+SLES 12SP5、SLES 15SP5 及 SLES 15SP6：升级Linux ECS实例内核至最新
+openSUSE
+openSUSE 15
+openSUSE 15.0-15.4：全部内核版本
+openSUSE 15.5：< 5.14.21-15000.55.73.1
+openSUSE 15.6：< 6.4.0-150600.23.14.2
+openSUSE 15.0-15.4：
+为系统盘创建快照。
+建议更换操作系统至 Alibaba Cloud Linux 3 或 Alibaba Cloud Linux 4。
+通过原系统盘快照恢复系统盘中的数据。
+openSUSE 15.5及15.6：升级Linux ECS实例内核至最新。

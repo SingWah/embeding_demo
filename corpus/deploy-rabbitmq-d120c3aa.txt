@@ -1,0 +1,263 @@
+# 部署RabbitMQ
+> https://help.aliyun.com/zh/ecs/user-guide/deploy-rabbitmq
+
+RabbitMQ是一款开源消息队列系统，支持多种协议（AMQP、MQTT、STOMP、HTTP/WebSockets），具有良好的易用性、扩展性和高可用性。主要用于在分布式系统中协调和管理通信，通过异步消息传递提高系统的解耦性、伸缩性、并发处理能力和容错性。其稳定的性能、丰富的功能集以及活跃的社区支持，广泛应用于企业级应用的消息传递和任务处理。本文介绍如何在云服务器ECS中部署开源的RabbitMQ。
+部署RabbitMQ
+手动部署：适合对Linux命令有基本了解的用户，能够自定义部署RabbitMQ。
+快速部署：省去了安装配置RabbitMQ的过程，大大节省了部署时间。
+手动部署
+本操作以安装最新版RabbitMQ为例进行说明，更多版本及安装方式，请参见Installing RabbitMQ。
+前提条件
+手动部署RabbitMQ时，请确保已创建ECS实例，并满足以下条件：
+实例已分配公网IP地址或绑定弹性公网IP（EIP）。具体操作，请参见弹性公网IP。
+操作系统：Ubuntu 20.04、Ubuntu 22.04、Debian 11.0~Debian 12.5。
+更多支持的系统及安装方式，请参见Installing RabbitMQ。
+安全组规则：安全组规则入方向需放行22、80、15672端口。
+说明
+如果需要通过MQ工具连接RabbitMQ服务器，还需放行5672端口。
+操作步骤
+远程连接需要部署RabbitMQ的实例。
+具体操作，请参见使用Workbench登录Linux实例。
+安装RabbitMQ。
+安装RabbitMQ基本依赖。
+sudo apt-get install curl gnupg apt-transport-https -y
+下载RabbitMQ和Erlang的GPG公钥，并将公钥信息添加到系统的信任密钥环中。
+curl -1sLf "https://keys.openpgp.org/vks/v1/by-fingerprint/0A9AF2115F4687BD29803A206B73A36E6026DFCA" | sudo gpg --dearmor | sudo tee /usr/share/keyrings/com.rabbitmq.team.gpg > /dev/null
+curl -1sLf https://github.com/rabbitmq/signing-keys/releases/download/3.0/cloudsmith.rabbitmq-erlang.E495BB49CC4BBE5B.key | sudo gpg --dearmor | sudo tee /usr/share/keyrings/rabbitmq.E495BB49CC4BBE5B.gpg > /dev/null
+curl -1sLf https://github.com/rabbitmq/signing-keys/releases/download/3.0/cloudsmith.rabbitmq-server.9F4587F226208342.key | sudo gpg --dearmor | sudo tee /usr/share/keyrings/rabbitmq.9F4587F226208342.gpg > /dev/null
+将RabbitMQ和Erlang的官方APT仓库添加到/etc/apt/sources.list.d/rabbitmq.list文件中。
+sudo tee /etc/apt/sources.list.d/rabbitmq.list <<EOF
+deb [signed-by=/usr/share/keyrings/rabbitmq.E495BB49CC4BBE5B.gpg] https://ppa1.novemberain.com/rabbitmq/rabbitmq-erlang/deb/ubuntu jammy main
+deb-src [signed-by=/usr/share/keyrings/rabbitmq.E495BB49CC4BBE5B.gpg] https://ppa1.novemberain.com/rabbitmq/rabbitmq-erlang/deb/ubuntu jammy main
+deb [signed-by=/usr/share/keyrings/rabbitmq.E495BB49CC4BBE5B.gpg] https://ppa2.novemberain.com/rabbitmq/rabbitmq-erlang/deb/ubuntu jammy main
+deb-src [signed-by=/usr/share/keyrings/rabbitmq.E495BB49CC4BBE5B.gpg] https://ppa2.novemberain.com/rabbitmq/rabbitmq-erlang/deb/ubuntu jammy main
+deb [signed-by=/usr/share/keyrings/rabbitmq.9F4587F226208342.gpg] https://ppa1.novemberain.com/rabbitmq/rabbitmq-server/deb/ubuntu jammy main
+deb-src [signed-by=/usr/share/keyrings/rabbitmq.9F4587F226208342.gpg] https://ppa1.novemberain.com/rabbitmq/rabbitmq-server/deb/ubuntu jammy main
+deb [signed-by=/usr/share/keyrings/rabbitmq.9F4587F226208342.gpg] https://ppa2.novemberain.com/rabbitmq/rabbitmq-server/deb/ubuntu jammy main
+deb-src [signed-by=/usr/share/keyrings/rabbitmq.9F4587F226208342.gpg] https://ppa2.novemberain.com/rabbitmq/rabbitmq-server/deb/ubuntu jammy main
+EOF
+更新本地的包索引。
+sudo apt-get update -y
+安装Erlang相关的各种包。
+sudo apt-get install -y erlang-base \
+erlang-asn1 erlang-crypto erlang-eldap erlang-ftp erlang-inets \
+erlang-mnesia erlang-os-mon erlang-parsetools erlang-public-key \
+erlang-runtime-tools erlang-snmp erlang-ssl \
+erlang-syntax-tools erlang-tftp erlang-tools erlang-xmerl
+安装RabbitMQ。
+sudo apt-get install rabbitmq-server -y --fix-missing
+配置RabbitMQ。
+设置RabbitMQ开机自启动并启动RabbitMQ。
+sudo systemctl enable rabbitmq-server
+sudo systemctl start rabbitmq-server
+为保证数据安全，建议您运行以下命令，删除默认用户。
+RabbitMQ默认的账号用户名和密码都是guest。
+sudo rabbitmqctl delete_user guest
+创建RabbitMQ管理员用户。
+创建一个新用户。
+sudo rabbitmqctl add_user <用户名> <密码>
+其中，<用户名>和<密码>为您自定义的信息。
+将创建的新用户设置为管理员。
+sudo rabbitmqctl set_user_tags <用户名> administrator
+赋予新创建的用户所有权限。
+sudo rabbitmqctl set_permissions -p / <用户名> ".*" ".*" ".*"
+启动RabbitMQ的Web管理界面。
+sudo rabbitmq-plugins enable rabbitmq_management
+快速部署
+使用云市场镜像快速部署
+通过云市场镜像快速部署，省去了安装配置RabbitMQ的过程，大大节省了部署时间。所使用的云市场镜像是否收费，以云市场镜像界面为准。
+单击开源消息队列中间件 RabbitMQ进入镜像详情页。
+您可以在镜像详情页获取镜像信息以及使用指南。
+单击立即购买。
+在自定义购买页，根据页面提示，完成配置项并购买ECS实例。
+配置时请注意以下参数，其他配置可以按需选择。更多参数说明，请参见自定义购买实例。
+镜像：镜像区域已设置为您购买的镜像。
+公网 IP：选中分配公网 IPv4 地址。
+安全组：安全组规则应放行22、80、15672。
+获取RabbitMQ的用户名和登录密码。
+远程连接RabbitMQ服务器。
+具体操作，请参见使用Workbench登录Linux实例。
+执行以下命令，获取RabbitMQ的用户名和登录密码。
+sudo cat /credentials/password.txt
+回显信息类似如下所示。
+rabbitmq_user：RabbitMQ用户名
+rabbitmq_password：RabbitMQ登录密码
+rabbitmq_gui_port：RabbitMQ Web服务器端口
+rabbitmq_mq_port：RabbitMQ远程连接端口
+rabbitmq_er_port：RabbitMQ服务器用于Erlang进程间通信的内部端口
+rabbitmq_mqtt_port：RabbitMQ服务器对外提供MQTT协议服务的监听端口
+root@iZuf660jbfxxx:~# sudo cat /credentials/password.txt
+======== credentials for rabbitmq ========
+rabbitmq_user: admin
+rabbitmq_password: OOhWmVE9xxx
+rabbitmq_gui_port: 15672
+rabbitmq_mq_port: 5672
+rabbitmq_er_port: 4369
+rabbitmq_mqtt_port: 1833
+使用Terraform快速部署
+Terraform是一款IaC工具（Infrastructure as Code），能够帮助开发人员和运维团队自动化基础设施的创建、部署和管理。您可以通过编写简洁的代码来定义和配置云端基础设施，而不必手动操作和配置。
+操作步骤
+点击一键运行进入Terraform Explorer，自动加载如下的Terraform代码。
+单击查看完整Terraform代码
+provider "alicloud" {
+region = var.region
+variable "region" {
+default = "cn-beijing"
+variable "common_name" {
+description = "Common name for resources."
+type = string
+default = "deploy_rabbitmq_by_tf"
+variable "system_disk_category" {
+default = "cloud_essd"
+description = "The category of the system disk."
+variable "instance_password" {
+description = "Server login password, length 8-30, must contain three (Capital letters, lowercase letters, numbers, `~!@#$%^&*_-+=|{}[]:;'<>?,./ Special symbol in)"
+type = string
+default = "Test@123456"
+variable "image_id" {
+description = "Image of instance. Supported only on Ubuntu."
+type = string
+default = "ubuntu_22_04_x64_20G_alibase_20241224.vhd"
+variable "instance_type" {
+description = "Instance type."
+type = string
+default = "ecs.e-c1m2.large"
+variable "access_ip" {
+description = "The IP address you used to access the ECS."
+type = string
+default = "0.0.0.0/0"
+variable "rabbitmq_user_name" {
+description = "Create a new user for RabbitMQ."
+type = string
+default = "rabbitmq@new_user"
+variable "rabbitmq_user_password" {
+description = "Password for a new RabbitMQ user."
+type = string
+default = "rabbitmq@pw12345"
+# 查询满足条件的可用区
+data "alicloud_zones" "default" {
+available_disk_category = var.system_disk_category
+available_resource_creation = "VSwitch"
+available_instance_type = var.instance_type
+resource "alicloud_vpc" "rabbitmq_vpc" {
+vpc_name = "${var.common_name}-vpc"
+cidr_block = "192.168.0.0/16"
+resource "alicloud_vswitch" "rabbitmq_vsw" {
+vpc_id = alicloud_vpc.rabbitmq_vpc.id
+vswitch_name = "${var.common_name}-vsw"
+cidr_block = "192.168.0.0/24"
+zone_id = data.alicloud_zones.default.zones.0.id
+resource "alicloud_security_group" "rabbitmq_sg" {
+security_group_name = "${var.common_name}-sg"
+vpc_id = alicloud_vpc.rabbitmq_vpc.id
+resource "alicloud_security_group_rule" "allow_tcp_22" {
+type = "ingress"
+ip_protocol = "tcp"
+nic_type = "intranet"
+policy = "accept"
+port_range = "22/22"
+priority = 1
+security_group_id = alicloud_security_group.rabbitmq_sg.id
+cidr_ip = var.access_ip
+resource "alicloud_security_group_rule" "allow_tcp_80" {
+type = "ingress"
+ip_protocol = "tcp"
+nic_type = "intranet"
+policy = "accept"
+port_range = "80/80"
+priority = 1
+security_group_id = alicloud_security_group.rabbitmq_sg.id
+cidr_ip = var.access_ip
+resource "alicloud_security_group_rule" "allow_tcp_15672" {
+type = "ingress"
+ip_protocol = "tcp"
+nic_type = "intranet"
+policy = "accept"
+port_range = "15672/15672"
+priority = 1
+security_group_id = alicloud_security_group.rabbitmq_sg.id
+cidr_ip = var.access_ip
+resource "alicloud_security_group_rule" "allow_icmp_all" {
+type = "ingress"
+ip_protocol = "icmp"
+nic_type = "intranet"
+policy = "accept"
+port_range = "-1/-1"
+priority = 1
+security_group_id = alicloud_security_group.rabbitmq_sg.id
+cidr_ip = "0.0.0.0/0"
+resource "alicloud_instance" "rabbitmq_ecs" {
+availability_zone = data.alicloud_zones.default.zones.0.id
+security_groups = [alicloud_security_group.rabbitmq_sg.id]
+instance_type = var.instance_type
+system_disk_category = var.system_disk_category
+image_id = var.image_id
+instance_name = "${var.common_name}-ecs"
+vswitch_id = alicloud_vswitch.rabbitmq_vsw.id
+internet_max_bandwidth_out = 10
+password = var.instance_password
+locals {
+command_content = <<SHELL
+#!/bin/sh
+sudo apt-get install curl gnupg apt-transport-https -y
+## Team RabbitMQ's main signing key
+curl -1sLf "https://keys.openpgp.org/vks/v1/by-fingerprint/0A9AF2115F4687BD29803A206B73A36E6026DFCA" | sudo gpg --dearmor | sudo tee /usr/share/keyrings/com.rabbitmq.team.gpg > /dev/null
+## Community mirror of Cloudsmith: modern Erlang repository
+curl -1sLf https://github.com/rabbitmq/signing-keys/releases/download/3.0/cloudsmith.rabbitmq-erlang.E495BB49CC4BBE5B.key | sudo gpg --dearmor | sudo tee /usr/share/keyrings/rabbitmq.E495BB49CC4BBE5B.gpg > /dev/null
+## Community mirror of Cloudsmith: RabbitMQ repository
+curl -1sLf https://github.com/rabbitmq/signing-keys/releases/download/3.0/cloudsmith.rabbitmq-server.9F4587F226208342.key | sudo gpg --dearmor | sudo tee /usr/share/keyrings/rabbitmq.9F4587F226208342.gpg > /dev/null
+## Add apt repositories maintained by Team RabbitMQ
+sudo tee /etc/apt/sources.list.d/rabbitmq.list <<EOF
+## Provides modern Erlang/OTP releases
+deb [arch=amd64 signed-by=/usr/share/keyrings/rabbitmq.E495BB49CC4BBE5B.gpg] https://ppa1.rabbitmq.com/rabbitmq/rabbitmq-erlang/deb/ubuntu jammy main
+deb-src [signed-by=/usr/share/keyrings/rabbitmq.E495BB49CC4BBE5B.gpg] https://ppa1.rabbitmq.com/rabbitmq/rabbitmq-erlang/deb/ubuntu jammy main
+# another mirror for redundancy
+deb [arch=amd64 signed-by=/usr/share/keyrings/rabbitmq.E495BB49CC4BBE5B.gpg] https://ppa2.rabbitmq.com/rabbitmq/rabbitmq-erlang/deb/ubuntu jammy main
+deb-src [signed-by=/usr/share/keyrings/rabbitmq.E495BB49CC4BBE5B.gpg] https://ppa2.rabbitmq.com/rabbitmq/rabbitmq-erlang/deb/ubuntu jammy main
+## Provides RabbitMQ
+deb [arch=amd64 signed-by=/usr/share/keyrings/rabbitmq.9F4587F226208342.gpg] https://ppa1.rabbitmq.com/rabbitmq/rabbitmq-server/deb/ubuntu jammy main
+deb-src [signed-by=/usr/share/keyrings/rabbitmq.9F4587F226208342.gpg] https://ppa1.rabbitmq.com/rabbitmq/rabbitmq-server/deb/ubuntu jammy main
+# another mirror for redundancy
+deb [arch=amd64 signed-by=/usr/share/keyrings/rabbitmq.9F4587F226208342.gpg] https://ppa2.rabbitmq.com/rabbitmq/rabbitmq-server/deb/ubuntu jammy main
+deb-src [signed-by=/usr/share/keyrings/rabbitmq.9F4587F226208342.gpg] https://ppa2.rabbitmq.com/rabbitmq/rabbitmq-server/deb/ubuntu jammy main
+EOF
+## Update package indices
+sudo apt-get update -y
+## Install Erlang packages
+sudo apt-get install -y erlang-base \
+erlang-asn1 erlang-crypto erlang-eldap erlang-ftp erlang-inets \
+erlang-mnesia erlang-os-mon erlang-parsetools erlang-public-key \
+erlang-runtime-tools erlang-snmp erlang-ssl \
+erlang-syntax-tools erlang-tftp erlang-tools erlang-xmerl
+## Install rabbitmq-server and its dependencies
+sudo apt-get install rabbitmq-server -y --fix-missing
+sudo systemctl enable rabbitmq-server
+sudo systemctl start rabbitmq-server
+sudo rabbitmqctl delete_user guest
+sudo rabbitmqctl add_user ${var.rabbitmq_user_name} ${var.rabbitmq_user_password}
+sudo rabbitmqctl set_user_tags ${var.rabbitmq_user_name} administrator
+sudo rabbitmqctl set_permissions -p / ${var.rabbitmq_user_name} ".*" ".*" ".*"
+sudo rabbitmq-plugins enable rabbitmq_management
+SHELL
+resource "alicloud_ecs_command" "deploy_rabbitmq" {
+name = "DeploydRabbitMQ"
+type = "RunShellScript"
+command_content = base64encode(local.command_content)
+timeout = 3600
+working_dir = "/root"
+resource "alicloud_ecs_invocation" "invocation" {
+instance_id = [alicloud_instance.rabbitmq_ecs.id]
+command_id = alicloud_ecs_command.deploy_rabbitmq.id
+timeouts {
+create = "5m"
+output "rabbitmq-login_url" {
+value = format("http://%s:15672", alicloud_instance.rabbitmq_ecs.public_ip)
+根据实际情况修改参数，默认情况下，将会在cn-beijing创建1个VPC、1个交换机、1个安全组、1台按量付费ECS实例。关于ECS实例的计费说明，请参见计费概述。
+单击发起调试，预览待创建资源详细信息，若资源信息无误，单击预览并执行开始创建资源。当任务的执行详情状态为执行成功时，说明已部署完成。
+登录RabbitMQ管理界面
+在本地浏览器中，输入http://<Linux实例的公网IP>:15672。
+显示如下页面，说明RabbitMQ安装成功。页面显示 RabbitMQ Management 登录界面，在 Username 和 Password 输入框中输入用户名和密码，单击 Login 登录管理控制台。
+输入已创建的RabbitMQ管理员用户名和密码后，单击Login，进入RabbitMQ管理界面。
+RabbitMQ管理界面展示信息：页面默认展示 Overview 选项卡，显示 RabbitMQ 及 Erlang 版本、集群节点资源使用情况（文件描述符、内存、磁盘空间等）以及连接数、队列数等全局统计信息，表明 RabbitMQ 部署成功且运行正常。
+开源RabbitMQ迁移上云
+如果您希望解决RabbitMQ集群各种稳定性痛点（例如消息堆积、脑裂等问题）、并实现高并发、分布式、灵活扩缩容时，您可以将开源RabbitMQ集群迁移至云消息队列 RabbitMQ 版，具体操作，请参见开源RabbitMQ迁移上云。

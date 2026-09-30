@@ -1,0 +1,90 @@
+# 通过OOS扩展程序可一键在ECS实例上安装OpenCode、Qwen Code或QoderCLI等AI编码助手，简化环境配置与依赖管理。
+> https://help.aliyun.com/zh/ecs/user-guide/install-an-ai-coding-assistant-on-ecs-instances-using-the-oos-extension
+
+通过系统运维管理（OOS）的扩展程序功能，可一键在 ECS 实例上安装 AI 编码助手工具，无需手动配置环境。支持 OpenCode、Qwen Code 和 QoderCLI 三款工具，根据需要选择其中一款安装即可。
+工具概览
+工具
+简介
+命令
+OpenCode
+开源 AI 编码助手，提供终端交互界面，支持多模型对话与代码生成
+opencode
+Qwen Code
+通义千问 AI 编码助手，在终端中辅助代码生成与调试
+qwen
+QoderCLI
+智能代码分析与生成工具，支持多语言项目，集成大语言模型能力
+qodercli
+操作步骤
+步骤一：进入 OOS 扩展程序页面
+登录系统运维管理（OOS）控制台。
+在左侧导航栏，选择服务器管理 > 扩展程序。
+在公共扩展程序页签中，可看到 OpenCode、Qwen Code 和 QoderCLI 三个扩展程序卡片。
+目标 ECS 实例需已安装并运行云助手服务，OOS 通过云助手下发安装任务。阿里云官方镜像默认预装云助手，无需额外操作。
+步骤二：安装 AI 编码助手
+根据需要选择一款工具，单击对应页签，按步骤完成安装。
+OpenCode
+找到 OpenCode 扩展程序卡片，单击安装扩展程序。
+在安装扩展程序面板中，配置以下参数：
+参数
+说明
+地域
+选择 ECS 实例所在地域
+操作内容
+选择安装
+版本
+选择最新版本
+ECS 实例
+选择目标 ECS 实例
+单击确定，等待安装完成。
+在任务执行记录中确认执行状态为成功。
+Qwen Code
+找到 qwen-code 扩展程序卡片，单击安装扩展程序。
+在安装扩展程序面板中，配置以下参数：
+参数
+说明
+地域
+选择 ECS 实例所在地域
+操作内容
+选择安装
+版本
+选择最新版本
+ECS 实例
+选择目标 ECS 实例
+单击确定，等待执行完成。
+在任务执行记录中确认执行状态为成功。
+首次运行 qwen 命令时，系统会提示登录，按照界面指引完成认证即可。
+QoderCLI
+找到 QoderCLI 扩展程序卡片，单击安装扩展程序。
+在安装扩展程序面板中，配置以下参数：
+参数
+说明
+地域
+选择 ECS 实例所在地域
+操作内容
+选择安装
+版本
+选择最新版本
+ECS 实例
+选择目标 ECS 实例
+单击确定，等待安装完成。
+在任务执行记录中确认执行状态为成功。
+首次与 QoderCLI 进行对话时，系统会提示登录，按照界面指引完成认证即可。
+验证安装
+通过 SSH 登录 ECS 实例，执行以下命令验证各工具是否安装成功。
+OpenCode
+opencode --version
+预期输出（版本号可能不同）：
+1.2.24
+Qwen Code
+qwen --version
+预期输出（版本号可能不同）：
+0.12.3
+QoderCLI
+qodercli --version
+预期输出（版本号可能不同）：
+0.1.30
+相关文档
+扩展程序概述
+OpenCode 官方文档
+通义千问 Qwen Code

@@ -1,0 +1,512 @@
+# 在 ECS 实例上部署 OpenClaw 的两种方式：计算巢服务、云助手公共命令。
+> https://help.aliyun.com/zh/ecs/user-guide/deploy-openclaw-on-ecs
+
+OpenClaw 支持通过计算巢服务、云助手命令或源码编译部署到 ECS。
+部署方式对比
+部署方式
+使用场景
+优势
+计算巢服务
+一站式开通，支持试用。
+可视化表单填写，自动完成 ECS 与 OpenClaw 的安装配置，方便集成消息渠道。
+云助手公共命令
+免登录批量部署与运维。
+无需登录实例，填写参数即可完成安装、模型切换、渠道集成、健康诊断等全生命周期运维，支持批量下发。
+源码编译
+需要深度定制或参与社区开发。
+可修改源码、调试功能，适合开发者和二次开发场景。
+部署步骤
+计算巢
+计算巢提供 OpenClaw 一键部署方案，开通即用，无需手动安装或配置实例环境。完整步骤见通过计算巢一键部署 OpenClaw 解决方案。
+云助手
+适用范围
+执行公共命令前，确保目标 ECS 实例满足以下条件：
+云助手状态：实例已安装云助手 Agent，且状态为正常。若未安装，请安装云助手Agent。
+网络环境：实例需开通公网，以便拉取 OpenClaw 依赖包及模型配置。
+支持的操作系统
+操作系统
+支持版本
+公共命令
+Linux
+Alibaba Cloud Linux 3、Ubuntu 22.04/24.04、Debian 12、Rocky Linux 8/9、AlmaLinux 8/9、CentOS Stream 8/9
+ACS-ECS-InstallOpenClaw-for-linux.sh
+Windows
+Windows Server 2016 及以上版本
+ACS-ECS-InstallOpenClaw-for-windows.ps1
+Windows 实例额外限制：
+受 OpenClaw 限制，Gateway 需用户登录桌面后才能启动，执行命令前确保用户已登录。
+Windows 版命令不支持以默认用户 system 执行，需在参数中重新指定执行用户（如 Administrator）。如需使用普通用户执行，请配置 Windows 实例的普通用户执行云助手命令。
+重要
+建议使用4vCPU 4GiB内存及以上规格的 ECS 实例。如果使用共享型实例（如 ecs.t6、ecs.s6 系列），则建议选择更高规格以确保安装和运行的稳定性。
+1. 安装
+通过云助手 ACS-ECS-InstallOpenClaw-for-linux.sh（Linux 实例）或 ACS-ECS-InstallOpenClaw-for-windows.ps1（Windows 实例）公共命令一键完成安装。支持控制台与 CLI 两种方式：
+控制台
+登录ECS控制台-云助手，在顶部选择目标实例所在地域。
+切换到公共命令页签，在搜索框中输入命令名称（如 ACS-ECS-InstallOpenClaw），找到目标命令卡片后单击执行。
+在执行命令窗口中配置关键参数，然后选择目标 ECS 实例并执行：
+INSTALL_METHOD：固定填写 plugin。
+AUTH_CHOICE：模型供应商标识，如 modelstudio-standard-api-key-cn（通义千问标准版）。完整列表请参见支持的模型供应商。
+API_KEY：对应供应商的 API Key。建议改用 ENCRYPTED_API_KEY + KEY_PAIR_ID 加密传输，详见如何使用加密 API Key。
+在命令执行结果页签查看执行状态。
+成功执行：表示 OpenClaw 已安装完成。如需远程访问 OpenClaw Dashboard，请参见通过公网访问 WebUI。
+执行失败：请根据任务输出和云助手日志排查原因，请参见公共命令执行失败是什么原因。
+（可选）安装完成后，OpenClaw 将使用该供应商的默认模型。如需查询、切换或新增模型供应商，请参见模型配置。
+CLI
+查看公共命令信息。执行以下命令查看 ACS-ECS-InstallOpenClaw-for-linux.sh 公共命令的详细信息：
+aliyun ecs DescribeCommands \
+--RegionId 'cn-hangzhou' \
+--CommandId 'ACS-ECS-InstallOpenClaw-for-linux.sh'
+查看Windows 实例命令将CommandID参数替换为ACS-ECS-InstallOpenClaw-for-windows.ps1。
+执行公共命令安装 OpenClaw。将以下示例中的地域 ID 和实例 ID 替换为实际值。地域 ID 可在控制台左上角查看，实例 ID 可在实例列表页获取。
+如需在多台实例上批量安装，通过 --InstanceId.N 参数指定多个实例 ID，最多支持 100 台。
+aliyun ecs InvokeCommand \
+--RegionId '<地域ID，如cn-hangzhou>' \
+--CommandId 'ACS-ECS-InstallOpenClaw-for-linux.sh' \
+--InstanceId.1 '<实例ID，如i-bp1xxxxxxxxxxxx>'
+如需在安装时配置模型，建议使用加密 API Key 而非明文传递，请参见如何使用加密 API Key。
+查看执行结果。命令执行后会返回 InvokeId，使用该 ID 查询执行结果：
+aliyun ecs DescribeInvocationResults \
+--RegionId '<地域ID>' \
+--InvokeId '<执行ID，如t-hz0xxxxxxxxxxxx>'
+返回结果中 Output 字段为脚本的标准输出，ErrorInfo 字段包含错误信息。
+2. 部署配置
+安装完成后，根据需要进行模型与消息渠道配置。所有配置均通过云助手公共命令完成，无需登录实例。
+2.1 模型配置
+对应公共命令：ACS-ECS-OpenClawModel-for-linux.sh（Windows 实例使用ACS-ECS-OpenClawModel-for-windows.ps1）。安装时已配置默认模型，按以下场景查询、切换或新增供应商。
+查询模型
+查询当前已配置的模型列表，常用于切换前确认可选的 MODEL_ID，或在排查问题时查看配置状态与认证概览。
+在云助手控制台的公共命令页签中执行 ACS-ECS-OpenClawModel-for-linux.sh，并按下表填写参数。
+参数
+说明
+可选值
+ACTION
+操作类型（必填）。list 列出已配置的模型；status 查看配置状态与认证概览。
+list / status
+OUTPUT_FORMAT
+输出格式（选填，默认为表格）。
+json / plain
+切换默认模型
+在已配置的模型之间切换默认模型，新会话立即生效。可先通过查询模型页签获取可用的 MODEL_ID。
+在云助手控制台的公共命令页签中执行 ACS-ECS-OpenClawModel-for-linux.sh，并按下表填写参数。
+参数
+说明
+可选值/示例值
+ACTION
+操作类型（必填）。
+switch
+MODEL_ID
+模型 ID（必填），格式为"供应商/模型名"。可通过查询模型页签获取。
+modelstudio/qwen3.5-plus
+添加新供应商
+为 OpenClaw 新增模型供应商（如 OpenAI、DeepSeek、自定义端点等）。完成后该供应商的默认模型即可使用，如需切换为其他模型请使用切换默认模型页签。
+在云助手控制台的公共命令页签中执行 ACS-ECS-OpenClawModel-for-linux.sh，并按下表填写参数。
+参数
+说明
+可选值/示例值
+ACTION
+操作类型（必填）。
+setup
+AUTH_CHOICE
+供应商标识（必填）。
+详见支持的模型供应商
+API_KEY
+明文 API Key。与 ENCRYPTED_API_KEY 二选一，建议使用加密版本。
+ENCRYPTED_API_KEY
+加密 API Key。与 API_KEY 二选一。可通过云助手命令内容加密生成加密密钥。
+KEY_PAIR_ID
+云助手数据加解密密钥对 ID。使用 ENCRYPTED_API_KEY 时必填。
+t-hy03a65fmrd****
+BASE_URL
+自定义端点 URL（选填）。
+CUSTOM_PROVIDER_ID
+自定义提供商 ID（选填）。
+CUSTOM_COMPATIBILITY
+API 兼容模式（选填）。
+openai（默认）/ anthropic
+2.2 消息渠道配置
+对应公共命令：ACS-ECS-OpenClawChannel-for-linux.sh（Windows 实例使用 .ps1 版本）。支持飞书、企业微信、钉钉、QQ机器人四种渠道。按下面页签选择需要配置的渠道，或切换到管理已配置渠道页签查询/移除已有渠道。
+钉钉
+创建钉钉应用
+选择或创建组织。
+选择组织
+访问钉钉开放平台，登录时会出现如下提醒。请选择有开发者权限的组织，或者选择某个组织后，获取开发者权限。
+创建组织
+若无可用组织，使用钉钉移动端扫描下方二维码创建新组织。
+钉钉移动客户端版本需≥6.5.45。
+在开发者后台的一键自动创建 OpenClaw 机器人处单击立即创建。平台已自动预设 OpenClaw 机器人信息，可根据业务需要修改配置后，单击确认进行创建。
+如需创建多个应用建议在创建时修改机器人名称或者图标，方便后续区分。
+创建成功后，复制并保存应用的 Client ID 和 Client Secret。窗口关闭后仍可在已创建的应用左侧导航栏凭证与基础信息中查看。
+使用云助手配置钉钉渠道
+登录 ECS控制台-云助手，在左侧导航栏选择运维与监控>云助手。
+在公共命令页签中，搜索并选择 ACS-ECS-OpenClawChannel-for-linux.sh（Windows 实例使用 .ps1 版本），单击执行命令。
+选择已部署 OpenClaw 的目标 ECS 实例。按下表填写参数。单击执行，等待命令执行成功。命令执行完成后，钉钉渠道即被添加到 OpenClaw 中（自动安装 @dingtalk-real-ai/dingtalk-connector 插件）。
+参数
+说明
+取值
+ACTION
+操作类型。
+setup
+CHANNEL_TYPE
+渠道类型。
+dingtalk
+PARAM_ID
+钉钉应用的 Client ID。
+PARAM_SECRET
+钉钉应用的 Client Secret。建议改用 ENCRYPTED_PARAM_SECRET + KEY_PAIR_ID 加密传输。
+测试机器人
+可创建群聊或在已有群聊中添加机器人，在钉钉群中 @机器人 进行对话，或通过搜索的方式与机器人私聊进行测试。
+群聊：进入钉钉群群设置页面，点击机器人卡片区域，在机器人管理页面，点击添加机器人。在搜索框中输入目标机器人名称，选中后点击添加，再点击完成添加。在群中 @机器人 即可对话。
+私聊：在钉钉上方搜索框中搜索创建的机器人名称，单击机器人头像即可进入私聊页面与机器人对话。
+飞书
+创建飞书应用
+访问飞书开放平台，在创建飞书智能体应用卡片中单击立即创建，按提示完成创建。该方式会自动预置 OpenClaw 所需的权限、事件订阅等配置。
+在左侧导航栏单击凭证与基础信息页面，复制 App ID（格式如 cli_xxx）和 App Secret。
+使用云助手配置飞书渠道
+登录 ECS控制台-云助手，在左侧导航栏选择运维与监控>云助手。
+在公共命令页签中，搜索并选择 ACS-ECS-OpenClawChannel-for-linux.sh（Windows 实例使用 .ps1 版本），单击执行命令。
+选择已部署 OpenClaw 的目标 ECS 实例。按下表填写参数。单击执行，等待命令执行成功。命令执行完成后，飞书渠道即被添加到 OpenClaw 中（自动启用飞书插件）。
+参数
+说明
+取值
+ACTION
+操作类型。
+setup
+CHANNEL_TYPE
+渠道类型。
+feishu
+PARAM_ID
+飞书应用的 App ID。
+PARAM_SECRET
+飞书应用的 App Secret。建议改用 ENCRYPTED_PARAM_SECRET + KEY_PAIR_ID 加密传输。
+测试机器人
+可以创建群聊或在已有群聊中添加机器人，在飞书群中 @机器人 进行对话，或通过搜索的方式与机器人私聊进行测试。
+若需在外部群中使用机器人，可参考飞书官方文档机器人支持外部群和外部用户单聊。
+按照添加路径添加机器人：群···>设置>群机器人>添加机器人。
+单击机器人头像，单击发送消息，可向机器人私发一条消息；@机器人可在群中向机器人发送消息。
+企业微信
+创建企业微信机器人
+访问企业微信管理后台，登录后在左侧导航栏依次单击管理工具>智能机器人。
+单击创建机器人，选择手动创建。填写机器人基础信息后，下拉到页面底部，单击API模式创建。
+配置以下参数后单击保存：
+可见范围：按需配置机器人的可见范围。
+API配置：在连接方式区域选择使用长连接。在配置方法的 Secret 区域单击点击获取，并复制保存 Bot ID 和 Secret。
+可使用权限：按需配置机器人的权限。
+使用云助手配置企业微信渠道
+命令执行成功后，OpenClaw 会自动安装 @wecom/wecom-openclaw-plugin 插件。
+登录ECS控制台-云助手，在左侧导航栏选择运维与监控>云助手。
+在公共命令页签中，搜索并选择 ACS-ECS-OpenClawChannel-for-linux.sh（Windows 实例使用 .ps1 版本），单击执行命令。
+选择已部署 OpenClaw 的目标 ECS 实例。按下表填写参数。单击执行，等待命令执行成功。命令执行完成后，企业微信渠道即被添加到 OpenClaw 中。
+参数
+说明
+取值
+ACTION
+操作类型。
+setup
+CHANNEL_TYPE
+渠道类型。
+wecom
+PARAM_ID
+企业微信机器人的 Bot ID。
+PARAM_SECRET
+企业微信机器人的 Secret。建议改用 ENCRYPTED_PARAM_SECRET + KEY_PAIR_ID 加密传输。
+测试机器人
+在企业微信群聊中点击添加群成员，搜索创建完成的机器人名称，加入群聊。
+在已添加机器人的群中 @机器人，即可与 OpenClaw 进行流式对话。
+QQ机器人
+创建 QQ 机器人
+访问腾讯 QQ 开放平台，在页面下方的龙虾专用入口单击去使用。在手机登录区域，使用 QQ 手机端扫描二维码完成登录。
+单击创建机器人，按提示生成新的 QQ 机器人，并保存机器人的 AppID 和 AppSecret。
+请妥善保管 AppSecret(机器人密钥)。AppSecret 不支持明文保存，首次查看或遗忘后需要重新生成，而重新生成会导致原密钥立即失效。
+使用云助手配置 QQ 机器人渠道
+通过云助手公共命令将 QQ 机器人渠道配置到 OpenClaw。命令执行成功后，OpenClaw 会自动安装 @tencent-connect/openclaw-qqbot 插件。
+登录ECS控制台-云助手，在左侧导航栏选择运维与监控>云助手。
+在公共命令页签中，搜索并选择 ACS-ECS-OpenClawChannel-for-linux.sh(Windows 实例使用 .ps1 版本)，单击执行命令。
+选择已部署 OpenClaw 的目标 ECS 实例。按下表填写参数。单击执行，等待命令执行成功。命令执行完成后，QQ 机器人渠道即被添加到 OpenClaw 中（自动启用 QQ 机器人插件）。
+参数
+说明
+取值
+ACTION
+操作类型。
+setup
+CHANNEL_TYPE
+渠道类型。
+qqbot
+PARAM_ID
+QQ 机器人的 AppID。
+PARAM_SECRET
+QQ 机器人的 AppSecret(机器人密钥)。建议改用 ENCRYPTED_PARAM_SECRET + KEY_PAIR_ID 加密传输。
+测试机器人
+在 QQ 中搜索并添加创建好的机器人，直接与机器人私聊，或将其拉入测试群后 @机器人，即可与 OpenClaw 进行流式对话。
+3. 验证
+访问 Dashboard（WebUI）：Gateway 默认监听 127.0.0.1:18789，仅允许本地访问。如需通过公网访问，推荐使用 SSH 隧道：
+ssh -L 18789:127.0.0.1:18789 root@<ECS公网IP>
+在本地浏览器访问 http://localhost:18789 即可进入 Dashboard。其他访问方式（Nginx 反向代理、LAN 监听）及安全注意事项，请参见通过公网访问 WebUI。
+4. 更多操作
+除模型与消息渠道配置外，常用的 Gateway 服务管理、管理已配置渠道、健康诊断、卸载清理操作如下。所有命令均需登录ECS控制台-云助手，在左侧导航栏选择运维与监控 > 云助手 > 公共命令 。
+Gateway 服务管理
+对应公共命令：ACS-ECS-OpenClawGateway-for-linux.sh（Windows 实例使用 .ps1 版本）。用于管理 Gateway 服务的启停、安装/卸载、后台运行和 Dashboard 访问。
+ACTION 操作
+ACTION
+说明
+选填参数
+start
+启动 Gateway。
+stop
+停止 Gateway。
+restart
+重启 Gateway。
+status
+查看状态和 RPC 探测。
+DEEP， OUTPUT_FORMAT， TIMEOUT
+install
+注册为系统服务。
+PORT， FORCE
+uninstall
+卸载系统服务。
+run
+后台运行（非 systemd 环境）。
+PORT， BIND， FORCE
+dashboard
+获取 Dashboard URL。
+参数说明
+参数
+说明
+可选值
+ACTION
+操作类型（必填）。
+start / stop / restart / status / install / uninstall / run / dashboard
+PORT
+端口号（默认 18789）。
+BIND
+绑定模式（仅 run）。
+loopback（默认）/ lan / auto
+FORCE
+强制模式。
+true / false（默认）
+DEEP
+深度扫描系统服务（仅 status）。
+true / false（默认）
+OUTPUT_FORMAT
+输出格式（仅 status）。
+json
+TIMEOUT
+探测超时秒数（仅 status）。
+管理已配置渠道
+使用同一公共命令 ACS-ECS-OpenClawChannel-for-linux.sh 查询、检测或移除已配置的渠道。在云助手控制台的公共命令页签中选择目标实例后，按下表填写参数。
+参数
+说明
+取值
+ACTION
+操作类型（必填）。
+list：列出已配置的渠道。
+status：查看连接状态（搭配 PROBE=true 探测凭证有效性）。
+get：获取指定渠道的配置信息（需指定 CHANNEL_TYPE）。
+remove：禁用指定渠道（需指定 CHANNEL_TYPE）。
+list / status / get / remove
+CHANNEL_TYPE
+渠道类型，get/remove 时必填。
+feishu / wecom / dingtalk / qqbot
+PROBE
+探测凭证有效性（仅 status 时有效）。
+true / false（默认）
+OUTPUT_FORMAT
+输出格式（仅 list/status/get 时有效）。
+json / plain
+诊断与健康检查
+对应公共命令：ACS-ECS-OpenClawDiagnose-for-linux.sh（Windows 实例使用 .ps1 版本）。执行健康检查、查看系统状态、自动修复常见问题。
+ACTION 操作
+ACTION
+说明
+选填参数
+doctor
+健康检查和自动修复。
+FIX， DEEP
+status
+系统状态总览。
+OUTPUT_FORMAT， ALL， DEEP， TIMEOUT
+health
+Gateway 健康状态。
+OUTPUT_FORMAT， TIMEOUT
+参数说明
+参数
+说明
+可选值
+ACTION
+操作类型（必填）。
+doctor / status / health
+FIX
+自动修复（仅 doctor）。
+true / false（默认）
+DEEP
+深度扫描（doctor/status）。
+true / false（默认）
+ALL
+完整诊断（仅 status）。
+true / false（默认）
+OUTPUT_FORMAT
+输出格式。
+json
+TIMEOUT
+超时秒数（status/health）。
+卸载与清理
+对应公共命令：ACS-ECS-UninstallOpenClaw-for-linux.sh（Windows 实例使用 .ps1 版本）。卸载 OpenClaw，优先检测并删除云助手插件，如未通过插件安装则执行 npm uninstall -g openclaw。
+参数说明
+参数
+必填
+说明
+REMOVE_WORKDIR
+选填
+是否删除工作目录 ~/.openclaw。
+true：清除所有配置数据。
+false（默认）：保留配置，方便重装。
+警告
+如果因 API Key 泄露或安全事件需要卸载 OpenClaw，执行时请务必将 REMOVE_WORKDIR 参数设为 true，以彻底清除磁盘上的凭证数据。
+源码编译
+如果您需要对 OpenClaw 进行深度定制或参与社区开发，可以通过克隆源码进行编译部署。
+前提条件
+ECS 实例已安装 Git。
+ECS 实例已安装 Node.js（版本 22.22.3+、24.15+ 或 25.9+）和 pnpm。
+说明
+源码仓库使用 pnpm workspace，不支持通过 npm install 安装依赖。
+操作步骤
+登录 ECS 实例，执行以下命令克隆 OpenClaw 源码仓库。
+git clone https://github.com/OpenClaw/openclaw.git
+进入项目目录并安装依赖。
+cd openclaw
+pnpm install
+编译项目。
+pnpm build
+pnpm ui:build
+编译完成后，请参见 CONTRIBUTING.md 了解开发环境配置和运行方法。
+常见问题
+云助手部署中公共命令执行失败是什么原因？
+常见失败原因包括：
+API Key 无效：AUTH_CHOICE 与实际供应商不匹配，或 Key 已过期/格式错误。
+端口冲突：18789 端口已被占用，可执行以下命令确认是否被占用。
+Linux：netstat -tlnp | grep 18789
+Windows：netstat -ano | findstr 18789
+安装时间过长：Windows 实例中，建议将 OpenClaw 安装目录（默认 C:\Users\<用户名>\.openclaw）添加到 Microsoft Defender 实时保护排除路径，不建议直接关闭实时保护。
+更多原因及排查步骤，请参见查看执行结果及修复常见问题。
+使用云助手安装 OpenClaw 后，如何通过公网远程访问 WebUI？
+OpenClaw 安装完成后，Gateway 服务默认监听 127.0.0.1:18789，仅允许本地访问。如需通过公网访问 WebUI（Dashboard），可选择以下任一方式：
+方式一：SSH 隧道转发（推荐）：在本地终端执行以下命令，然后在本地浏览器访问 http://localhost:18789。
+ssh -L 18789:127.0.0.1:18789 root@<ECS公网IP>
+方式二：通过会话管理CLI免公网连接OpenClaw
+方式三：修改 Gateway 监听模式为 LAN：
+登录 ECS 实例，将 Gateway 绑定模式从 loopback 改为 lan（监听所有网络接口）：
+openclaw config set gateway.bind lan
+openclaw gateway restart
+在 ECS 安全组中放行入方向 TCP 18789 端口。建议将授权对象限制为您的办公/家庭出口 IP 段，而非 0.0.0.0/0。
+在浏览器中访问 http://<ECS公网IP>:18789。
+警告
+修改为 lan 模式后，Gateway 将监听所有网络接口。请务必在安全组中限制 18789 端口的访问来源 IP，避免向公网所有地址开放。
+云助手部署中如何使用加密 API Key？
+为避免 API Key 明文传输，建议使用云助手数据加解密功能对 API Key 进行加密。加密后通过以下参数传递：
+ENCRYPTED_API_KEY：加密后的 API Key，可通过云助手命令内容加密生成加密密钥。
+KEY_PAIR_ID：云助手数据加解密密钥对 ID，可在生成加密密钥时获取。
+CLI 示例：
+aliyun ecs InvokeCommand \
+--RegionId '<地域ID>' \
+--CommandId 'ACS-ECS-InstallOpenClaw-for-linux.sh' \
+--InstanceId.1 '<实例ID>' \
+--Parameters '{"AUTH_CHOICE":"modelstudio-standard-api-key-cn"，"ENCRYPTED_API_KEY":"<加密后的Key>"，"KEY_PAIR_ID":"<OOS密钥对ID>"}'
+云助手部署中如何如何配置安装部署参数来设置百炼的Token Plan？
+使用百炼 Token Plan 安装时，AUTH_CHOICE 需设置为 custom-api-key，同时需要配置以下参数：
+API_KEY：Token Plan 团队版专属 API Key。
+BASE_URL：百炼的 API 端点地址，Token Plan 团队版Base URL。
+MODEL_ID：Token Plan 团队版支持的模型。
+云助手部署OpenClaw 中都支持哪些模型供应商？
+以下为 AUTH_CHOICE 参数支持的供应商列表。安装或切换模型时，将对应的 AUTH_CHOICE 值填入参数即可。
+AUTH_CHOICE
+供应商
+modelstudio-standard-api-key-cn
+通义千问 Standard Plan（CN，按量付费）
+modelstudio-standard-api-key
+通义千问 Standard Plan（Global，pay-as-you-go）
+modelstudio-api-key-cn
+通义千问 Coding Plan（CN，订阅制）
+modelstudio-api-key
+通义千问 Coding Plan（Global，subscription）
+openai-api-key
+OpenAI
+anthropic-api-key
+Anthropic
+deepseek-api-key
+DeepSeek
+gemini-api-key
+Google Gemini
+mistral-api-key
+Mistral AI
+openrouter-api-key
+OpenRouter
+xai-api-key
+xAI（Grok）
+volcengine-api-key
+火山引擎
+byteplus-api-key
+BytePlus
+qianfan-api-key
+百度千帆
+moonshot-api-key
+Moonshot AI / Kimi K2.5（国际站）
+moonshot-api-key-cn
+Moonshot AI / Kimi K2.5（中国内地站）
+kimi-code-api-key
+Kimi Code
+xiaomi-api-key
+小米
+zai-api-key
+Z.AI
+zai-coding-global
+Z.AI Coding Plan（Global）
+zai-coding-cn
+Z.AI Coding Plan（CN）
+zai-global
+Z.AI（Global）
+zai-cn
+Z.AI（CN）
+together-api-key
+Together AI
+huggingface-api-key
+Hugging Face
+venice-api-key
+Venice AI
+kilocode-api-key
+Kilo Gateway
+litellm-api-key
+LiteLLM
+synthetic-api-key
+Synthetic
+chutes-api-key
+Chutes
+opencode-zen
+OpenCode（Zen catalog）
+opencode-go
+OpenCode（Go catalog）
+minimax-global-api
+MiniMax（Global）
+minimax-cn-api
+MiniMax（CN）
+ai-gateway-api-key
+Vercel AI Gateway
+custom-api-key
+自定义端点（需 BASE_URL + MODEL_ID）
+OpenClaw常用命令行工具（CLI）有哪些？
+登录 ECS 实例终端，切换到 root 用户后可执行以下命令。
+查看 OpenClaw 版本：
+openclaw --version
+查看已安装技能（Skills）：
+openclaw skills list
+查看插件管理命令帮助：
+openclaw plugins -h
+如何重启OpenClaw Gateway 网关服务？
+登录 ECS 实例，在终端执行以下命令即可重启 Gateway 网关服务：
+openclaw gateway restart
+如何在OpenClaw中安装或添加Skills？
+OpenClaw 支持通过对话交互、链接安装以及转存安装三种方式来添加 Skill：
+交互式创建（适用于新建 Skill）
+OpenClaw 内置了 Skill Creator 组件，可直接与 Skill Creator 进行对话聊天，描述需求，让它自动创建一个全新的 Skill。
+通过 URL 安装（适用于复用现有 Skill）
+如需安装已经开发好的 Skill，只需将该 Skill 的 URL 地址发送给 OpenClaw，系统即可自动完成安装。
+中转源安装（适用于网络受限场景）
+如果 ECS 实例的网络环境无法访问 GitHub 等外部代码库，可以先将 Skill 文件下载到本地，上传至可访问的存储空间（例如 OSS），再将新地址发送给 OpenClaw 进行安装。

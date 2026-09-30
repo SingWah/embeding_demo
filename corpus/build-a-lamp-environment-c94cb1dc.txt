@@ -1,0 +1,17 @@
+# LAMP环境简介
+> https://help.aliyun.com/zh/ecs/user-guide/build-a-lamp-environment/
+
+LAMP环境是常用的Web开发环境之一，其中LAMP分别代表Linux、Apache、MySQL和PHP。LAMP拥有庞大的社区支持和丰富的资源，适合开发、部署和维护各种规模的Web应用，由于其高度灵活性和可定制性，您可以根据项目需求调整每个组件的配置，以达到最佳性能和安全性。
+LAMP架构
+Linux：作为LAMP架构的核心，Linux提供了一个稳定且免费的操作系统环境，支持多种发行版，如Alibaba Cloud Linux、CentOS、Ubuntu等。
+Apache：Apache是一个广泛使用的开源Web服务器软件，以其稳定性和灵活性而闻名。它能够处理静态内容，并Apache支持多种模块，这些模块允许Apache与不同的后端技术（如PHP、Python、Ruby等）集成，从而处理动态内容。
+MySQL：MySQL是一个关系型数据库管理系统，用于存储网站数据。它是LAMP架构中的数据存储组件，提供数据查询和存储功能。
+PHP：PHP是一种服务器端脚本语言，用于生成动态网页内容。它可以嵌入HTML中，与Apache和MySQL协同工作，提供完整的Web应用开发功能。
+示意图
+部署方式
+方式
+适用场景
+使用扩展程序部署LAMP环境
+如果您不希望花费太多时间在配置服务器上，并且对自定义要求不高的话，可以使用扩展程序部署LAMP环境。
+手动部署LAMP环境
+如果您想要深入了解PHP如何连接MySQL数据库，以及Apache配置PHP服务，您可以通过手动部署LAMP环境。

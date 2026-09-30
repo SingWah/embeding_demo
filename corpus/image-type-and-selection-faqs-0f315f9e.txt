@@ -1,0 +1,54 @@
+# 镜像选择与使用FAQ
+> https://help.aliyun.com/zh/ecs/image-type-and-selection-faqs
+
+实例与操作系统的兼容性问题
+AMD实例规格与操作系统兼容性说明
+Intel实例规格与操作系统兼容性说明
+海光实例规格与操作系统兼容性说明
+为什么创建ECS实例时看不到某些镜像？
+Red Hat镜像支持哪些实例规格族？
+FreeBSD操作系统兼容性说明
+本地SSD型i4实例规格与操作系统兼容性说明
+镜像选择问题
+Windows系统不同版本的内存限制有何不同？
+Windows系统不同的版本对应的内存上限不同。更多信息，请参见Memory Limits for Windows and Windows Server Releases。请您根据Windows系统的内存限制选择合适的实例规格。
+为什么创建部分规格的ECS实例时无法选择Windows操作系统？
+使用Windows操作系统创建ECS实例时，需要确保实例内存大于等于1 GiB。内存低于1 GiB的ECS实例（例如0.5 GB）只能选择Linux镜像或者Windows Server Version 2004镜像。
+说明
+1 GiB内存的实例和Windows Server 2012的组合可能会因为内存使用率过高导致系统不稳定。推荐您在2 GiB以上内存的实例规格中使用Windows Server 2012及以上版本，或者在1 GiB内存的实例规格时使用Windows Server 2008或者Windows Server Version 2004。
+哪些操作系统支持可视化（图形化桌面）？
+Linux：默认是命令行形式，您可以根据需要安装可视化桌面。详情请参见为Linux实例安装图形化界面。
+Windows：除Windows Server Version 2004 ****（不含图形化桌面）、Windows Server 2022 数据中心版****（不含图形化桌面）以外，其余Windows操作系统均支持可视化。更多信息，请参见公共镜像。
+如何配置并使用Docker私有镜像库？
+镜像管理是Docker的核心，为了满足企业或组织内部分享镜像，Docker官方在Github上建立了一个开源项目docker-registry，专门用于自建Docker的私有镜像库。
+快速启动支持阿里云对象存储OSS的docker-registry：您可以从GitHub下载并安装docker-registry，运行pip install docker-registry-driver-alioss命令，通过pip安装OSS driver。
+运行docker registry。
+docker run \\
+-e OSS_BUCKET= \\
+-e STORAGE_PATH=/docker/ \\
+-e OSS_KEY= \\
+-e OSS_SECRET= \\
+-p 5000:5000 \\
+-d chrisjin/registry:ali_oss
+配置config.yml。
+storage: alioss
+storage_path: _env:STORAGE_PATH:/devregistry/
+oss_bucket: _env:OSS_BUCKET[:default_value]
+oss_accessid: _env:OSS_KEY
+oss_accesskey: _env:OSS_SECRET
+启动docker-registry。
+DOCKER_REGISTRY_CONFIG=[your_config_path] gunicorn -k gevent -b 0.0.0.0:5000 -w 1 docker_registry.wi:application
+如问题还未解决，请提交工单寻求技术支持。
+创建ECS实例时，可以选择哪些国产合规操作系统？
+目前支持的国产合规操作系统包括：阿里云服务器操作系统 （即Alibaba Cloud Linux 3/4 Pro）、麒麟、统信。
+阿里云服务器操作系统：即Alibaba Cloud Linux 3/4 Pro，是阿里云基于Alibaba Cloud Linux推出的商业化付费版本。该版本提供全面的高可用性、深度的云原生支持以及丰富的软硬件生态，符合安全合规的要求，并提供长达13年的生命周期维护，为对稳定性有较高要求的用户提供业务连续性保障。已适配海光和倚天实例。该操作系统的费用请参见：Alibaba Cloud Linux Pro。
+您可以在实例购买页选择Alibaba Cloud Linux 3/4 Pro 64位。
+麒麟：已上架云市场。
+麒麟X86版（适配海光实例）
+麒麟ARM版（适配倚天实例）
+统信：已上架云市场。
+统信X86版（适配海光实例）
+统信ARM版（适配倚天实例）
+说明
+关于海光实例和倚天实例的更多说明，请参见实例规格族。
+关于云市场镜像的购买方式，请参见云市场镜像。

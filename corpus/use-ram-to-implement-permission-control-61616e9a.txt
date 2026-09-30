@@ -1,0 +1,816 @@
+# 授权RAM用户使用云助手
+> https://help.aliyun.com/zh/ecs/user-guide/use-ram-to-implement-permission-control
+
+您可以授予RAM用户不同的RAM策略，从而提升或降低RAM用户的权限级别，实现更安全可控的访问，并有效降低阿里云账号AccessKey密钥被泄露的风险。本文介绍了授权步骤，并给出了云助手相关的RAM策略示例。
+背景信息
+权限策略分为您自行创建的自定义策略和阿里云提供的系统策略。具体到云助手，除系统策略外，您可以从地域、ECS实例、云助手命令、托管实例激活码等维度设计自定义策略，并授权给RAM用户使用，从而灵活控制RAM用户使用云助手的权限。
+操作步骤
+使用阿里云账号（主账号）创建一个RAM用户。
+具体操作，请参见创建RAM用户。
+使用阿里云账号创建一个自定义策略。具体操作，请参见创建自定义权限策略。
+常见云助手功能涉及的自定义策略如下表所示：
+云助手功能
+自定义策略示例
+云助手
+云助手管理员权限（可读可写）
+云助手查看权限（只读）
+设置云助手的地域限制
+云助手Agent
+查询云助手Agent安装状态
+安装云助手Agent
+查询和修改云助手Agent升级配置
+查询云助手Agent升级配置
+云助手命令
+查看云助手命令
+删除云助手命令
+创建云助手命令
+修改云助手命令
+执行命令
+立即执行命令
+查询命令执行结果
+停止执行任务
+修改定时任务的执行信息
+在命令中使用OSS普通参数
+在命令中使用OSS加密参数
+发送文件
+上传本地文件
+查询文件上传结果
+运维任务执行记录投递
+查询和修改运维任务执行记录投递功能的配置
+查询运维任务执行记录投递功能的配置
+设置运维任务执行记录投递功能的地域限制
+查询和修改会话操作记录投递功能的配置
+查询会话操作记录投递功能的配置
+设置会话操作记录投递功能的地域限制
+查询OSS存储空间
+查询SLS项目与日志库
+托管实例
+注销托管实例
+查询托管实例
+创建托管实例激活码
+禁用托管实例激活码
+查询托管实例激活码
+删除托管实例激活码
+会话管理
+创建和查询会话管理（Session Manager）
+使用阿里云账号为已创建的RAM用户授予权限。
+具体操作，请参见管理RAM用户的权限。
+指定您自行创建的自定义策略。在添加权限面板中，将授权范围设置为整个云账号，选择对应的权限策略后单击确定。
+指定阿里云提供的系统策略
+AliyunECSAssistantFullAccess：允许RAM用户管理ECS云助手服务的权限。
+AliyunECSAssistantReadonlyAccess：允许RAM用户只读访问ECS云助手服务的权限。
+您可以在RAM控制台查看系统策略的策略内容等基本信息，具体操作，请参见查看权限策略信息。
+查看RAM用户信息，确认已被授权登录阿里云管理控制台。
+如果未开启控制台访问权限，RAM用户只能调用API使用云助手。具体步骤，请参见查看RAM用户的权限。在认证管理页签下，查看控制台登录管理区域，确认控制台访问状态为已开启。
+使用RAM用户登录阿里云控制台。
+具体步骤，请参见RAM用户登录阿里云控制台。在 RAM 用户登录页面，选择RAM 用户名密码登录页签，输入 RAM 用户名（格式为 username@company.onaliyun.com 或 username@company-alias），单击下一步，然后输入密码完成登录。
+使用RAM用户登录ECS管理控制台云助手页面，RAM用户开始使用云助手。
+云助手自定义策略示例
+云助手管理员权限（可读可写）
+授予以下权限后，RAM用户拥有云助手API的全部查询和操作权限。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs:DescribeInstances",
+"ecs:DescribeTag*",
+"ecs:*Command",
+"ecs:DescribeCommand*",
+"ecs:DescribeInvocation*",
+"ecs:StopInvocation",
+"ecs:*CloudAssistant*",
+"ecs:SendFile",
+"ecs:DescribeSendFileResults",
+"ecs:*ManagedInstance",
+"ecs:DescribeManagedInstances",
+"ecs:*Activation",
+"ecs:DescribeActivations",
+"ecs:ListPluginStatus",
+"ecs:ModifyInvocationAttribute",
+"ecs:StartTerminalSession",
+"ecs:DescribeTerminalSessions",
+"ecs:RunCommand"
+"Resource": [
+"acs:ecs:*:*:instance/*",
+"acs:ecs:*:*:command/*",
+"acs:ecs:*:*:activation/*",
+"acs:ecs:*:*:invocation/*"
+"Effect": "Allow",
+"Action": [
+"ram:CreateServiceLinkedRole"
+"Resource": "*",
+"Condition": {
+"StringEquals": {
+"ram:ServiceName": [
+"archiving.ecs.aliyuncs.com"
+"Effect": "Allow",
+"Action": [
+"ecs:ModifyCloudAssistantSettings",
+"ecs:DescribeCloudAssistantSettings"
+"Resource": [
+"acs:ecs:*:*:servicesettings/*"
+云助手查看权限（只读）
+授予以下权限后，RAM用户拥有云助手API的全部查询权限。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs:DescribeInstances",
+"ecs:DescribeTag*",
+"ecs:DescribeCommand*",
+"ecs:DescribeInvocation*",
+"ecs:DescribeCloudAssistant*",
+"ecs:DescribeSendFileResults",
+"ecs:DescribeManagedInstances",
+"ecs:DescribeActivations",
+"ecs:ListPluginStatus",
+"ecs:DescribeTerminalSessions"
+"Resource": [
+"acs:ecs:*:*:instance/*",
+"acs:ecs:*:*:command/*",
+"acs:ecs:*:*:activation/*"
+"Effect": "Allow",
+"Action": [
+"ecs:DescribeCloudAssistantSettings"
+"Resource": [
+"acs:ecs:*:*:servicesettings/*"
+设置云助手的地域限制
+通过在权限策略元素的地域字段指定地域值，可以限制RAM用户的地域权限。例如只允许RAM用户在华东1（杭州）地域使用云助手。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs:DescribeInstances",
+"ecs:DescribeTag*",
+"ecs:*Command",
+"ecs:DescribeCommand*",
+"ecs:DescribeInvocation*",
+"ecs:StopInvocation",
+"ecs:*CloudAssistant*",
+"ecs:SendFile",
+"ecs:DescribeSendFileResults",
+"ecs:*ManagedInstance",
+"ecs:DescribeManagedInstances",
+"ecs:*Activation",
+"ecs:DescribeActivations",
+"ecs:ListPluginStatus",
+"ecs:ModifyInvocationAttribute",
+"ecs:StartTerminalSession",
+"ecs:DescribeTerminalSessions",
+"ecs:RunCommand"
+"Resource": [
+"acs:ecs:cn-hangzhou:*:instance/*",
+"acs:ecs:cn-hangzhou:*:command/*",
+"acs:ecs:cn-hangzhou:*:activation/*",
+"acs:ecs:cn-hangzhou:*:invocation/*"
+"Effect": "Allow",
+"Action": [
+"ram:CreateServiceLinkedRole"
+"Resource": "*",
+"Condition": {
+"StringEquals": {
+"ram:ServiceName": [
+"archiving.ecs.aliyuncs.com"
+"Effect": "Allow",
+"Action": [
+"ecs:ModifyCloudAssistantSettings",
+"ecs:DescribeCloudAssistantSettings"
+"Resource": [
+"acs:ecs:cn-hangzhou:*:servicesettings/*"
+云助手Agent
+查询云助手Agent安装状态
+相关API：DescribeCloudAssistantStatus
+授予以下权限后，允许RAM用户查询所有ECS实例的云助手Agent安装状态。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs:DescribeInstances",
+"ecs:DescribeCloudAssistantStatus"
+"Resource": [
+"acs:ecs:*:*:instance/*"
+通过在Resource列表中设置实例ID，授予以下权限后，RAM用户只能查看指定的ECS实例的云助手Agent安装状态。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs:DescribeInstances",
+"ecs:DescribeCloudAssistantStatus"
+"Resource": [
+"acs:ecs:*:*:instance/i-instancexxx000a",
+"acs:ecs:*:*:instance/i-instancexxx000b"
+安装云助手Agent
+相关API：InstallCloudAssistant
+授予以下权限后，允许RAM用户为任意ECS实例安装云助手Agent。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs:InstallCloudAssistant"
+"Resource": [
+"acs:ecs:*:*:instance/*"
+通过在Resource列表中设置实例ID，授予以下权限后，RAM用户只能为指定ECS实例安装云助手Agent。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs:InstallCloudAssistant"
+"Resource": [
+"acs:ecs:*:*:instance/i-instancexxx00a",
+"acs:ecs:*:*:instance/i-instancexxx00b"
+云助手命令自定义策略示例
+查看云助手命令
+相关API：DescribeCommands
+授予以下权限后，允许RAM用户查看所有云助手命令。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs:DescribeCommands"
+"Resource": [
+"acs:ecs:*:*:command/*"
+通过在Resource列表中设置命令ID，授予以下权限后，RAM用户只能查看指定的命令。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs:DescribeCommands"
+"Resource": [
+"acs:ecs:*:*:command/c-commandxxx000a",
+"acs:ecs:*:*:command/c-commandxxx000b"
+删除云助手命令
+相关API：DeleteCommand
+授予以下权限后，允许RAM用户删除所有云助手命令。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs:DeleteCommand"
+"Resource": [
+"acs:ecs:*:*:command/*"
+通过在Resource列表中设置命令ID，授予以下权限后，RAM用户只能删除指定的命令。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs:DeleteCommand"
+"Resource": [
+"acs:ecs:*:*:command/c-commandxxx000a",
+"acs:ecs:*:*:command/c-commandxxx000b"
+创建云助手命令
+相关API：CreateCommand
+RAM用户至少需要以下权限，才能创建云助手命令。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs:CreateCommand"
+"Resource": [
+"acs:ecs:*:*:command/*"
+修改云助手命令
+相关API：ModifyCommand
+授予以下权限后，允许RAM用户修改任意云助手命令。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs:ModifyCommand"
+"Resource": [
+"acs:ecs:*:*:command/*"
+通过在Resource列表中设置实例ID，授予以下权限后，RAM用户只能修改指定的命令。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs:ModifyCommand"
+"Resource": [
+"acs:ecs:*:*:command/c-commandxxx000a",
+"acs:ecs:*:*:command/c-commandxxx000b"
+执行命令
+相关API：InvokeCommand
+授予以下权限后，允许RAM用户在任意实例上执行命令。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs:InvokeCommand"
+"Resource": [
+"acs:ecs:*:*:command/*",
+"acs:ecs:*:*:instance/*"
+通过在Resource列表中设置实例ID，授予以下权限后，RAM用户只能在指定的ECS实例上执行云助手命令。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs:InvokeCommand"
+"Resource": [
+"acs:ecs:*:*:command/*",
+"acs:ecs:*:*:instance/i-instancexxx00a",
+"acs:ecs:*:*:instance/i-instancexxx00b"
+通过在Resource列表中设置命令ID，授予以下权限后，RAM用户只能在ECS实例上执行指定的命令。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs:InvokeCommand"
+"Resource": [
+"acs:ecs:*:*:command/c-commandxxx00a",
+"acs:ecs:*:*:command/c-commandxxx00b",
+"acs:ecs:*:*:instance/*"
+通过在Resource列表中设置命令ID和实例ID，授予以下权限后，RAM用户只能在指定的ECS实例上执行指定的命令。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs:InvokeCommand"
+"Resource": [
+"acs:ecs:*:*:instance/i-instancexxx00a",
+"acs:ecs:*:*:instance/i-instancexxx00b",
+"acs:ecs:*:*:command/c-commandxxx00a",
+"acs:ecs:*:*:command/c-commandxxx00b"
+限定可执行的插件：通过赋予子账号如下的权限策略，可以限制只能操作名称为ACS-ECS-ExecutePlugin-for-linux.sh的公共命令，且对应插件名称为test-plugin。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": "ecs:InvokeCommand",
+"Resource": [
+"acs:ecs:*:*:command/ACS-ECS-ExecutePlugin-for-linux.sh",
+"acs:ecs:*:*:instance/*"
+"Condition": {
+"StringEqualsIgnoreCase": {
+"ecs:PluginName": [
+"test-plugin"
+通过在Condition中增加标签条件来控制可执行命令的ECS实例范围。例如只允许在带有标签test:tony的ECS实例上执行命令。
+说明
+在使用acs:ResourceTag时，资源必须附带标签方可使用。例如，ECS实例可以绑定标签，而命令则不具备标签。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": "ecs:InvokeCommand",
+"Resource": [
+"acs:ecs:*:*:instance/*"
+"Condition": {
+"StringEquals": {
+"acs:ResourceTag/Owner": "zxy"
+"Effect": "Allow",
+"Action": "ecs:InvokeCommand",
+"Resource": [
+"acs:ecs:*:*:command/*"
+立即执行命令
+相关API：RunCommand
+说明
+如果调用RunCommand时，您指定了参数KeepCommand=true，则需要在Resource列表中添加一行 "acs::ecs:*:*:command/*"。
+授予以下权限后，允许RAM用户在任意实例上立即执行命令。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs:RunCommand"
+"Resource": [
+"acs:ecs:*:*:instance/*"
+通过在Resource列表中设置实例ID，授予以下权限后，RAM用户只能在指定的ECS实例上立即执行云助手命令。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs: RunCommand"
+"Resource": [
+"acs:ecs:*:*:instance/i-instancexxx00a",
+"acs:ecs:*:*:instance/i-instancexxx00b"
+通过在Condition中增加标签条件来控制可立即执行命令的ECS实例范围。例如只允许在带有标签test:tony的ECS实例上立即执行命令。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs:RunCommand"
+"Resource": "acs:ecs:*:*:instance/*",
+"Condition": {
+"StringEquals": {
+"acs:ResourceTag/test": "tony"
+查询命令执行结果
+相关API：DescribeInvocations
+授予以下权限后，允许RAM用户在任意实例上查询命令执行结果。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs: DescribeInvocations"
+"Resource": [
+"acs:ecs:*:*:instance/*",
+"acs:ecs:*:*:command/*"
+通过在Resource列表中设置实例ID，授予以下权限后，RAM用户只能在指定的ECS实例上查询命令执行结果。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs: DescribeInvocations"
+"Resource": [
+"acs:ecs:*:*:instance/i-instancexxx00a",
+"acs:ecs:*:*:instance/i-instancexxx00b",
+"acs:ecs:*:*:command/*"
+通过在Resource列表中设置命令ID，授予以下权限后，RAM用户只能在ECS实例上查询指定的命令执行结果。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs: DescribeInvocations"
+"Resource": [
+"acs:ecs:*:*:instance/*",
+"acs:ecs:*:*:command/c-commandxxx00a",
+"acs:ecs:*:*:command/c-commandxxx00b"
+通过在Resource列表中设置命令ID和实例ID，授予以下权限后，RAM用户只能在指定的ECS实例上查询指定的命令执行结果。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs: DescribeInvocations"
+"Resource": [
+"acs:ecs:*:*:instance/i-instancexxx00a",
+"acs:ecs:*:*:instance/i-instancexxx00b",
+"acs:ecs:*:*:command/c-commandxxx00a",
+"acs:ecs:*:*:command/c-commandxxx00b"
+修改定时任务的执行信息
+相关API：ModifyInvocationAttribute
+授予以下权限后，允许RAM用户修改任意定时任务的执行信息，并将任意实例加入定时任务。
+当您修改了CommandContent，且调用InvokeCommand或调用RunCommand时设置KeepCommand为true创建任务，将会新增一条命令并长期保留，因此需要在调用ModifyInvocationAttribute前，在Resource列表中添加一行acs:ecs:*:*:command/*。
+"Version": "1",
+"Statement": [
+"Action": "ecs:ModifyInvocationAttribute",
+"Resource": [
+"acs:ecs:*:*:instance/*",
+"acs:ecs:*:*:invocation/*"
+"Effect": "Allow"
+通过在Resource列表中设置任务ID，授予以下权限后，RAM用户只能修改指定任务的执行信息，并将任意实例加入指定任务。
+"Version": "1",
+"Statement": [
+"Action": "ecs:ModifyInvocationAttribute",
+"Resource": [
+"acs:ecs:*:*:instance/*",
+"acs:ecs:*:*:invocation/task-xxx"
+"Effect": "Allow"
+通过在Resource列表中设置实例ID，授予以下权限后，允许RAM用户修改任意定时任务的执行信息，且只能将指定实例加入定时任务。
+"Version": "1",
+"Statement": [
+"Action": "ecs:ModifyInvocationAttribute",
+"Resource": [
+"acs:ecs:*:*:instance/i-instance-xxx",
+"acs:ecs:*:*:invocation/*"
+"Effect": "Allow"
+通过在Resource列表中设置实例ID与任务ID，授予以下权限后，RAM用户只能修改指定任务的执行信息，且只能将指定实例加入定时任务。
+"Version": "1",
+"Statement": [
+"Action": "ecs:ModifyInvocationAttribute",
+"Resource": [
+"acs:ecs:*:*:instance/i-instance-xxx",
+"acs:ecs:*:*:invocation/task-xxx"
+"Effect": "Allow"
+停止执行任务
+相关API：StopInvocation
+授予以下权限后，允许RAM用户在任意实例上停止进行中（Running）的云助手命令进程。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs:StopInvocation"
+"Resource": [
+"acs:ecs:*:*:instance/*"
+通过在Resource列表中设置实例ID，授予以下权限后，RAM用户只能在指定的ECS实例上停止进行中（Running）的云助手命令进程。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs:StopInvocation"
+"Resource": [
+"acs:ecs:*:*:instance/i-instancexxx00a",
+"acs:ecs:*:*:instance/i-instancexxx00b"
+在命令中使用OSS普通参数
+授予以下权限后，允许RAM用户使用云助手执行包含OSS普通参数的命令。
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs:DescribeInstances",
+"ecs:CreateCommand",
+"ecs:DescribeCommands",
+"ecs:InvokeCommand",
+"ecs:RunCommand",
+"ecs:DescribeInvocations",
+"ecs:DescribeInvocationResults",
+"ecs:DescribeCloudAssistantStatus",
+"oos:GetParameters",
+"oos:GetParameter"
+"Resource": "*"
+"Version": "1"
+在命令中使用OSS加密参数
+授予以下权限后，允许RAM用户使用云助手执行包含OSS加密参数的命令。
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs:DescribeInstances",
+"ecs:CreateCommand",
+"ecs:DescribeCommands",
+"ecs:InvokeCommand",
+"ecs:RunCommand",
+"ecs:DescribeInvocations",
+"ecs:DescribeInvocationResults",
+"ecs:DescribeCloudAssistantStatus",
+"oos:GetParameters",
+"oos:GetSecretParameters",
+"oos:GetParameter",
+"oos:GetSecretParameter",
+"kms:GetSecretValue"
+"Resource": "*"
+"Version": "1"
+发送文件自定义策略示例
+上传本地文件
+相关API：SendFile
+授予以下权限后，允许RAM用户上传本地文件到任意ECS实例。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs:SendFile"
+"Resource": [
+"acs:ecs:*:*:instance/*"
+通过在Resource列表中设置实例ID，授予以下权限后，RAM用户只能上传本地文件到指定的ECS实例。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs:SendFile"
+"Resource": [
+"acs:ecs:*:*:instance/i-instancexxx00a",
+"acs:ecs:*:*:instance/i-instancexxx00b"
+通过在Condition中增加标签条件来控制文件可上传的ECS实例范围。例如只允许将文件上传到带有标签test:tony的ECS实例上。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs:SendFile"
+"Resource": "acs:ecs:*:*:instance/*",
+"Condition": {
+"StringEquals": {
+"acs:ResourceTag/test": "tony"
+查询文件上传结果
+相关API：DescribeSendFileResults
+授予以下权限后，允许RAM用户查询任意实例的文件上传结果。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs:DescribeSendFileResults"
+"Resource": [
+"acs:ecs:*:*:instance/*"
+通过在Resource列表中设置实例ID，授予以下权限后，RAM用户只能查询指定ECS实例的文件上传结果。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs:DescribeSendFileResults"
+"Resource": [
+"acs:ecs:*:*:instance/i-instancexxx00a",
+"acs:ecs:*:*:instance/i-instancexxx00b"
+运维任务执行记录投递自定义策略示例
+查询和修改运维任务执行记录投递功能的配置
+授予以下权限后，允许RAM用户查询和修改运维任务执行记录投递功能的配置。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs:ModifyCloudAssistantSettings",
+"ecs:DescribeCloudAssistantSettings"
+"Resource": [
+"acs:ecs:*:*:servicesettings/cloudassistantdeliverysettings"
+查询运维任务执行记录投递功能的配置
+授予以下权限后，允许RAM用户查询运维任务执行记录投递功能的配置。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs:DescribeCloudAssistantSettings"
+"Resource": [
+"acs:ecs:*:*:servicesettings/cloudassistantdeliverysettings"
+设置运维任务执行记录投递功能的地域限制
+通过在权限策略元素的地域字段指定地域值，可以限制RAM用户的地域级别访问权限。
+授予以下权限后，只允许RAM用户在华东1（杭州）地域查询和修改运维任务执行记录投递功能的配置。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs:ModifyCloudAssistantSettings",
+"ecs:DescribeCloudAssistantSettings"
+"Resource": [
+"acs:ecs:cn-hangzhou:*:servicesettings/cloudassistantdeliverysettings"
+授予以下权限后，只允许RAM用户在华东1（杭州）地域查询运维任务执行记录投递功能的配置。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs:DescribeCloudAssistantSettings"
+"Resource": [
+"acs:ecs:cn-hangzhou:*:servicesettings/cloudassistantdeliverysettings"
+查询和修改会话操作记录投递功能的配置
+授予以下权限后，允许RAM用户查询和修改会话操作记录投递功能的配置。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs:ModifyCloudAssistantSettings",
+"ecs:DescribeCloudAssistantSettings"
+"Resource": [
+"acs:ecs:*:*:servicesettings/sessionmanagerdeliverysettings"
+查询会话操作记录投递功能的配置
+授予以下权限后，允许RAM用户查询会话操作记录投递功能的配置。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs:DescribeCloudAssistantSettings"
+"Resource": [
+"acs:ecs:*:*:servicesettings/sessionmanagerdeliverysettings"
+设置会话操作记录投递功能的地域限制
+通过在权限策略元素的地域字段指定地域值，可以限制RAM用户的地域级别访问权限。
+授予以下权限后，只允许RAM用户在华东1（杭州）地域查询和修改会话操作记录投递功能的配置。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs:ModifyCloudAssistantSettings",
+"ecs:DescribeCloudAssistantSettings"
+"Resource": [
+"acs:ecs:cn-hangzhou:*:servicesettings/sessionmanagerdeliverysettings"
+授予以下权限后，只允许RAM用户在华东1（杭州）地域查询会话操作记录投递功能的配置。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs:DescribeCloudAssistantSettings"
+"Resource": [
+"acs:ecs:cn-hangzhou:*:servicesettings/sessionmanagerdeliverysettings"
+查询OSS存储空间
+使用运维任务执行记录或会话操作记录投递功能时，如果需要投递到OSS，则需要授予以下权限，允许RAM用户查询OSS存储空间。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"oss:ListBuckets"
+"Resource": "*"
+运维任务执行记录或会话操作记录投递到OSS后，为了便于进行查询、分析等操作，您还需要了解OSS的权限控制规则。更多信息，请参见OSS RAM Policy概述和OSS RAM Policy常见示例。
+查询SLS项目与日志库
+使用运维任务执行记录或会话操作记录投递功能时，如果需要投递到SLS，则需要授予以下权限，允许RAM用户查询SLS项目与对应的日志库。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"log:ListProject",
+"log:ListLogStores"
+"Resource": "*"
+运维任务执行记录或会话操作记录投递到SLS后，为了便于进行查询、分析等操作，您还需要了解SLS的权限控制规则。更多信息，请参见SLS鉴权规则概览。
+托管实例自定义策略示例
+注销托管实例
+相关API：DeregisterManagedInstance
+授予以下权限后，允许RAM用户注销任意托管实例。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs:DeregisterManagedInstance"
+"Resource": [
+"acs:ecs:*:*:instance/*"
+通过在Resource列表中设置实例ID，授予以下权限后，RAM用户只能注销指定托管实例。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs:DeregisterManagedInstance"
+"Resource": [
+"acs:ecs:*:*:instance/i-instancexxx00a",
+"acs:ecs:*:*:instance/i-instancexxx00b"
+查询托管实例
+相关API：DescribeManagedInstances
+授予以下权限后，允许RAM用户查询任意托管实例的信息。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs:DescribeManagedInstances"
+"Resource": [
+"acs:ecs:*:*:instance/*"
+通过在Resource列表中设置实例ID，授予以下权限后，RAM用户只能查询指定托管实例的信息。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs:DescribeManagedInstances"
+"Resource": [
+"acs:ecs:*:*:instance/i-instancexxx00a",
+"acs:ecs:*:*:instance/i-instancexxx00b"
+创建托管实例激活码
+相关API：CreateActivation
+RAM用户至少需要以下权限，才能创建阿里云托管实例激活码，用于将非阿里云服务器注册为阿里云托管实例。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs:CreateActivation"
+"Resource": [
+"acs:ecs:*:*:activation/*"
+禁用托管实例激活码
+相关API：DisableActivation
+授予以下权限后，允许RAM用户禁用任意阿里云托管实例激活码。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs:DisableActivation"
+"Resource": [
+"acs:ecs:*:*:activation/*"
+通过在Resource列表中设置实例ID，授予以下权限后，RAM用户只能禁用指定阿里云托管实例激活码。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs:DisableActivation"
+"Resource": [
+"acs:ecs:*:*:activation/*****-*****A",
+"acs:ecs:*:*:activation/*****-*****B"
+查询托管实例激活码
+相关API：DescribeActivations
+授予以下权限后，允许RAM用户查询已创建的托管实例激活码以及激活码的使用情况。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs:DescribeActivations"
+"Resource": [
+"acs:ecs:*:*:activation/*"
+通过在Resource列表中设置实例ID，授予以下权限后，RAM用户只能查询已创建的指定托管实例激活码以及激活码的使用情况。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs:DescribeActivations"
+"Resource": [
+"acs:ecs:*:*:activation/*****-*****A",
+"acs:ecs:*:*:activation/*****-*****B"
+删除托管实例激活码
+相关API：DeleteActivation
+授予以下权限后，允许RAM用户删除任意未被使用的托管实例激活码。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs:DeleteActivation"
+"Resource": [
+"acs:ecs:*:*:activation/*"
+通过在Resource列表中设置实例ID，授予以下权限后，RAM用户只能删除指定的未被使用的托管实例激活码。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs:DeleteActivation"
+"Resource": [
+"acs:ecs:*:*:activation/*****-*****A",
+"acs:ecs:*:*:activation/*****-*****B"
+云助手Agent升级配置自定义策略示例
+相关API：修改云助手服务配置、查询云助手服务配置。
+查询和修改云助手Agent升级配置
+授予以下权限后，允许RAM用户查询和修改云助手Agent升级配置。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs:ModifyCloudAssistantSettings",
+"ecs:DescribeCloudAssistantSettings"
+"Resource": [
+"acs:ecs:*:*:servicesettings/AgentUpgradeConfig"
+查询云助手Agent升级配置
+授予以下权限后，允许RAM用户查询云助手Agent升级配置。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs:DescribeCloudAssistantSettings"
+"Resource": [
+"acs:ecs:*:*:servicesettings/AgentUpgradeConfig"
+Session Manager自定义策略示例
+相关API：开始终端会话、查看Session Manager会话历史记录。
+创建和查询会话管理（Session Manager）
+授予以下权限后，允许RAM用户创建和查询会话管理（Session Manager）。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs:StartTerminalSession",
+"ecs:DescribeTerminalSessions"
+"Resource": [
+"acs:ecs:*:*:instance/*"
+通过在Resource列表中设置实例ID，授予以下权限后，RAM用户只能给指定实例创建Session Manager，查询指定实例的Session Manager记录。
+"Version": "1",
+"Statement": [
+"Effect": "Allow",
+"Action": [
+"ecs:StartTerminalSession",
+"ecs:DescribeTerminalSessions"
+"Resource": [
+"acs:ecs:*:*:instance/i-instancexxx00a",
+"acs:ecs:*:*:instance/i-instancexxx00b"

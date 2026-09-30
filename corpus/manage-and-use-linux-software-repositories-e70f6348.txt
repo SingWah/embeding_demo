@@ -1,0 +1,579 @@
+# 为Linux实例添加或修复阿里云软件源及使用包管理工具进行软件包管理
+> https://help.aliyun.com/zh/ecs/user-guide/manage-and-use-linux-software-repositories
+
+在Linux系统中，软件包通常存放于软件源（Repository）中。添加软件源后，您可以利用Linux系统提供的包管理工具查找、安装或更新软件源中包含的软件，从而快速完成系统运维或满足应用开发需求。本文以添加阿里云软件源为例，为您介绍在不同Linux发行版本上管理及使用软件源的操作步骤。
+背景信息
+不同软件源的访问速度会受到地域及距离等因素的影响，阿里巴巴开源镜像站依托阿里云的技术能力，为互联网用户提供免费、高速的一站式镜像服务，提供包括CentOS、Debian、Ubuntu、Fedora及openSUSE等主流发行版的软件源镜像。该软件源对阿里云用户和非阿里云用户均免费开放。更多信息，请访问阿里巴巴开源镜像站。
+重要
+对于阿里云官方提供的公共镜像，默认会将常见Linux发行版的软件源替换为阿里云镜像站ECS内网软件源地址，ECS用户可直接使用，无需手动进行配置，如果您需要为Linux发行版手动添加或修复其软件源，请参考本文进行操作 。
+本文添加的镜像地址为阿里云镜像站公网软件源地址http://mirrors.aliyun.com，适用于具备公网访问能力的Linux系统，如果您的服务器为阿里云ECS实例，建议您使用阿里云镜像站ECS内网软件源地址http://mirrors.cloud.aliyuncs.com，以获得更快的下载速度。
+为Linux实例添加阿里云软件源
+远程连接Linux实例
+具体操作，请参见使用Workbench登录Linux实例。本文以使用ecs-user用户登录目标主机为例，您也可以选择其他登录方式。
+添加阿里云软件源
+说明
+以下列举了几种常见的Linux发行版添加阿里云软件源的操作方法。在实际操作中，请以您的系统版本为准。如需为其他版本的Linux发行版添加阿里云软件源，请在阿里巴巴开源镜像站页面，找到并单击您使用的操作系统，以查看具体操作步骤。
+Alibaba Cloud Linux 3/2
+运行以下命令，备份原软件源。
+sudo mv /etc/yum.repos.d/AliYun.repo /etc/yum.repos.d/AliYun.repo.backup
+运行以下命令，重新添加软件源。
+Alibaba Cloud Linux 3
+sudo rpm -Uvh --reinstall https://mirrors.aliyun.com/alinux/3/updates/x86_64/Packages/alinux-repos-3.2104.12-1.al8.x86_64.rpm
+Alibaba Cloud Linux 2
+sudo rpm -Uvh --reinstall https://mirrors.aliyun.com/alinux/2/updates/x86_64/Packages/alinux-release-2.1903-11.al7.x86_64.rpm
+运行以下命令，生成本地缓存，加快搜索、安装软件的速度。
+sudo yum clean all && sudo yum makecache
+CentOS 8/7/6
+运行以下命令，备份原软件源。
+sudo mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup
+运行以下命令，添加阿里云软件源。
+CentOS 8
+url=https://mirrors.aliyun.com/repo/Centos-vault-8.5.2111.repo;if [ -f /usr/bin/curl ];then sudo curl -sSo /etc/yum.repos.d/Centos-vault-8.5.2111.repo $url;else sudo wget -O /etc/yum.repos.d/Centos-vault-8.5.2111.repo $url; fi
+CentOS 7
+url=https://mirrors.aliyun.com/repo/Centos-7.repo;if [ -f /usr/bin/curl ];then sudo curl -sSO $url;else sudo wget -O /etc/yum.repos.d/Centos-7.repo $url; fi
+CentOS 6
+url=https://mirrors.aliyun.com/repo/Centos-vault-6.10.repo;if [ -f /usr/bin/curl ];then sudo curl -sSL -o /etc/yum.repos.d/Centos-vault-6.10.repo $url;else sudo wget -O /etc/yum.repos.d/Centos-vault-6.10.repo $url; fi
+运行以下命令，生成本地缓存，加快搜索、安装软件的速度。
+sudo yum clean all && sudo yum makecache
+Ubuntu
+运行以下命令，备份原软件源。
+sudo mv /etc/apt/sources.list /etc/apt/sources.list.backup
+运行以下命令，新建并打开配置文件。
+sudo vim /etc/apt/sources.list
+按i进入编辑模式，为配置文件添加以下信息。
+Ubuntu 24.04
+deb https://mirrors.aliyun.com/ubuntu/ noble main restricted universe multiverse
+deb-src https://mirrors.aliyun.com/ubuntu/ noble main restricted universe multiverse
+deb https://mirrors.aliyun.com/ubuntu/ noble-security main restricted universe multiverse
+deb-src https://mirrors.aliyun.com/ubuntu/ noble-security main restricted universe multiverse
+deb https://mirrors.aliyun.com/ubuntu/ noble-updates main restricted universe multiverse
+deb-src https://mirrors.aliyun.com/ubuntu/ noble-updates main restricted universe multiverse
+# deb https://mirrors.aliyun.com/ubuntu/ noble-proposed main restricted universe multiverse
+# deb-src https://mirrors.aliyun.com/ubuntu/ noble-proposed main restricted universe multiverse
+deb https://mirrors.aliyun.com/ubuntu/ noble-backports main restricted universe multiverse
+deb-src https://mirrors.aliyun.com/ubuntu/ noble-backports main restricted universe multiverse
+Ubuntu 23.04
+deb https://mirrors.aliyun.com/ubuntu/ lunar main restricted universe multiverse
+deb-src https://mirrors.aliyun.com/ubuntu/ lunar main restricted universe multiverse
+deb https://mirrors.aliyun.com/ubuntu/ lunar-security main restricted universe multiverse
+deb-src https://mirrors.aliyun.com/ubuntu/ lunar-security main restricted universe multiverse
+deb https://mirrors.aliyun.com/ubuntu/ lunar-updates main restricted universe multiverse
+deb-src https://mirrors.aliyun.com/ubuntu/ lunar-updates main restricted universe multiverse
+# deb https://mirrors.aliyun.com/ubuntu/ lunar-proposed main restricted universe multiverse
+# deb-src https://mirrors.aliyun.com/ubuntu/ lunar-proposed main restricted universe multiverse
+deb https://mirrors.aliyun.com/ubuntu/ lunar-backports main restricted universe multiverse
+deb-src https://mirrors.aliyun.com/ubuntu/ lunar-backports main restricted universe multiverse
+Ubuntu 22.04
+deb https://mirrors.aliyun.com/ubuntu/ jammy main restricted universe multiverse
+deb-src https://mirrors.aliyun.com/ubuntu/ jammy main restricted universe multiverse
+deb https://mirrors.aliyun.com/ubuntu/ jammy-security main restricted universe multiverse
+deb-src https://mirrors.aliyun.com/ubuntu/ jammy-security main restricted universe multiverse
+deb https://mirrors.aliyun.com/ubuntu/ jammy-updates main restricted universe multiverse
+deb-src https://mirrors.aliyun.com/ubuntu/ jammy-updates main restricted universe multiverse
+# deb https://mirrors.aliyun.com/ubuntu/ jammy-proposed main restricted universe multiverse
+# deb-src https://mirrors.aliyun.com/ubuntu/ jammy-proposed main restricted universe multiverse
+deb https://mirrors.aliyun.com/ubuntu/ jammy-backports main restricted universe multiverse
+deb-src https://mirrors.aliyun.com/ubuntu/ jammy-backports main restricted universe multiverse
+Ubuntu 20.04
+deb https://mirrors.aliyun.com/ubuntu/ focal main restricted universe multiverse
+deb-src https://mirrors.aliyun.com/ubuntu/ focal main restricted universe multiverse
+deb https://mirrors.aliyun.com/ubuntu/ focal-security main restricted universe multiverse
+deb-src https://mirrors.aliyun.com/ubuntu/ focal-security main restricted universe multiverse
+deb https://mirrors.aliyun.com/ubuntu/ focal-updates main restricted universe multiverse
+deb-src https://mirrors.aliyun.com/ubuntu/ focal-updates main restricted universe multiverse
+# deb https://mirrors.aliyun.com/ubuntu/ focal-proposed main restricted universe multiverse
+# deb-src https://mirrors.aliyun.com/ubuntu/ focal-proposed main restricted universe multiverse
+deb https://mirrors.aliyun.com/ubuntu/ focal-backports main restricted universe multiverse
+deb-src https://mirrors.aliyun.com/ubuntu/ focal-backports main restricted universe multiverse
+Ubuntu 18.04
+deb https://mirrors.aliyun.com/ubuntu/ bionic main restricted universe multiverse
+deb-src https://mirrors.aliyun.com/ubuntu/ bionic main restricted universe multiverse
+deb https://mirrors.aliyun.com/ubuntu/ bionic-security main restricted universe multiverse
+deb-src https://mirrors.aliyun.com/ubuntu/ bionic-security main restricted universe multiverse
+deb https://mirrors.aliyun.com/ubuntu/ bionic-updates main restricted universe multiverse
+deb-src https://mirrors.aliyun.com/ubuntu/ bionic-updates main restricted universe multiverse
+# deb https://mirrors.aliyun.com/ubuntu/ bionic-proposed main restricted universe multiverse
+# deb-src https://mirrors.aliyun.com/ubuntu/ bionic-proposed main restricted universe multiverse
+deb https://mirrors.aliyun.com/ubuntu/ bionic-backports main restricted universe multiverse
+deb-src https://mirrors.aliyun.com/ubuntu/ bionic-backports main restricted universe multiverse
+按Esc键，输入:wq，按Enter键关闭并保存配置文件。
+运行以下命令，更新软件包信息库。
+sudo apt update
+Debian
+运行以下命令，备份原软件源。
+sudo mv /etc/apt/sources.list /etc/apt/sources.list.backup
+运行以下命令，新建并打开配置文件。
+sudo vim /etc/apt/sources.list
+按i进入编辑模式，为配置文件添加以下信息。
+Debian 11.x
+deb http://mirrors.cloud.aliyuncs.com/debian/ bullseye main non-free contrib
+deb-src http://mirrors.cloud.aliyuncs.com/debian/ bullseye main non-free contrib
+deb http://mirrors.cloud.aliyuncs.com/debian-security/ bullseye-security main
+deb-src http://mirrors.cloud.aliyuncs.com/debian-security/ bullseye-security main
+deb http://mirrors.cloud.aliyuncs.com/debian/ bullseye-updates main non-free contrib
+deb-src http://mirrors.cloud.aliyuncs.com/debian/ bullseye-updates main non-free contrib
+Debian 10.x
+deb http://mirrors.cloud.aliyuncs.com/debian-archive/debian/ buster main non-free contrib
+deb http://mirrors.cloud.aliyuncs.com/debian-archive/debian-security buster/updates main
+deb http://mirrors.cloud.aliyuncs.com/debian-archive/debian/ buster-updates main non-free contrib
+deb-src http://mirrors.cloud.aliyuncs.com/debian-archive/debian/ buster main non-free contrib
+deb-src http://mirrors.cloud.aliyuncs.com/debian-archive/debian-security buster/updates main
+deb-src http://mirrors.cloud.aliyuncs.com/debian-archive/debian/ buster-updates main non-free contrib
+Debian 9.x
+deb http://mirrors.cloud.aliyuncs.com/debian-archive/debian stretch main contrib non-free
+#deb http://mirrors.cloud.aliyuncs.com/debian-archive/debian stretch-proposed-updates main non-free contrib
+#deb http://mirrors.cloud.aliyuncs.com/debian-archive/debian stretch-backports main non-free contrib
+deb http://mirrors.cloud.aliyuncs.com/debian-archive/debian-security stretch/updates main contrib non-free
+deb-src http://mirrors.cloud.aliyuncs.com/debian-archive/debian stretch main contrib non-free
+#deb-src http://mirrors.cloud.aliyuncs.com/debian-archive/debian stretch-proposed-updates main contrib non-free
+#deb-src http://mirrors.cloud.aliyuncs.com/debian-archive/debian stretch-backports main contrib non-free
+deb-src http://mirrors.cloud.aliyuncs.com/debian-archive/debian-security stretch/updates main contrib non-free
+Debian 8.x
+deb http://mirrors.cloud.aliyuncs.com/debian-archive/debian/ jessie main non-free contrib
+deb-src http://mirrors.cloud.aliyuncs.com/debian-archive/debian/ jessie main non-free contrib
+按Esc键，输入:wq，按Enter键关闭并保存配置文件。
+运行以下命令，更新软件包信息库。
+sudo apt update
+Fedora
+运行以下命令，备份原软件源。
+sudo mv /etc/yum.repos.d/fedora.repo /etc/yum.repos.d/fedora.repo.backup
+sudo mv /etc/yum.repos.d/fedora-updates.repo /etc/yum.repos.d/fedora-updates.repo.backup
+运行以下命令，添加阿里云Fedora软件源。
+url=http://mirrors.aliyun.com/repo/fedora.repo;if [ -f /usr/bin/curl ];then sudo curl -sSO $url;else sudo wget -O /etc/yum.repos.d/fedora.repo $url; fi
+运行以下命令，添加阿里云fedora-updates软件源。
+url=http://mirrors.aliyun.com/repo/fedora-updates.repo;if [ -f /usr/bin/curl ];then sudo curl -sSO $url;else sudo wget -O /etc/yum.repos.d/fedora-updates.repo $url; fi
+运行以下命令，生成本地缓存。
+sudo yum clean all && sudo yum makecache
+openSUSE 15.6
+运行以下命令，备份原软件源。
+sudo rename '.repo' '.repo.backup' /etc/zypp/repos.d/openSUSE*.repo
+运行以下命令，添加阿里云软件源。
+sudo zypper addrepo -f http://mirrors.aliyun.com/opensuse/distribution/leap/15.6/repo/oss/ openSUSE-15.6-Oss
+sudo zypper addrepo -f http://mirrors.aliyun.com/opensuse/distribution/leap/15.6/repo/non-oss/ openSUSE-15.6-Non-Oss
+sudo zypper addrepo -f http://mirrors.aliyun.com/opensuse/update/leap/15.6/oss/ openSUSE-15.6-Update-Oss
+sudo zypper addrepo -f http://mirrors.aliyun.com/opensuse/update/leap/15.6/non-oss/ openSUSE-15.6-Update-Non-Oss
+运行以下命令，生成本地缓存。
+sudo zypper ref
+使用包管理工具管理软件
+在Linux系统中，您可以使用包管理工具对软件源中包含的软件进行管理。常见的包管理工具包括yum、dnf、apt、zypper等。本文为您介绍不同操作系统如何通过包管理工具查询、安装、更新和删除软件。在实际使用中，您可以按照自身需求替换示例软件包名称。
+说明
+Linux发行版中的软件包会不断更新，以添加新功能、修复错误、提供安全更新等，您可以根据自身需求选择将软件包更新至最新版本。
+Alibaba Cloud Linux / CentOS / Fedora
+查找软件包
+运行以下命令，使用yum包管理工具查找软件包。
+sudo yum search <软件包关键字>
+示例：运行以下命令，搜索包含nginx关键字的软件包。
+sudo yum search nginx
+安装软件包
+运行以下命令，使用yum包管理工具安装软件包。
+sudo yum install <软件包名称>
+示例：运行以下命令，安装nginx软件包。
+sudo yum install nginx
+重新安装已安装软件包
+运行以下命令，使用yum包管理工具重新安装已安装软件包。
+sudo yum reinstall <软件包名称>
+示例：运行以下命令，重新安装nginx软件包。
+sudo yum reinstall nginx
+更新软件包
+运行以下命令，使用yum包管理工具更新软件包。
+sudo yum update <软件包名称>
+示例：运行以下命令，更新nginx软件包。
+sudo yum update nginx
+删除软件包
+运行以下命令，使用yum包管理工具删除软件包。
+sudo yum remove <软件包名称>
+示例：运行以下命令，删除nginx软件包。
+sudo yum remove nginx
+Ubuntu / Debian
+查找软件包
+运行以下命令，使用apt包管理工具查找软件包。
+sudo apt search <软件包关键字>
+示例：运行以下命令，搜索包含nginx关键字的软件包。
+sudo apt search nginx
+安装软件包
+运行以下命令，使用apt包管理工具安装软件包。
+sudo apt install <软件包名称>
+示例：运行以下命令，安装nginx软件包。
+sudo apt install nginx
+重新安装已安装软件包
+运行以下命令，使用apt包管理工具重新安装已安装软件包。
+sudo apt install --reinstall <软件包名称>
+示例：运行以下命令，重新安装nginx软件包。
+sudo apt install --reinstall nginx
+更新软件包
+运行以下命令，使用apt包管理工具更新软件包。
+sudo apt upgrade <软件包名称>
+示例：运行以下命令，更新nginx软件包。
+sudo apt upgrade nginx
+删除软件包
+运行以下命令，使用yum包管理工具删除软件包。
+sudo apt remove <软件包名称>
+示例：运行以下命令，更新nginx软件包。
+sudo apt remove nginx
+openSUSE
+查找软件包
+运行以下命令，使用zypper包管理工具查找软件包。
+sudo zypper search <软件包关键字>
+示例：运行以下命令，搜索包含nginx关键字的软件包。
+sudo zypper search nginx
+安装软件包
+运行以下命令，使用zypper包管理工具安装软件包。
+sudo zypper install <软件包名称>
+示例：运行以下命令，安装nginx软件包。
+sudo zypper install nginx
+重新安装已安装软件包
+运行以下命令，使用zypper包管理工具重新安装已安装软件包。
+sudo zypper install --force <软件包名称>
+示例：运行以下命令，重新安装nginx软件包。
+sudo zypper install --force nginx
+更新软件包
+运行以下命令，使用zypper包管理工具更新软件包。
+sudo zypper update <软件包名称>
+示例：运行以下命令，更新nginx软件包。
+sudo zypper update nginx
+删除软件包
+运行以下命令，使用zypper包管理工具删除软件包。
+sudo zypper remove <软件包名称>
+示例：运行以下命令，更新nginx软件包。
+sudo zypper remove nginx
+常见问题
+Ubuntu 14.04系统的ECS实例无法安装OpenJDK，提示“Failed to fetch”错误怎么办？
+问题现象
+在Ubuntu 14.04系统的ECS实例内，执行如下命令安装openjdk-7-jre-headless包时提示“Failed to fetch”错误。
+apt-get install openjdk-7-jre-headless
+系统显示类似如下。
+问题原因
+Ubuntu 14.04系统连接了外部的更新软件源，导致无法安装OpenJDK。
+解决方案
+远程连接Linux实例。
+具体操作，请参见通过密码或密钥认证登录Linux实例。
+您可以尝试执行如下命令，重新安装OpenJDK。
+apt-get install openjdk-7-jre-headless --fix-missing
+CentOS 7.0系统的ECS实例使用YUM安装MySQL失败，提示“File contains no section headers.”错误怎么办？
+问题现象
+CentOS 7.0系统的ECS实例中使用Yum命令安装MySQL时报如下错误。
+File contains no section headers.
+问题原因
+软件源中未包含相关软件包。
+解决方案
+参考如下步骤，尝试切换到CentOS官方的软件源。
+远程连接Linux实例。
+具体操作，请参见通过密码或密钥认证登录Linux实例。
+修改/etc/yum.repos.d/epel.repo配置文件。
+执行如下命令，编辑/etc/yum.repos.d/epel.repo配置文件。
+vim /etc/yum.repos.d/epel.repo
+按i键进入编辑模式，将该配置文件内容修改为如下内容。
+[epel-source]
+name=Extra Packages for Enterprise Linux 7 - $basearch - Source
+#baseurl=http://download.fedoraproject.org/pub/epel/7/SRPMS
+mirrorlist=https://mirrors.fedoraproject.org/metalink?repo=epel-source-7&arch=$basearch
+failovermethod=priority
+enabled=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
+gpgcheck=1
+[epel]
+name=Extra Packages for Enterprise Linux 7 - $basearch
+#baseurl=http://download.fedoraproject.org/pub/epel/7/$basearch
+mirrorlist=https://mirrors.fedoraproject.org/metalink?repo=epel-7&arch=$basearch
+failovermethod=priority
+enabled=1
+gpgcheck=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
+[epel-debuginfo]
+name=Extra Packages for Enterprise Linux 7 - $basearch - Debug
+#baseurl=http://download.fedoraproject.org/pub/epel/7/$basearch/debug
+mirrorlist=https://mirrors.fedoraproject.org/metalink?repo=epel-debug-7&arch=$basearch
+failovermethod=priority
+enabled=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
+gpgcheck=1
+编辑完成后，按Esc键退出编辑模式，然后输入:wq并按回车键保存退出。
+依次执行如下命令，使新的软件源生效。
+yum makecache
+yum repolist
+重新安装MySQL，若不再提示以上报错信息，则表示问题已修复。
+通过Apt-get安装软件时，提示“error processing package install-info (--configure）”错误怎么办？
+问题现象
+在Ubuntu系统的ECS实例中，通过Apt-get安装软件时提示“error processing package install-info (--configure）”错误。
+问题原因
+可能是由于Ubuntu软件包损坏，导致软件安装失败。
+解决方案
+请参考以下操作进行apt源更新同步，重新安装软件。
+远程连接Ubuntu实例。
+具体操作，请参见通过密码或密钥认证登录Linux实例。
+将info文件夹更名。
+mv /var/lib/dpkg/info/ /var/lib/dpkg/info.bak.old/
+新建一个新的info文件夹。
+mkdir /var/lib/dpkg/info/
+执行如下命令，进行apt源更新同步。
+apt-get update
+执行如下命令，重新安装xxxxx软件，若不再提示以上报错信息，则表示问题已修复。
+apt-get install xxxxx
+通过Apt-get安装软件或更新时，提示“Segmentation faultsts”错误怎么办？
+问题现象
+在Ubuntu系统的ECS实例中，通过Apt-get安装软件或更新时提示“Segmentation faultsts”错误。
+问题原因
+可能是由于apt的cache出现冲突，导致软件安装或更新失败。
+解决方案
+请参考以下操作进行apt源更新同步。
+远程连接Ubuntu实例。
+具体操作，请参见通过密码或密钥认证登录Linux实例。
+将/var/cache/apt/目录进行备份。
+备份完成后，执行如下命令，删除/var/cache/apt/目录中所有.bin文件。
+rm /var/cache/apt/*.bin
+执行如下命令，进行apt源更新同步。
+apt-get update
+测试是否可以正常使用apt-get。
+说明
+如果实例内存配置过低（比如内存大小只有512MB）的情况下，当提示“Segmentation faults”错误时，您还可以使用top命令检查内存使用情况，将一些非必须的进程先暂时关闭，再尝试执行apt-get。
+通过Apt-get安装软件时，提示“Reading package lists... Error!”错误怎么办？
+问题现象
+在Ubuntu系统的ECS实例中，通过Apt-get安装软件时出现类似如下报错信息。
+Reading package lists... Error! E: Encountered a section with no Package: header E: Problem with MergeList /var/lib/apt/lists/AZ.archive.ubuntu.com_ubuntu_dists_natty_main_i18n _Translation-en E: The package lists or status file could not be parsed or opened.
+问题原因
+软件包列表损坏，导致软件安装报错。
+解决方案
+请参考以下操作清除已损坏的列表，重新生成更新列表。
+执行如下命令，清除目录下已经损坏的列表。
+rm -rf /var/lib/apt/lists/*
+执行如下命令，重新生成更新列表。
+apt-get update
+再次安装软件，若不再提示以上报错信息，则表示问题已修复。
+执行apt-get install unzip或aptitude install unzip命令时，提示“Error http://mirrors.aliyun.com/ubuntu/ trusty-updates/main unzip amd64 6.0-9ubuntu1.1 404 Not Found [IP: 112.124.XXX.XXX 80]”错误怎么办？
+问题现象
+在Ubuntu系统的ECS实例中，执行apt-get install unzip或aptitude install unzip命令时，提示如下错误提示。
+Error http://mirrors.aliyun.com/ubuntu/ trusty-updates/main unzip amd64 6.0-9ubuntu1.1 404 Not Found [IP: 112.124.XXX.XXX 80]
+Error http://mirrors.aliyun.com/ubuntu/ trusty-updates/main unzip amd64 6.0-9ubuntu1.1 404 Not Found [IP: 112.124.XXX.XXX 80]
+Error http://mirrors.aliyun.com/ubuntu/ trusty-updates/main unzip amd64 6.0-9ubuntu1.1 404 Not Found [IP: 112.124.XXX.XXX 80]
+问题原因
+该问题通常是由于初始系统中的软件版本库与apt源中的版本不一致（即apt-get请求的资源在apt源中不存在）所导致的。
+解决办法
+请参考以下操作进行apt源更新同步。
+远程连接Ubuntu实例。
+具体操作，请参见通过密码或密钥认证登录Linux实例。
+执行如下命令，进行apt源更新同步。
+apt-get update
+源更新同步完成后，通过使用apt-get install命令安装所需软件。
+执行apt-get update命令时，提示“The following signatures were invalid: KEYEXPIRED 1544811256”错误怎么办？
+问题现象
+在Ubuntu系统的ECS实例中，执行apt-get update命令时，提示以下信息。
+The following signatures were invalid: KEYEXPIRED 1544811256
+问题原因
+由于使用的软件源签名到期，导致更新报错。
+解决方案
+请参考以下操作更新已过期的key。
+远程连接Ubuntu实例。
+具体操作，请参见通过密码或密钥认证登录Linux实例。
+执行以下命令，获取过期的key。
+sudo apt-key list | grep -A 1 expired
+执行以下命令，更新过期的key。
+apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys [$Key]
+说明
+[$Key]指的是之前获取到的过期的key。
+重新执行以下命令，进行apt源更新同步。
+apt-get update
+在Alibaba Cloud Linux 2系统的ECS实例中，使用docker-ce、epel等第三方YUM源安装软件失败怎么办？
+问题现象
+在符合如下条件的Alibaba Cloud Linux 2系统的ECS实例中，使用适配CentOS 7系统中的docker-ce、epel第三方YUM源，执行yum install docker-ce命令安装Docker软件包失败，并提示如下报错。
+镜像：Alibaba Cloud Linux 2.1903 LTS 64位。
+镜像ID：aliyun_2_1903_x64_20G_alibase_20210325.vhd及之前所有版本。
+Loaded plugins: fastestmirror, langpacks, update-motd
+Loading mirror speeds from cached hostfile
+* epel: mirror.sjtu.edu.cn
+https://mirrors.aliyun.com/docker-ce/linux/centos/2.1903/x86_64/stable/repodata/repomd.xml: [Errno 14] HTTPS Error 404 - Not Found
+Trying other mirror.
+Downloading packages:
+docker-ce-20.10.6-3.el7.x86_64 FAILED
+https://mirrors.aliyun.com/docker-ce/linux/centos/2.1903/x86_64/stable/Packages/docker-ce-20.10.6-3.el7.x86_64.rpm: [Errno 14] HTTPS Error 404 - Not Found
+Trying other mirror.
+docker-ce-rootless-extras-20.1 FAILED
+https://mirrors.aliyun.com/docker-ce/linux/centos/2.1903/x86_64/stable/Packages/docker-ce-rootless-extras-20.10.6-3.el7.x86_64.rpm: [Errno 14] HTTPS Error 404 - Not Found
+Trying other mirror.
+Error downloading packages:
+3:docker-ce-20.10.6-3.el7.x86_64: [Errno 256] No more mirrors to try.
+docker-ce-rootless-extras-20.10.6-3.el7.x86_64: [Errno 256] No more mirrors to try.
+问题原因
+第三方YUM源仅适配CentOS 7发行版，Alibaba Cloud Linux 2操作系统与CentOS 7操作系统的$releasever值不同，导致YUM解析后的地址无效，从而下载容器软件包失败。
+说明
+YUM安装docker-ce软件包时，首先会在系统中获取版本号，即$releasever值，然后替换相应YUM源中baseurl地址对应的$releasever变量，YUM从替换后的baseurl地址中获取相关数据。由于CentOS 7操作系统的$releasever值为7，Alibaba Cloud Linux 2操作系统的$releasever值为2.1903，因此解析后的baseurl地址并非预期地址，YUM便无法从这个错误的地址中获取数据。
+解决方案
+请根据实际需求情况，选择以下对应方案进行修复。
+通过手动修改$releasever变量值进行修复。
+通过安装yum-plugin-releasever-adapter插件进行修复。
+说明
+下列操作以docker-ce源为例进行举例，如果您使用的是其他YUM源，解决方法类似。
+方案一：手动修改
+远程登录Linux实例。
+具体操作，请参见通过密码或密钥认证登录Linux实例。
+执行以下命令，编辑/etc/yum.repos.d/docker-ce.repo配置文件。
+vim /etc/yum.repos.d/docker-ce.repo
+按i键切换至编辑模式，找到docker-ce.repo文件中所有enabled=1值的源，将源中baseurl地址的$releasever变量修改为7，修改之后的内容如下所示。
+修改完成后，按下Esc键后，输入:wq并回车以保存并关闭配置文件，重新安装软件包即可。
+方案二：安装插件修改
+安装yum-plugin-releasever-adapter插件实现$releasever值的自动转换，即将2.1903转换为7。
+确认实例是否支持使用yum-plugin-releasever-adapter插件。
+yum-plugin-releasever-adapter插件目前的版本及默认支持的第三方repo如下表所示：
+插件版本
+默认支持的第三方repo
+插件的限制
+1.0-1.3
+docker-ce.repo，epel.repo
+您需要满足以下条件，才可以使用该插件：
+操作系统需要是Alibaba Cloud Linux 2。
+执行以下命令，确认系统中存在plus的repo。
+cat /etc/yum.repos.d/AliYun.repo |grep -A3 plus
+系统显示类似如下，说明存在plus的repo。
+远程登录Linux实例。
+具体操作，请参见通过密码或密钥认证登录Linux实例。
+执行以下命令，安装yum-plugin-releasever-adapter插件，插件默认对docker-ce、epel第三方YUM源中的$releasever值自动进行转换。
+yum install yum-plugin-releasever-adapter --disablerepo=* --enablerepo=plus
+若无其他的YUM源需要转换，安装插件后即可直接安装软件；若还有其他的YUM源需要转换，请按照以下方式配置：
+执行以下命令，进入指定目录。
+cd /etc/yum/pluginconf.d/
+执行以下命令，编辑releasever-adapter.conf配置文件。如果需要添加其他的YUM源，则需要将YUM源的.repo文件名添加在includes字段后面，并以逗号隔开。
+vim releasever-adapter.conf
+系统显示类似如下。
+[main]
+enabled=1
+hostfilepath=timedhosts.txt
+[releasevermapping]
+release_dict={'2.1903':'7', '3':'8'}
+[reposlist]
+includes=docker-ce.repo, epel.repo
+说明
+文件中参数的具体介绍如下所示：
+[main]：为插件的主要控制部分，控制插件的启用与否，其中enabled=1表示启用插件，enabled=0表示停用插件。
+[releasevermapping]：为待处理的$releasever的映射关系，其中2.1903映射为7，3映射为8。
+[repolist]：为需要修改的源的列表，如果需要添加其他的源，则需要将.repo文件的名字添加在include字段后面，并以逗号隔开。
+一个.repo文件中有多个可以使用的源，每个源都有一个独立的名称区分其他的源，同时一个系统中不能出现重复的名称，例如：docker-ce.repo中有[docker-ce-stable]和[docker-ce-stable-debuginfo]等源。
+请务必保证新添加到releasever-adapter.conf配置文件中的源文件名称是源文件内各个源名称的前缀，例如：docker-ce.repo源文件中包含的docker-ce-stable和docker-ce-stable-debuginfo两个源名称，均以docker-ce为前缀。
+保存配置文件，执行以下命令，即可通过docker-ce、epel第三方YUM源安装软件包。
+yum install docker-ce
+在Alibaba Cloud Linux 3系统的ECS实例中，使用docker-ce、epel等第三方DNF（YUM）源安装软件失败怎么办？
+问题现象
+在符合如下条件的Alibaba Cloud Linux 3系统的ECS实例中，执行dnf install docker-ce命令安装容器软件包失败，并出现如下报错。
+使用适配CentOS 8系统中的第三方DNF（YUM）源。
+aliyun_3_x64_20G_alibase_20210425.vhd及之前的所有镜像版本。
+系统显示报错信息类似如下。
+Docker CE Stable - x86_64
+Failed to download metadata for repo 'docker-ce-stable'
+Error: Failed to download metadata for repo 'docker-ce-stable'
+问题原因
+第三方DNF源仅适配CentOS 8发行版，而在Alibaba Cloud Linux 3中，系统的$releasever变量值与CentOS 8不同，导致DNF解析后的地址无效，进而导致下载RPM包失败。
+说明
+DNF安装docker-ce时，首先会从系统中获取版本号，即$releasever变量值，然后替换掉相应源baseurl中对应的$releasever变量值，之后DNF从替换后的baseurl中获取相关数据。由于CentOS 8的$releasever变量值为8，而Alibaba Cloud Linux 3系统的$releasever变量值为3，因此解析后的baseurl并非预期地址，DNF便无法从这个错误的地址中安装软件包。
+解决方案
+请根据实际需求情况，选择以下对应方案进行修复。
+通过手动修改$releasever变量值进行修复。
+通过安装dnf-plugin-releasever-adapter插件进行修复。
+说明
+本文以docker-ce源为例进行介绍，如果您使用的是其他DNF源，解决方案类似。
+方案一：手动修改
+远程登录Linux实例。
+具体操作，请参见通过密码或密钥认证登录Linux实例。
+执行以下命令，打开/etc/yum.repos.d/docker-ce.repo配置文件。
+vim /etc/yum.repos.d/docker-ce.repo
+按i键进入编辑模式，找到docker-ce.repo文件中所有存在enabled=1值的源，将源中baseurl的$releasever变量替换为8。
+按下Esc键后，输入:wq并按Enter键以保存关闭配置文件，重新进行安装即可。
+方案二：安装插件修改
+通过安装dnf-plugin-releasever-adapter插件实现$releasever的变量进行自动转换，即将3转换为8。
+确认实例是否支持使用dnf-plugin-releasever-adapter插件。
+dnf-plugin-releasever-adapter插件目前的版本及默认支持的第三方repo如下表所示：
+插件版本
+默认支持的第三方repo
+插件的限制
+新版本：1.0-2
+旧版本：1.0-1.3
+说明
+新版本插件和旧版本插件不兼容，新版本的配置文件名称为releasever_adapter.conf，旧版本为releasever-adapter.conf。升级版本会删除原来的配置文件。因此升级后，如果需要支持除docker-ce和epel之外的第三方源，需要重新按照步骤修改配置文件的include字段，其他的保持不变。
+docker-ce.repo，epel.repo
+您需要满足以下条件，才可以使用该插件：
+操作系统需要是Alibaba Cloud Linux 3。
+执行以下命令，确认系统中存在alinux3-plus的repo。
+cat /etc/yum.repos.d/AliYun.repo |grep -A3 alinux3-plus
+系统显示类似如下，说明存在alinux3-plus的repo。
+远程登录Linux实例。
+具体操作，请参见通过密码或密钥认证登录Linux实例。
+执行以下命令，安装dnf-plugin-releasever-adapter插件。
+说明
+目前，插件默认对docker-ce和epel源中的$releasever变量值做自动转换。
+dnf install dnf-plugin-releasever-adapter --repo alinux3-plus
+若无其他的DNF源需要转换，安装插件后即可直接安装软件；若还有其他的DNF源需要转换，请按照以下方式配置：
+执行以下命令，进入/etc/yum/pluginconf.d/目录。
+cd /etc/yum/pluginconf.d/
+执行以下命令，编辑releasever_adapter.conf配置文件。
+vim releasever_adapter.conf
+按i键切换至编辑模式，如果需要添加其他的DNF源，则需要将DNF源的.repo文件名添加在include字段后面，并以逗号隔开。
+说明
+DNF源的.repo文件一般在/etc/yum.repos.d/目录下查看。
+系统显示类似如下。
+[main]
+enabled=1
+[releasevermapping]
+2.1903 = 7
+3 = 8
+[reposlist]
+include=docker-ce.repo, epel.repo
+说明
+文件中参数的具体介绍如下所示：
+[main]：此部分为插件的主要控制部分，控制插件的启用与否，其中enabled=1表示启用插件，enabled=0表示停用插件。
+[releasevermapping]：此部分为待处理的$releasever的映射关系，其中2.1903映射为7，3映射为8。
+[repolist]：此部分为需要修改的源的列表，如果需要添加其他的源，则需要将.repo文件的名字添加在include字段后面，并以逗号隔开。
+一般来说，一个.repo文件中有多个可以使用的源，每个源都有一个独立的名称区分其他的源，一个系统中不能出现重复的名称，例如：docker-ce.repo中有[docker-ce-stable]和[docker-ce-stable-debuginfo]等源。
+修改完成后，按下Esc键，然后输入:wq并按回车，保存并关闭配置文件。
+执行如下命令，通过docker-ce、epel和您添加的源安装docker-ce软件。
+dnf install docker-ce
+在CentOS 7系统的ECS实例中，执行yum命令提示“-bash: /usr/bin/yum: /usr/bin/python: bad interpreter: No such file or directory”错误怎么办？
+问题现象
+在CentOS 7系统的ECS实例中执行yum命令时，提示以下报错信息。
+-bash: /usr/bin/yum: /usr/bin/python: bad interpreter: No such file or directory
+问题原因
+可能是由于Python异常（Python被卸载、改名或移动路径），导致执行yum命令时报错。
+说明
+yum（ Yellow dog Updater, Modified）是一个在Fedora、RedHat以及SUSE中的Shell前端软件包管理器。
+解决方案
+请参考以下操作，排查Python是否异常并修复。
+远程连接Linux实例。
+具体操作，请参见通过密码或密钥认证登录Linux实例。
+执行以下命令，查看yum路径。
+which yum
+系统返回如下信息，表示yum路径为/usr/bin/yum。
+/usr/bin/yum
+执行以下命令，查看yum内容。
+cat /usr/bin/yum
+系统返回以下信息，表示使用的Python版本路径。
+#!/usr/bin/python
+说明
+本文以/usr/bin/python路径为示例，请根据实际情况更换实际路径。
+执行以下命令，检查上述查看的路径。
+ls -al /usr/bin/python
+如果系统返回类似以下信息，则表示Python可能被卸载、改名或移动路径。
+ls: cannot access /usr/bin/python: No such file or directory
+执行以下命令，查看Python相关文件是否存在。
+rpm -qa | grep python
+正常情况下，系统返回类似以下信息。
+python-decorator-3.4.0-3.el7.noarch
+libselinux-python-2.5-14.1.el7.x86_64
+python-backports-1.0-8.el7.x86_64
+python-pyudev-0.15-9.el7.noarch
+rpm-python-4.11.3-35.el7.x86_64
+python-2.7.5-76.el7.x86_64
+.....
+Python相关文件存在：说明Python相关文件被改名或移动路径。
+执行以下命令，查看Python相关文件。
+ls -al /usr/bin/python*
+系统返回类似以下信息，提示“/usr/bin/python.bak -> python2”，则表示Python名称已被更改。
+lrwxrwxrwx 1 root root 14 Feb 15 2019 /usr/bin/python-config -> python2-config
+lrwxrwxrwx. 1 root root 7 Feb 15 2019 /usr/bin/python.bak -> python2
+lrwxrwxrwx. 1 root root 9 Feb 15 2019 /usr/bin/python2 -> python2.7
+lrwxrwxrwx 1 root root 16 Feb 15 2019 /usr/bin/python2-config -> python2.7-config
+-rwxr-xr-x. 1 root root 7216 Oct 31 2018 /usr/bin/python2.7
+-rwxr-xr-x 1 root root 1835 Oct 31 2018 /usr/bin/python2.7-config
+执行以下命令，将/usr/bin/python.bak名称改为/usr/bin/python。
+mv python.bak python
+重新执行yum命令，若不再提示以上报错信息，则表示问题已修复。
+Python相关文件不存在：说明Python被卸载。
+依次执行如下命令，安装Python。
+mkdir /python/
+yum install python --downloadonly --downloaddir=/python/
+重新执行yum命令，若不再提示以上报错信息，则表示问题已修复。

@@ -1,0 +1,54 @@
+# 封装API调用操作ECS资源
+> https://help.aliyun.com/zh/ecs/developer-reference/overview-14
+
+云服务器ECS SDK是一个简化开发工作的依赖包，通过封装底层API调用，可以让开发者在使用时轻松实现对ECS资源（如实例、安全组、镜像等）的创建、查询、更新和删除操作。ECS SDK内部处理了网络通信、请求格式化和响应解析等复杂细节，并支持多种语言，使开发者能够专注于业务逻辑，而无需关心底层实现。
+SDK代系
+ECS SDK包含V2.0 SDK和V1.0 SDK两个代系。V2.0 SDK为最新发布的代系，相较于V1.0 SDK，它支持更多的编程语言，解决了V1.0 SDK中存在的单Client线程安全问题，同时具备更强的健壮性和易用性，从而为开发者在开发过程中提供更优质的使用体验。
+说明
+推荐使用V2.0 SDK。若您使用的是V1.0 SDK，建议升级到V2.0 SDK，详细信息请参见升级V1.0 SDK指南。
+SDK下载地址
+ECS V2.0 SDK支持多种编程语言。您可以在OpenAPI门户获取SDK的安装方式，也可以在开源平台GitHub中查看源码及相关安装指引。建议使用各编程语言主流的依赖管理工具进行安装。
+语言
+SDK安装方式
+GitHub地址
+快速入门
+Java
+SDK for Java
+SDK for Java（异步）
+alibabacloud-java-sdk/ecs-20140526
+alibabacloud-java-async-sdk/ecs-20140526
+通过IDE使用阿里云Java SDK
+Go
+SDK for Go
+alibabacloud-go/ecs-20140526
+通过IDE使用阿里云Go SDK
+Python
+SDK for Python
+alibabacloud-python-sdk/ecs-20140526
+通过IDE使用阿里云Python SDK
+Node.js
+SDK for TypeScript
+alibabacloud-typescript-sdk/ecs-20140526
+通过IDE使用阿里云Node.js SDK
+C#
+SDK for C#
+alibabacloud-csharp-sdk/ecs-20140526
+通过IDE使用阿里云.NET SDK
+PHP
+SDK for PHP
+alibabacloud-sdk-php/ecs-20140526
+通过IDE使用阿里云PHP SDK
+C++
+SDK for C++
+alibabacloud-sdk-cpp/ecs-20140526
+Swift
+SDK for Swift
+alibabacloud-sdk-swift/ecs-20140526
+使用示例
+以调用查询一台或多台ECS实例的详细信息接口为例，为您演示如何使用云服务器ECS SDK。
+Java SDK调用示例
+Go SDK调用示例
+Python SDK调用示例
+Node.js SDK调用示例
+.NET SDK调用示例
+PHP SDK调用示例
